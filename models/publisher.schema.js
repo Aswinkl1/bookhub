@@ -12,7 +12,7 @@ const publisherSchema = new Schema({
     },
     isBlocked:{
         type:Boolean,
-        defualt:false
+        default:false
     },
     createdAt:{
         type:Date,

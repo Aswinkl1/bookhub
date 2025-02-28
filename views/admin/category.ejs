@@ -1,0 +1,590 @@
+
+<%-include('../../views/partials/admin/_header')%>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    :root {
+        /* --primary-color: #4361ee; */
+      --danger-color: #ef476f;
+      --success-color: #06d6a0;
+      /* --light-bg: #f8f9fa; */
+      --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --primary-color: #4361ee;
+      --light-bg: #f8f9fa;
+      --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    .action-btn {
+      border-radius: 50px;
+      padding: 6px 16px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    
+    .btn-block {
+      background-color: #fff;
+      color: var(--danger-color);
+      border: 1px solid var(--danger-color);
+    }
+    
+    .btn-block:hover {
+      background-color: var(--danger-color);
+      color: white;
+    }
+    
+    .btn-unblock {
+      background-color: #fff;
+      color: var(--success-color);
+      border: 1px solid var(--success-color);
+    }
+    
+    .btn-unblock:hover {
+      background-color: var(--success-color);
+      color: white;
+    }
+    
+    body {
+      background-color: #f5f7ff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .dashboard-card {
+      border-radius: 12px;
+      border: none;
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+      height: 100%;
+    }
+    
+    .card-header {
+      background-color: white;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      padding: 16px 20px;
+    }
+    
+    .card-title {
+      color: #2d2d2d;
+      font-weight: 600;
+      margin-bottom: 0;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+    
+    .btn-primary:hover {
+      background-color: #3351dc;
+      border-color: #3351dc;
+    }
+    
+    .table-header {
+      background-color: rgba(67, 97, 238, 0.05);
+      font-weight: 600;
+      color: #3a3a3a;
+    }
+    
+    .table>:not(caption)>*>* {
+      padding: 12px 16px;
+      vertical-align: middle;
+    }
+    
+    .action-btn {
+      padding: 5px 8px;
+      font-size: 0.85rem;
+    }
+    
+    .badge-count {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background-color: var(--primary-color);
+      color: white;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: bold;
+    }
+    
+    .search-container {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    
+    .search-input {
+      padding-left: 40px;
+      border-radius: 30px;
+      border: 1px solid #e0e0e0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    .search-icon {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6c757d;
+    }
+    
+    .category-name {
+      font-weight: 600;
+      color: #2d2d2d;
+    }
+    
+    .category-description {
+      font-size: 0.85rem;
+      color: #6c757d;
+      max-width: 220px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .status-toggle {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 28px;
+    }
+    
+    .status-toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+      background-color: #2196F3;
+    }
+    
+    input:checked + .slider:before {
+      transform: translateX(32px);
+    }
+    
+    .slider-text {
+      font-size: 10px;
+      color: white;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      text-align: center;
+      width: 30px;
+    }
+    
+    .slider-text.list {
+      right: 5px;
+    }
+    
+    .slider-text.unlist {
+      left: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-4">
+    <div class="row mb-3">
+      <div class="col">
+        <h4 class="fw-bold">Category Management</h4>
+        <p class="text-muted">Add and manage product categories</p>
+      </div>
+    </div>
+    
+    <!-- Search Bar -->
+    <div class="row mb-4">
+      <div class="col-md-6 offset-md-6">
+        <div class="search-container">
+          <i class="bi bi-search search-icon"></i>
+          <input type="text" class="form-control search-input" id="categorySearch" placeholder="Search categories..." onkeyup="searchCategories()">
+        </div>
+      </div>
+    </div>
+    
+    <div class="row g-4">
+      <!-- Add Category Form (Left Side) -->
+      <div class="col-md-4">
+        <div class="dashboard-card card">
+          <div class="card-header">
+            <h5 class="card-title">Add New Category</h5>
+          </div>
+          <div class="card-body">
+            <form id="categoryForm" method="post" action="/admin/addCategory"  onsubmit="handleFormSubmit(event)">
+                <div id="name-error" class="error-message"></div>
+              <div class="mb-3">
+                <label for="categoryName" class="form-label">Category Name</label>
+                <input type="text" class="form-control" id="name" placeholder="Enter category name" required>
+              </div>
+              <div id="description-error" class="error-message"></div>
+
+              <div class="mb-3">
+                <label for="categoryDescription" class="form-label">Description</label>
+                <textarea class="form-control" id="description" rows="3" placeholder="Enter category description"></textarea>
+              </div>
+              <!-- <div class="row mb-3">
+                <div class="col">
+                  <label for="offerPrice" class="form-label">Offer Price</label>
+                  <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input type="number" class="form-control" id="offerPrice" placeholder="0.00">
+                  </div>
+                </div>
+                <div class="col">
+                  <label for="offerPercentage" class="form-label">Offer %</label>
+                  <div class="input-group">
+                    <input type="number" class="form-control" id="offerPercentage" placeholder="0">
+                    <span class="input-group-text">%</span>
+                  </div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label d-block">Status</label>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="statusRadio" id="statusActive" value="Active" checked>
+                  <label class="form-check-label" for="statusActive">Active</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="statusRadio" id="statusInactive" value="Inactive">
+                  <label class="form-check-label" for="statusInactive">Inactive</label>
+                </div>
+              </div> -->
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary" >
+                  <i class="bi bi-plus-circle me-2"></i>Add Category
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Category Listing (Right Side) -->
+      <div class="col-md-8">
+        <div class="dashboard-card card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title">Categories</h5>
+            <div class="position-relative">
+              <span class="badge-count" id="categoryCount">3</span>
+              <button class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-funnel me-1"></i>Filter
+              </button>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="table mb-0" id="categoryTable">
+              <thead>
+                <tr class="table-header">
+                  <th width="25%">Name & Description</th>
+                  <th>Offer Price</th>
+                  <th>Offer %</th>
+                  <th>Status</th>
+                  <th>List/Unlist</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% cat.reverse().forEach((category,index)=>{%>
+                <tr>
+                  <td>
+                    <div>
+                      <div class="category-name"><%=category.name%></div>
+                      <div class="category-description text-truncate"><%=category.description%></div>
+                    </div>
+                  </td>
+                  <td>$299.99</td>
+                  <td>15%</td>
+                  <% if(category.isListed == false){%>
+                  <td><span class="badge bg-danger">unlist</span></td>
+                  <% }else {%>
+                  <td><span class="badge bg-success">list</span></td>
+                  <% } %>
+
+
+                  <% if(category.isListed == false){%>
+
+                    <td>
+                      <a href="/admin/listCategory?id=<%=category._id%>" class="btn action-btn btn-unblock" >
+                        <i class="bi bi-slash-circle me-1"></i>List
+                      </a>
+                    </td>
+                  
+                  <% }else {%>
+                    <td>
+                      <a href="/admin/unListCategory?id=<%=category._id%>"class="btn action-btn btn-block" >
+                        <i class="bi bi-check-circle me-1"></i>Unlist
+                      </a>
+                    </td>
+                    <% } %>
+                  <td>
+                    <a href="/admin/editCategory?id=<%=category._id%>" class="btn btn-sm btn-outline-primary action-btn">
+                      <i class="bi bi-pencil"></i> Edit
+                    </a>
+                  </td>
+                </tr>
+                
+                <%})%>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+   <!-- Pagination -->
+   <div class="p-3 bg-white border-top">
+    <nav aria-label="Customer list pagination">
+      <ul class="pagination custom-pagination justify-content-center mb-0">
+        <!-- <li class="page-item disabled">
+          <a class="page-link" href="#" tabindex="-1"><i class="bi bi-chevron-left"></i></a>
+        </li> -->
+
+        <% for(let i=1;i<=totalPages;i++){%>
+        <li class="page-item <%= (i===currentPage)?'active':'' %>">
+          <a class="page-link" href="?page=<%=i%>"> <%= i%></a>
+        </li>
+        <%}%>
+
+        <!-- <li class="page-item">
+          <a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a>
+        </li> -->
+      </ul>
+    </nav>
+  </div>
+</div>
+
+  <!-- Bootstrap JS Bundle with Popper -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- JavaScript for adding categories and search -->
+  <!-- <script>
+    function addCategory() {
+      const categoryName = document.getElementById('categoryName').value;
+      const categoryDescription = document.getElementById('categoryDescription').value;
+      const offerPrice = document.getElementById('offerPrice').value;
+      const offerPercentage = document.getElementById('offerPercentage').value;
+      const statusActive = document.getElementById('statusActive').checked;
+      
+      if (!categoryName) {
+        alert('Please enter a category name');
+        return;
+      }
+      
+      // Create new row
+      const table = document.getElementById('categoryTable');
+      const newRow = table.insertRow(-1);
+      
+      // Create cells with category info
+      const nameCell = newRow.insertCell(0);
+      nameCell.innerHTML = `
+        <div>
+          <div class="category-name">${categoryName}</div>
+          <div class="category-description">${categoryDescription || 'No description'}</div>
+        </div>
+      `;
+      
+      // Create offer price cell
+      const priceCell = newRow.insertCell(1);
+      priceCell.innerText = offerPrice ? `$${offerPrice}` : '-';
+      
+      // Create offer percentage cell
+      const percentageCell = newRow.insertCell(2);
+      percentageCell.innerText = offerPercentage ? `${offerPercentage}%` : '-';
+      
+      // Create status cell
+      const statusCell = newRow.insertCell(3);
+      statusCell.innerHTML = statusActive ? 
+        '<span class="badge bg-success">Active</span>' : 
+        '<span class="badge bg-secondary">Inactive</span>';
+      
+      // Create list/unlist toggle cell
+      const toggleCell = newRow.insertCell(4);
+      toggleCell.innerHTML = `
+        <label class="status-toggle">
+          <input type="checkbox" ${statusActive ? 'checked' : ''}>
+          <span class="slider">
+            <span class="slider-text list">LIST</span>
+            <span class="slider-text unlist">UNLIST</span>
+          </span>
+        </label>
+      `;
+      
+      // Create actions cell
+      const actionsCell = newRow.insertCell(5);
+      actionsCell.innerHTML = `
+        <button class="btn btn-sm btn-outline-primary action-btn">
+          <i class="bi bi-pencil"></i> Edit
+        </button>
+      `;
+      
+      // Update category count
+      const countElement = document.getElementById('categoryCount');
+      countElement.innerText = parseInt(countElement.innerText) + 1;
+      
+      // Reset form
+      document.getElementById('categoryForm').reset();
+      
+      // Show success message
+      alert(`Category "${categoryName}" added successfully!`);
+    }
+    
+    function searchCategories() {
+      const input = document.getElementById('categorySearch');
+      const filter = input.value.toUpperCase();
+      const table = document.getElementById('categoryTable');
+      const rows = table.getElementsByTagName('tr');
+      
+      // Loop through all table rows, starting from index 1 to skip the header
+      for (let i = 1; i < rows.length; i++) {
+        const nameCell = rows[i].getElementsByTagName('td')[0];
+        if (nameCell) {
+          const nameElement = nameCell.getElementsByClassName('category-name')[0];
+          const descElement = nameCell.getElementsByClassName('category-description')[0];
+          const nameText = nameElement.textContent || nameElement.innerText;
+          const descText = descElement.textContent || descElement.innerText;
+          
+          if (nameText.toUpperCase().indexOf(filter) > -1 || descText.toUpperCase().indexOf(filter) > -1) {
+            rows[i].style.display = '';
+          } else {
+            rows[i].style.display = 'none';
+          }
+        }
+      }
+    }
+  </script> -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script>
+    function handleFormSubmit(event){
+        console.log("hofo")
+        event.preventDefault();
+        
+        if(!validateForm()){
+            return
+        }
+        const name = document.getElementById("name").value
+        console.log(name);
+        
+        const description = document.getElementById("description").value
+        fetch('/admin/addCategory',{
+            method:"POST",
+            headers:{'content-type':'application/json'},
+            body:JSON.stringify({name,description})
+        }).then((response)=>{
+            if(!response.ok){
+                return response.json().then(err=>{
+                    throw new Error(err.error)
+                })
+            }
+            console.log("success")
+            return response.json();
+        }).then(data =>{
+            Swal.fire({
+                    icon:"success",
+                    title:"done",
+                    text:data.message ,
+                    timer:2000
+                    // showCloseButton: true, 
+                    // confirmButtonText: "Ok",
+                      
+                }).then((res)=>{
+                    
+                        location.reload();
+                
+                })
+            
+        }).catch(error=>{
+            if(error.message === "Category already exists"){
+
+            
+                Swal.fire({
+                    icon:"error",
+                    title:"Ooops",
+                    text:"Category already exists"      
+                })
+            }else{
+                Swal.fire({
+                    icon:"error",
+                    title:"Ooops",
+                    text:"An error occured while adding the category"      
+                })
+
+            }
+        })
+    }
+
+        function validateForm(){
+            clearErrorMessages();
+            const name = document.getElementById("name").value.trim()
+            const description = document.getElementById("description").value.trim()
+            isValid = true
+            console.log("val")
+            if(name ===""){
+                displayErrormessage("name-error","Please enter a name")
+                isValid = false
+            }
+            else if(!/^[a-zA-Z\s]+$/.test(name)){
+                displayErrormessage("name-error","category name should contain only alphabetic characters")
+                isValid = false
+
+            }
+
+            if(description == ""){
+                displayErrormessage("description-error","Please enter a description")
+                isValid = false
+            }
+            return isValid
+        }
+
+        function displayErrormessage(elementId,message){
+            var errorElement = document.getElementById(elementId)
+            console.log(errorElement)
+            errorElement.innerHTML = `
+            <div class="alert alert-danger" role="alert">
+                                    ${message}
+            </div>
+            `
+
+
+        }
+
+        function clearErrorMessages(elementId,message){
+            var errorElement = document.getElementsByClassName("error-message")
+            Array.from(errorElement).forEach(ele=>{
+                ele.innerHTML = ""
+            })
+        }
+    
+
+  </script>
+<%-include('../../views/partials/admin/_footer')%>

@@ -14,7 +14,7 @@ const productSchema = new Schema({
     category:{
         type:Schema.Types.ObjectId,
         ref:'Category',
-        required:true
+        // required:true 
     },
     regularPrice:{
         type:Number,
@@ -43,6 +43,14 @@ const productSchema = new Schema({
     status:{
         type:String,
         enum:["Available","out of stock"]
+    },
+    authorname:{
+        type:String,
+        required:true
+    },
+    language:{
+        type:String,
+        required:true
     }
 },{timestamps:true});
 

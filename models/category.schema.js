@@ -14,7 +14,7 @@ const categorySchema = new Schema({
     },
     isListed:{
         type:Boolean,
-        defualt:true
+        default:true
     },
     categoryOffer:{
         type:Number,

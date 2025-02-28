@@ -1,0 +1,323 @@
+
+<%-include('../../views/partials/admin/_header')%>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --danger-color: #ef476f;
+      --success-color: #06d6a0;
+      --light-bg: #f8f9fa;
+      --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    
+    body {
+      background-color: #f5f7ff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .dashboard-card {
+      border-radius: 12px;
+      border: none;
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+    }
+    
+    .dashboard-header {
+      background-color: white;
+      padding: 20px 25px;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .table-header {
+      background-color: rgba(67, 97, 238, 0.05);
+      font-weight: 600;
+      color: #3a3a3a;
+    }
+    
+    .custom-search {
+      border-radius: 50px;
+      padding-left: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid #e0e0e0;
+    }
+    
+    .custom-search-btn {
+      border-radius: 0 50px 50px 0;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+    }
+    
+    .custom-search-btn:hover {
+      background-color: #3351dc;
+      color: white;
+    }
+    
+    .status-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 8px;
+    }
+    
+    .status-active {
+      background-color: var(--success-color);
+    }
+    
+    .status-blocked {
+      background-color: var(--danger-color);
+    }
+    
+    .table>:not(caption)>*>* {
+      padding: 16px 20px;
+    }
+    
+    .action-btn {
+      border-radius: 50px;
+      padding: 6px 16px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    
+    .btn-block {
+      background-color: #fff;
+      color: var(--danger-color);
+      border: 1px solid var(--danger-color);
+    }
+    
+    .btn-block:hover {
+      background-color: var(--danger-color);
+      color: white;
+    }
+    
+    .btn-unblock {
+      background-color: #fff;
+      color: var(--success-color);
+      border: 1px solid var(--success-color);
+    }
+    
+    .btn-unblock:hover {
+      background-color: var(--success-color);
+      color: white;
+    }
+    
+    .customer-name {
+      font-weight: 600;
+      color: #2d2d2d;
+    }
+    
+    .customer-email {
+      color: #666;
+      font-size: 0.9rem;
+    }
+    
+    .page-title {
+      color: #2d2d2d;
+      font-weight: 600;
+      margin-bottom: 0;
+    }
+    
+    .page-subtitle {
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+    
+    .custom-pagination .page-link {
+      border-radius: 4px;
+      margin: 0 3px;
+      color: #4361ee;
+    }
+    
+    .custom-pagination .page-item.active .page-link {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+    
+    .blocked-row {
+      background-color: rgba(239, 71, 111, 0.05);
+    }
+    
+    .customer-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background-color: #e9ecef;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-right: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-4">
+    <div class="dashboard-card card mb-4">
+      <!-- Dashboard Header -->
+      <div class="dashboard-header d-flex justify-content-between align-items-center">
+        <div>
+          <h4 class="page-title">Customer Management</h4>
+          <p class="page-subtitle mb-0">Manage and monitor customer accounts</p>
+        </div>
+        <div class="col-md-5">
+          <div class="input-group">
+            <input type="text" class="form-control custom-search" placeholder="Search by name, email or phone...">
+            <button class="btn custom-search-btn" type="button">
+              <i class="bi bi-search"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Table -->
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <tbody>
+            <tr class="table-header">
+              <td>Customer</td>
+              <td>Contact Information</td>
+              <td>Status</td>
+              <td>Action</td>
+            </tr>
+            <% for(let i=0;i<data.length;i++) {%>
+
+            
+            <tr>
+              <td>
+                <div class="d-flex align-items-center">
+                  <div class="customer-avatar">JS</div>
+                  <span class="customer-name"><%= data[i].name %></span>
+                </div>
+              </td>
+              <td>
+                <div class="d-flex flex-column">
+                  <span class="customer-email"><%= data[i].email%></span>
+                  <span class="text-muted"><%= data[i].phone%></span>
+                </div>
+              </td>
+              <% if(data[i].isBlocked == false){%>
+              <td>
+                <span class="badge bg-light text-dark">
+                  <span class="status-indicator status-active"></span>Active
+                </span>
+              </td>
+              <% }else {%>
+                <td>
+                  <span class="badge bg-light text-danger">
+                    <span class="status-indicator status-blocked"></span>Blocked
+                  </span>
+                </td>
+
+                <% } %>
+                <% if(data[i].isBlocked == false){%>
+
+              <td>
+                <a href="/admin/blockCustomer?id=<%=data[i]._id%>" class="btn action-btn btn-block" onclick="blockUser('<%=data[i].name%>')">
+                  <i class="bi bi-slash-circle me-1"></i>Block
+                </a>
+              </td>
+            </tr>
+            <% }else {%>
+              <td>
+                <a href="/admin/unBlockCustomer?id=<%=data[i]._id%>"class="btn action-btn btn-unblock" onclick="unblockUser('<%=data[i].name%>')">
+                  <i class="bi bi-check-circle me-1"></i>Unblock
+                </a>
+              </td>
+              <% } %>
+
+            <%}%>
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Pagination -->
+      <div class="p-3 bg-white border-top">
+        <nav aria-label="Customer list pagination">
+          <ul class="pagination custom-pagination justify-content-center mb-0">
+            <!-- <li class="page-item disabled">
+              <a class="page-link" href="#" tabindex="-1"><i class="bi bi-chevron-left"></i></a>
+            </li> -->
+
+            <% for(let i=1;i<=totalPages;i++){%>
+            <li class="page-item <%= (i===currentPage)?'active':'' %>">
+              <a class="page-link" href="?page=<%=i%>"> <%= i%></a>
+            </li>
+            <%}%>
+
+            <!-- <li class="page-item">
+              <a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a>
+            </li> -->
+          </ul>
+        </nav>
+      </div>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="row g-3">
+      <div class="col-md-4">
+        <div class="card dashboard-card">
+          <div class="card-body d-flex align-items-center">
+            <div class="me-3 p-3 text-primary bg-light rounded">
+              <i class="bi bi-people-fill fs-3"></i>
+            </div>
+            <div>
+              <h6 class="text-muted mb-1">Total Customers</h6>
+              <h3 class="mb-0"><%= count %></h3>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card dashboard-card">
+          <div class="card-body d-flex align-items-center">
+            <div class="me-3 p-3 text-success bg-light rounded">
+              <i class="bi bi-person-check-fill fs-3"></i>
+            </div>
+            <div>
+              <h6 class="text-muted mb-1">Active Customers</h6>
+              <h3 class="mb-0">1,187</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card dashboard-card">
+          <div class="card-body d-flex align-items-center">
+            <div class="me-3 p-3 text-danger bg-light rounded">
+              <i class="bi bi-person-x-fill fs-3"></i>
+            </div>
+            <div>
+              <h6 class="text-muted mb-1">Blocked Customers</h6>
+              <h3 class="mb-0">67</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS Bundle with Popper -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- JavaScript for the block/unblock functionality -->
+  <script>
+    function blockUser(userId) {
+      // In a real application, this would call an API
+      alert(` ${userId} blocked successfully`);
+      // Refresh the table or update the UI
+    }
+    
+    function unblockUser(userId) {
+      // In a real application, this would call an API
+      alert(` ${userId} unblocked successfully`);
+      // Refresh the table or update the UI
+    }
+  </script>
+
+<%-include('../../views/partials/admin/_footer')%>

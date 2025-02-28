@@ -20,7 +20,9 @@ const userSchema = new Schema({
     },
     googleId:{
         type:String,
-        unique:true
+        default:null
+
+
     },
     password:{
         type:String,
@@ -28,11 +30,11 @@ const userSchema = new Schema({
     },
     isBlocked:{
         type:Boolean,
-        defualt:false
+        default:false
     },
     isAdmin:{
         type:Boolean,
-        defualt:false
+        default:false
     },
     // cart:[{
     //     type:Schema.Types.ObjectId,
@@ -77,6 +79,7 @@ const userSchema = new Schema({
 })
 
 
+
 const User = mongoose.model('User',userSchema)
 
-module.exports = {User}
+module.exports = User
