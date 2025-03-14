@@ -34,7 +34,7 @@ router.get("/addProducts",productController.getProductAddPage)
 router.post("/addProducts",uploads.array("images",4),productController.addproducts)
 router.get('/products',productController.getAllProducts)
 router.get('/editProduct',productController.getEditProducts)
-
+router.post('/editProduct/:id',uploads.array("images",4),productController.postEditProduct)
 
 
 module.exports = router

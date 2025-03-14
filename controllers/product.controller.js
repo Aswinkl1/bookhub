@@ -99,7 +99,7 @@ const getAllProducts = async (req,res)=>{
             
         }).countDocuments()
         const category = await Category.find({isListed:true})
-        console.log(productData)
+        // console.log(productData)
         res.render("product-list",{
             data:productData,
             currentPage:page,
@@ -127,12 +127,115 @@ const getEditProducts = async (req,res)=>{
     }
 }
 
-
+async function postEditProduct(req, res) {
+    console.log(req.body); 
+    console.log("Processing product edit");
+    try {
+        const productId = req.params.id;
+        const productData = req.body;
+        
+        // Find the product to update
+        const existingProduct = await Product.findById(productId);
+        
+        if (!existingProduct) {
+            return res.status(404).json("Product not found");
+        }
+        
+        console.log("Existing images:", existingProduct.productImage);
+        
+        // Get all existing images from the product
+        const allExistingImages = existingProduct.productImage || [];
+        
+        // Get images that should be deleted (those explicitly marked)
+        let imagesToDelete = [];
+        if (req.body.deleteImages) {
+            // Convert to array if it's a single value
+            imagesToDelete = Array.isArray(req.body.deleteImages)
+                ? req.body.deleteImages
+                : [req.body.deleteImages];
+        }
+        console.log("Images to delete:", imagesToDelete);
+        
+        // Delete the physical files
+        for (const image of imagesToDelete) {
+            try {
+                const imagePath = path.join(__dirname, '../public/uploads/products-images', image);
+                if (fs.existsSync(imagePath)) {
+                    fs.unlinkSync(imagePath);
+                    console.log(`Deleted image: ${image}`);
+                }
+            } catch (err) {
+                console.error(`Error deleting image ${image}:`, err);
+            }
+        }
+        
+        // Get the images that should be kept
+        const imagesToKeep = allExistingImages.filter(image => !imagesToDelete.includes(image));
+        console.log("Images to keep:", imagesToKeep);
+        
+        // Process any new images
+        const newImages = [];
+        if (req.files && req.files.length > 0) {
+            for (const file of req.files) {
+                try {
+                    const originalImagePath = file.path;
+                    const resizedImagePath = path.join(__dirname, '../public/uploads/products-images', file.filename);
+                    
+                    // Resize the image
+                    await sharp(originalImagePath)
+                        .resize({ width: 440, height: 440 })
+                        .toFile(resizedImagePath);
+                    
+                    // Add to new images array
+                    newImages.push(file.filename);
+                } catch (err) {
+                    console.error(`Error processing image ${file.filename}:`, err);
+                }
+            }
+        }
+        
+        // Combine kept images and new images
+        const updatedImages = [...imagesToKeep, ...newImages];
+        console.log("Final image list:", updatedImages);
+        
+        // Get category ID
+        const categoryId = await Category.findOne({ name: productData.category });
+        if (!categoryId) {
+            return res.status(400).send("Invalid category name");
+        }
+        
+        // Update the product
+        const updatedProduct = {
+            productTitle: productData.productName,
+            description: productData.description,
+            category: categoryId._id,
+            regularPrice: productData.regularPrice,
+            salePrice: productData.salePrice || existingProduct.salePrice,
+            quantity: productData.quantity,
+            productImage: updatedImages,
+            status: productData.status || existingProduct.status,
+            authorname: productData.authorName,
+            language: productData.language,
+            updatedAt: new Date()
+        };
+        
+        await Product.findByIdAndUpdate(productId, updatedProduct);
+        
+        // Redirect to products page
+        return res.redirect("/admin/products");
+        
+    } catch (error) {
+        console.log("Error updating product");
+        console.log(error);
+        return res.redirect("/admin/pageerror");
+    }
+}
 
 module.exports = {
     getProductAddPage,
     addproducts,
     getAllProducts,
     getEditProducts,
+    postEditProduct
 
 }

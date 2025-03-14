@@ -7,9 +7,13 @@ const exp = require('constants')
 const session = require('express-session')
 const {userRouter,adminRouter} = require('./routes')
 const passport = require('./config/passport')
+const  morgan = require('morgan')
+const { url } = require('inspector')
+const mongoStore = require('connect-mongo');
 db()
 
 
+// app.use(morgan('dev'))
 app.set('view engine','ejs')
 app.set('views',[path.join(__dirname,'views/user'),path.join(__dirname,'views/admin'),path.join(__dirname,'views')])
 
@@ -18,11 +22,20 @@ app.use(session({
     secret:"secreta is myhjkfjg",
     resave:false,
     saveUninitialized:true,
+    store:  mongoStore.create({
+        mongoUrl:process.env.MONGODB_URI,
+        ttl:14 * 24 *60 *60,
+        collectionName: "sessions",
+        autoRemove:'native'
+
+    }),
+    
     cookie:{
         secure:false,
         httpOnly:true,
         maxAge:72*60*60*100
-    }
+    },
+    
 }));
 
 // app level middleware

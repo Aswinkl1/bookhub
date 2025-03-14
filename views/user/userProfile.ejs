@@ -1,0 +1,581 @@
+
+<%-include('../../views/partials/user/_header')%>
+
+
+
+<!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet"> -->
+    <!-- Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .page-header {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .profile-img-container {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            margin: 0 auto;
+        }
+        
+        .profile-img {
+            width: 180px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 5px solid white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .profile-img:hover {
+            transform: scale(1.05);
+        }
+        
+        .img-edit-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .img-edit-btn:hover {
+            background-color: #f8f9fa;
+            transform: scale(1.1);
+        }
+        
+        .profile-section {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            margin-bottom: 25px;
+        }
+        
+        .profile-section:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+        }
+        
+        .edit-btn {
+            position: absolute;
+            top: 12px;
+            right: 15px;
+            z-index: 10;
+            border-radius: 50px;
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+        
+        .edit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .list-group-item {
+            border-left: none;
+            border-right: none;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .list-group-item strong {
+            min-width: 120px;
+            color: #495057;
+        }
+        
+        .list-group-item span {
+            color: #212529;
+            font-weight: 500;
+        }
+        
+        .info-icon {
+            margin-right: 10px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: white;
+        }
+        
+        .modal-content {
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .btn {
+            border-radius: 50px;
+            padding: 0.5rem 1.5rem;
+        }
+        
+        .form-control {
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+        }
+        
+        .form-control:focus {
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        }
+    </style>
+</head>
+<%-include('../../views/partials/user/_aside')%>
+   
+    
+    <div class="col-md-8 py-3">
+        <div class=" ">
+            <div class="">
+                <!-- Profile Picture Section -->
+                <div class="text-center mb-4">
+                    <div class="profile-img-container">
+                        <img src="https://www.claudeusercontent.com/api/placeholder/180/180" alt="Profile" class="profile-img">
+                        <div class="img-edit-btn" data-bs-toggle="modal" data-bs-target="#profilePicModal">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                    </div>
+                    <h3 class="mt-3" id="display-name"><%=profile.name%></h3>
+                </div>
+                
+                <!-- First Group: Personal Information -->
+                <div class="card mb-4 profile-section">
+                    <div class="card-header bg-primary text-white">
+                        <i class="fas fa-user me-2"></i> Personal Information
+                    </div>
+                    <div class="card-body p-0">
+                        <button class="btn btn-sm btn-outline-primary edit-btn" id="edit-btn" data-bs-toggle="modal" data-bs-target="#personalInfoModal">
+                            <i class="fas fa-edit me-1"></i> Edit
+                        </button>
+                        
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <div class="info-icon bg-primary">
+                                    <i class="fas fa-id-card"></i>
+                                </div>
+                                <strong>Name:</strong> <span id="user-name"><%=profile.name %></span>
+                            </li>
+                            <li class="list-group-item">
+                                <div class="info-icon bg-primary">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <strong>Phone:</strong> <span id="user-phone"><%=profile.phone%></span>
+                            </li>
+                            <li class="list-group-item">
+                                <div class="info-icon bg-primary">
+                                    <i class="fas fa-birthday-cake"></i>
+                                </div>
+                                <strong>Date of Birth:</strong> <span id="user-dob"><%= profile.dateOfBirth.toISOString().split("T")[0].split("-").reverse().join("-") %></span>
+                            </li>
+                            <li class="list-group-item">
+                                <div class="info-icon bg-primary">
+                                    <i class="fas fa-venus-mars"></i>
+                                </div>
+                                <strong>Gender:</strong> <span id="user-gender"><%=profile.gender%></span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Second Group: Contact Information -->
+                <div class="card profile-section">
+                    <div class="card-header bg-success text-white">
+                        <i class="fas fa-envelope me-2"></i> Contact Information
+                    </div>
+                    <div class="card-body p-0">
+                        <button class="btn btn-sm btn-outline-success edit-btn" data-bs-toggle="modal" data-bs-target="#contactInfoModal">
+                            <i class="fas fa-edit me-1"></i> Edit
+                        </button>
+                        
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <div class="info-icon bg-success">
+                                    <i class="fas fa-at"></i>
+                                </div>
+                                <strong>Email:</strong> <span id="user-email"><%=profile.email%></span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for editing Profile Picture -->
+    <div class="modal fade" id="profilePicModal" tabindex="-1" aria-labelledby="profilePicModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="profilePicModalLabel">Change Profile Picture</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <img src="/api/placeholder/180/180" alt="Profile" class="profile-img mb-3">
+                    </div>
+                    <form id="profilePicForm">
+                        <div class="mb-3">
+                            <label for="profile-pic" class="form-label">Upload new picture</label>
+                            <input type="file" class="form-control" id="profile-pic" accept="image/*">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveProfilePic">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for editing Personal Information -->
+    <div class="modal fade" id="personalInfoModal" tabindex="-1" aria-labelledby="personalInfoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="personalInfoModalLabel">Edit Personal Information</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="personalInfoForm">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" name="name" id="name" onblur="validateName(event)"  value="<%=profile.name%>">
+                        </div>
+                        <div id="errorForName"></div>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" name="phone" id="phone" onblur="phoneValidationCheck(event)" maxlength="10" value="<%=profile.phone%>">
+                        </div>
+                        <div id="errorForPassword"></div>
+
+                        <div class="mb-3">
+                            <label for="dob" class="form-label">Date of Birth</label>
+                            <input type="date" class="form-control" name="dateOfBirth" id="dob" value="<%= profile.dateOfBirth.toISOString().split('T')[0]%>">
+                        </div>
+                        <input type="text" name="id" value="<%=profile._id%>" hidden id="">
+                        <div class="mb-3">
+                            <label class="form-label">Gender</label>
+                            <div class="d-flex gap-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="gender" id="Male" value="Male">
+                                    <label class="form-check-label" for="male">
+                                        Male
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="gender" id="Female" value="Female">
+                                    <label class="form-check-label" for="female">
+                                        Female
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="gender" id="Other" value="Other">
+                                    <label class="form-check-label" for="other">
+                                        Other
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancel" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="savePersonalInfo">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for otp verification Contact Information -->
+    <div class="modal fade" id="contactInfoModal" tabindex="-1" aria-labelledby="contactInfoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="contactInfoModalLabel">Edit Contact Information</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="contactInfoForm">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" name="email" id="email" value="" onblur="emailValidationCheck(event)">
+                            <input type="text" name="id" value="<%=profile._id%>" hidden>
+                        </div>
+                        <div id="errorForEmail"></div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="email-cancel-btn">Cancel</button>
+                    <button type="button" class="btn btn-success" id="saveContactInfo">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for editing Contact Information -->
+    <div class="modal fade" id="otpVerificationModal" tabindex="-1" aria-labelledby="otpVerificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="otpVerificationModalLabel">Edit Contact Information</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="otpInfoForm">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">OTP </label>
+                            <input type="number" class="form-control" name="otp" id="otp" maxlength="6" value="" onblur="">
+                            <input type="text" name="id" value="<%=profile._id%>" hidden>
+                        </div>
+                        <div id="errorForEmail"></div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="otp-cancel-btn">Cancel</button>
+                    <button type="button" class="btn btn-success" id="verifyOtp">verify</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+
+        function validateName(name) {
+            const errName = document.getElementById("errorForName")
+            const nameval = name.value || name.target.value
+        const namePattern = /^[A-Za-z\s]+$/
+        if(nameval.trim() === ""){
+            errName.innerHTML = '<p class="text-danger"><small>please enter a valid name</small></p>'
+            return false
+        }else if(!namePattern.test(nameval)){
+            errName.innerHTML = '<p class="text-danger"><small>can only contain alphabets</small></p>'
+            return false
+        }else{
+            errName.innerHTML = ""
+            return true
+        }
+            
+        }
+
+        function emailValidationCheck(email) {
+        const errEmail = document.getElementById("errorForEmail")
+        const emailVal = email.value || email.target.value
+        const emailPattern =  /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if(emailVal.trim() === "" || !emailPattern.test(emailVal)){
+            errEmail.innerHTML = '<p class="text-danger"><small>please enter a valid email</small></p>'
+            return false
+       }else{
+            errEmail.innerHTML = ""
+            return true
+        }
+    }
+
+    function phoneValidationCheck(phone){
+        const errPhone = document.getElementById("errorForPassword")
+        console.log(phone) 
+        const phonepattern = /^[6-9]\d{9}$/; // Validates a 10-digit Indian phone number starting with 6-9
+        const phoneVal = phone.value || phone.target.value
+        console.log(phoneVal)
+        if(!phonepattern.test(phoneVal)){
+            errPhone.innerHTML =  '<p class="text-danger"><small>Enter a valid  10 digits number</small></p>'
+            return false
+        }else{
+            errPhone.innerHTML = ""
+            return true
+        }
+    }
+
+
+        // Script for handling form submissions
+        document.getElementById('saveProfilePic').addEventListener('click', function() {
+            // In a real application, you would upload the file to a server
+            // For this demo, we just close the modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('profilePicModal'));
+            modal.hide();
+        });
+        
+        document.getElementById("edit-btn").addEventListener('click',()=>{
+            document.getElementById("<%=profile.gender %>").checked = true
+        })
+
+
+        document.getElementById('savePersonalInfo').addEventListener('click',async function() {
+            try{
+                
+             const name = document.getElementById("name")
+             const phone = document.getElementById("phone")
+
+                if(!validateName(name) && !phoneValidationCheck(phone)){
+                    console.log("jhghgf")
+                    return 
+                }
+            // Get form values
+            const data = new FormData(document.getElementById("personalInfoForm"))
+            let jsonData = {}
+            data.forEach((value,key)=>{
+                jsonData[key] = value
+            })
+            // send data to server using fetach
+
+           const res = await fetch("api/editprofile",{
+                method:"put",
+                headers:{'content-Type':"application/json"},
+                body:JSON.stringify(jsonData)
+            })
+            if(res.ok){
+                const response = await res.json()
+                // Update displayed values
+            document.getElementById('user-name').innerHTML = response.data.name;
+            document.getElementById('display-name').textContent = response.data.name;
+            document.getElementById('user-phone').textContent = response.data.phone;
+            console.log(response.data.dateOfBirth)
+            document.getElementById('user-dob').textContent = response.data.dateOfBirth.split("T")[0].split("-").reverse().join("-");
+            document.getElementById('user-gender').textContent = response.data.gender;
+
+            document.getElementById("cancel").click()
+          
+                
+            }else{
+                console.log(res)
+                console.log("jkdshfkj")
+            }
+        
+        }catch (error){
+            console.log(error)
+        }
+
+        });
+        
+
+        
+
+        document.getElementById('saveContactInfo').addEventListener('click',async function() {
+            // Get form value
+            const email = document.getElementById('email')
+            console.log(email)
+            if(!emailValidationCheck(email)){
+                console.log("did")
+                return
+            }
+            console.log("got it")
+            const formData = new FormData(document.getElementById("contactInfoForm"))
+            let jsonData ={}
+            formData.forEach((value,key)=>{
+                jsonData[key] = value
+            });
+
+            const responce = await fetch("api/editEmail",{
+                method:"put",
+                headers:{'content-Type':'application/json'},
+                body:JSON.stringify(jsonData)
+            })
+
+            const data = await responce.json()
+            if(responce.ok){
+                console.log(data)
+                const cancel = document.getElementById("email-cancel-btn").click()
+
+                Swal.fire({
+                position: "top",
+                icon: "success",
+                title: "Otp has send to your email",
+                showConfirmButton: false,
+                timer: 1500
+                });
+//              The JavaScript Runs Before the Modal Loads
+//              If your modal is loaded dynamically (e.g., inside fetch() or after an AJAX call), it might not exist yet when the script runs.
+//              Fix: Run JavaScript only after the modal is added to the DOM.
+                setTimeout(() => {
+                const modalElement = document.getElementById('otpVerificationModal');
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+                }, 10)  // Small delay to wait for modal to load
+                
+                
+            }else{
+                const errEmail = document.getElementById("errorForEmail")
+                errEmail.innerHTML = '<p class="text-danger"><small>Email id already existed </small></p>'
+            }
+
+        });
+
+        document.getElementById("verifyOtp").addEventListener('click',async ()=>{
+            try{
+
+            
+            console.log("hufh")
+            const formData = new FormData(document.getElementById("otpInfoForm"))
+            let jsondata = {}
+            formData.forEach((value,key)=>{
+                jsondata[key] = value
+            })
+            console.log(jsondata)
+            const responce = await fetch("api/verifyOtpForEmail",{
+                method:"PATCH",
+                headers:{"Content-Type":"application/json"},
+                body:JSON.stringify(jsondata)
+            });
+
+            const responceData = await responce.json()
+            console.log(responce.ok)
+            if(responce.ok){
+                Swal.fire({
+                title: "Email change successfully",
+                // text: "You clicked the button!",
+                icon: "success"
+                });
+                //changing the email in profile
+                document.getElementById("user-email").innerHTML = responceData.email
+                console.log(responceData.email)
+                //clicking the cancel button in modal otp
+                console.log(document.getElementById("otp-cancel-btn"))
+             
+                document.getElementById("otp-cancel-btn").click()
+                
+            }else{
+                Swal.fire({
+                icon: "error",
+                title: responce.message,
+                });
+
+            }
+        }catch (error){
+            console.log(error);
+
+        }
+        });
+    </script>
+    </body>
+
+<%-include('../../views/partials/user/_footer')%>

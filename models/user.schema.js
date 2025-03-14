@@ -12,6 +12,17 @@ const userSchema = new Schema({
         required:true,
         unique:true
     },
+    gender:{
+        type:String,
+    },
+    profilePicture:{
+        type:String,
+        required:false
+    },
+    dateOfBirth:{
+        type:Date,
+        required:false
+    },
     phone:{
         type:String,
         required:false,
@@ -21,8 +32,6 @@ const userSchema = new Schema({
     googleId:{
         type:String,
         default:null
-
-
     },
     password:{
         type:String,
@@ -36,6 +45,10 @@ const userSchema = new Schema({
         type:Boolean,
         default:false
     },
+    addresses: [{
+         type: Schema.Types.ObjectId,
+          ref: "Address"
+    }],
     // cart:[{
     //     type:Schema.Types.ObjectId,
     //     ref:'Cart'

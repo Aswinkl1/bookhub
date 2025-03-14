@@ -103,7 +103,7 @@ const postEditcategory = async (req,res)=>{
         console.log(updateCategory)
 
         if(updateCategory){
-            console.log("redire")
+            console.log("redire") 
             res.status(200).json({message:"category updated successfull",redirect:"/admin/category"})
         }else{
             console.log("else")

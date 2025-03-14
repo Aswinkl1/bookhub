@@ -30,7 +30,7 @@ const productSchema = new Schema({
     },
     quantity:{
         type:Number,
-        default:true
+        // default:true
     },
     productImage:{
         type:[String],
@@ -53,6 +53,7 @@ const productSchema = new Schema({
         required:true
     }
 },{timestamps:true});
+
 
 const product = mongoose.model('Product',productSchema)
 

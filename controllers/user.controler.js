@@ -3,18 +3,23 @@ const nodemailer =require('nodemailer')
 const env = require('dotenv').config()
 const bcrypt = require('bcrypt')
 const { json } = require('express')
+const Product = require("../models/product.schema")
 
 const HomePageLoad = async (req,res)=>{
     try{
         const userId = req.session.userId
+        const product = await Product.find()
+        console.log(product)
         // console.log(data)
         if(userId){
             const userData = await User.findOne({_id:userId});
-            res.render('home',{user:userData});
+            res.render('home',{user:userData,product:product});
         }else{
-            res.render('home');
+            
+            res.render('home',{product:product});
         }
     }catch (e){
+
         console.log("Home doesnt load ")
         
     }
@@ -66,7 +71,7 @@ async function sendVerificationEmail(email,otp) {
 
         return info.accepted.length > 0
     } catch (error) {
-        console.error("Error sednign email",error)
+        console.error("Error sending email",error);
         return false
         
     }
@@ -77,7 +82,6 @@ const postSignUp = async (req,res)=>{
     const findUser = await User.findOne({email})
     if(findUser){
         return res.render('signup',{message:"User with this email already exists"})
-        
     }
     const otp = generateOtp()
     const emailSend = sendVerificationEmail(email,otp);
@@ -109,33 +113,33 @@ const securePassword = async (password)=>{
 
 const verifyOtp = async (req,res)=>{
     try{
-        console.log(req.session)
+        console.log(req.session);
         const {otp} = req.body;
-        console.log("user otp",otp)
+        console.log("user otp",otp);
         if(otp === req.session.userOtp){
-            const user = req.session.userData
-            const passwordHash = await securePassword(user.password)
+            const user = req.session.userData;
+            const passwordHash = await securePassword(user.password);
             const saveUserData = new User({
                 name:user.name,
                 email:user.email,
                 phone:user.phone,
                 password:passwordHash
-            })
+            });
 
             await saveUserData.save();
             req.session.user = saveUserData._id;
-            res.json({success:true,redirectUrl:'/login'})
+            res.json({success:true,redirectUrl:'/login'});
 
         }else{
-            res.status(400).json({success:false,message:"Invalid OTP, Please try again"})
+            res.status(400).json({success:false,message:"Invalid OTP, Please try again"});
         }
     }catch (error){
         console.error("Error verifying OTP",error);
         res.status(500).json({
             success:false,
             message:"An error occured"
-        })
-    }
+        });
+    };
 }
 
 const resendOtp = async (req,res)=>{
@@ -151,11 +155,11 @@ const resendOtp = async (req,res)=>{
             console.log("Resend otp ",otp)
             res.status(200).json({success:true,message:"OTP resend successfully"})
         }else{
-            res.status(500).json({success:false,message:"Failed to resend OTP, Plase try again"})
+            res.status(500).json({success:false,message:"Failed to resend OTP, Please try again"})
         }
     } catch (error) {
         console.error("error resending OTP",error)
-        res.status(500).json({success:false,message:"internal server error, Plase try again"})
+        res.status(500).json({success:false,message:"internal server error, Please try again"})
 
     }
 }
@@ -212,6 +216,115 @@ const logout = async (req,res)=>{
     }
 }
 
+
+//------------------------------------------------------------- profile -----------------------------------------------------
+
+
+const getAccount = async (req,res)=>{
+    try {
+        const id = req.session.userId || "67c466bc5d269f89c3810e4e"
+    console.log(id)
+    const profileData = await User.findById(id,{
+        name:1,
+        dateOfBirth:1,
+        email:1,
+        gender:1,
+        phone:1,
+        profilePicture:1,
+        _id:1
+    }).exec()
+    console.log(profileData)
+    
+    res.render("userProfile",{profile:profileData})
+        
+    } catch (error) {
+        
+    }
+    
+
+
+}
+
+
+const editProfile = async(req,res)=>{
+    try {
+        const data = req.body;
+        console.log(req.body)
+        if(!data.id){
+            return res.status(400).json({success:false,message:"id not found"})
+        }   
+        const userData = await User.findById(data.id)
+
+        if (!userData) {
+            return res.status(404).json({ success: false, message: "User not found." });
+        }
+
+        userData.name = data.name
+        userData.gender = data.gender
+        userData.dateOfBirth = data.dateOfBirth
+        userData.phone = data.phone
+
+        await userData.save()
+        let responseData = {
+
+            name:userData.name,
+            phone:userData.phone,
+            dateOfBirth:userData.dateOfBirth,
+            id:userData._id,
+            gender:userData.gender
+
+        }
+
+        return res.status(200).json({success:true,message:"user update successfully",data:responseData})
+    } catch (error) {
+        console.log(error);
+    }
+}
+const editEmail = async (req,res)=>{
+    console.log("df")
+    const {email,id} = req.body
+    const isEmailExist = await User.findOne({email:email,_id:{$ne:id}})
+    if(isEmailExist){
+        return res.status(400).json({message:"Email already exist"})
+    }
+    const otp = generateOtp()
+    // const emailSend = sendVerificationEmail(email,otp)
+
+    // !emailSend? res.json({message:"some error occured"}) : console.log("no error occur")
+    req.session.emailOtp = otp
+    console.log(otp)
+    req.session.email = email
+    res.status(200).json({message:"otp has send to your email "})
+}
+
+
+const verifyOtpForEditEmail = async (req,res)=>{
+    try{
+    const {otp,id} = req.body
+    console.log("otp"+typeof otp)
+        console.log(typeof req.session.emailOtp)
+    if(req.session.emailOtp != otp){
+        console.log("invalid")
+        return res.status(500).json({message:"Invalid otp"})
+    }
+
+    const userData = await User.findById(id,{email:1})
+
+    if(!userData){
+        res.status(400).json({message:"user not found"})
+    }
+    userData.email = req.session.email
+
+    await userData.save()
+
+
+    res.status(200).json({email:req.session.email})
+    }catch (error){
+        console.log(error)
+    }
+
+
+}
 module.exports = {
     HomePageLoad,
     pageNotFound,
@@ -222,7 +335,10 @@ module.exports = {
     resendOtp,
     postLoginPage,
     logout,
-
+    getAccount,
+    editProfile,
+    editEmail,
+    verifyOtpForEditEmail
 
 
 }
