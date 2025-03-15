@@ -8,6 +8,9 @@ const multer = require('multer')
 const storage = require('../helpers/multer')
 const uploads = multer({storage:storage})
 const productController = require('../controllers/product.controller')
+const coupon = require("../controllers/coupon.controller")
+
+
 router.get('/login',controller.loadLogin)
 
 router.post('/login',controller.postLogin)
@@ -36,5 +39,8 @@ router.get('/products',productController.getAllProducts)
 router.get('/editProduct',productController.getEditProducts)
 router.post('/editProduct/:id',uploads.array("images",4),productController.postEditProduct)
 
+
+// coupon
+router.get("/coupon",coupon.loadCouponPage)
 
 module.exports = router

@@ -1,0 +1,408 @@
+<%-include('../../views/partials/admin/_header')%>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Bootstrap Theme -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/5.3.0/pulse/bootstrap.min.css" rel="stylesheet">
+    <!-- DataTables CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+
+    
+<!-- Main Content -->
+ 
+<div class="container">
+       
+
+    <!-- Search and Filter -->
+    <div class="card border-0 shadow-sm rounded-3 mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                        <input type="text" class="form-control border-start-0" placeholder="Search coupons...">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-primary rounded-pill">
+                            <i class="fas fa-filter me-1"></i>Filter
+                        </button>
+                        <select class="form-select">
+                            <option selected>Status: All</option>
+                            <option>Status: Active</option>
+                            <option>Status: Inactive</option>
+                        </select>
+                        <select class="form-select">
+                            <option selected>Sort By: Newest</option>
+                            <option>Sort By: Expiry</option>
+                            <option>Sort By: Value</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Tags -->
+    <div class="d-flex flex-wrap gap-2 mb-4">
+        <span class="badge bg-primary rounded-pill px-3 py-2">
+            <i class="fas fa-tag me-1"></i>All Coupons
+        </span>
+        <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+            <i class="fas fa-check me-1"></i>Active
+        </span>
+        <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+            <i class="fas fa-times me-1"></i>Inactive
+        </span>
+        <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+            <i class="fas fa-clock me-1"></i>Expiring Soon
+        </span>
+        <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+            <i class="fas fa-percentage me-1"></i>High Value
+        </span>
+    </div>
+
+    <!-- Coupons Table -->
+    <button type="button" class="btn btn-primary btn-add-coupon" data-bs-toggle="modal" data-bs-target="#addCouponModal">
+        <i class="fas fa-plus"></i> Add New Coupon
+    </button>
+    <div class="card border-0 shadow-sm rounded-3 mb-4">
+      <div class="card-header bg-white py-3">
+          <h5 class="card-title mb-0">
+              <i class="fas fa-list text-primary me-2"></i>All Coupons
+          </h5>
+      </div>
+      <div class="card-body">
+          <div class="table-responsive">
+              <table id="couponsTable" class="table table-hover">
+                  <thead class="table-light">
+                      <tr>
+                          <th>Description</th>
+                          <th>Code</th>
+                          <th>Discount</th>
+                          <th>Min Amount</th>
+                          <th>Max Discount</th>
+                          <th>Expiry Date</th>
+                          <th>Status</th>
+                          <th>Actions</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr class="align-middle">
+                          <td>Spring Sale</td>
+                          <td>
+                              <span class="badge bg-light text-dark fw-normal px-3 py-2 rounded-3">
+                                  SPRING25
+                              </span>
+                          </td>
+                          <td>
+                              <span class="badge bg-success px-3 py-2 rounded-pill">25%</span>
+                          </td>
+                          <td>$50.00</td>
+                          <td>$100.00</td>
+                          <td>
+                              <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill">
+                                  <i class="fas fa-clock me-1"></i>2025-06-30
+                              </span>
+                          </td>
+                          <td>
+                              <div class="form-check form-switch">
+                                  <input class="form-check-input" type="checkbox" role="switch" id="status1" checked>
+                                  <label class="form-check-label" for="status1">Active</label>
+                              </div>
+                          </td>
+                          <td>
+                              <div class="btn-group">
+                                  <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addCouponModal">
+                                      <i class="fas fa-edit"></i>
+                                  </button>
+                                  <button class="btn btn-sm btn-outline-danger">
+                                      <i class="fas fa-trash"></i>
+                                  </button>
+                              </div>
+                          </td>
+                      </tr>
+                      <tr class="align-middle">
+                          <td>Summer Collection</td>
+                          <td>
+                              <span class="badge bg-light text-dark fw-normal px-3 py-2 rounded-3">
+                                  SUMMER20
+                              </span>
+                          </td>
+                          <td>
+                              <span class="badge bg-success px-3 py-2 rounded-pill">20%</span>
+                          </td>
+                          <td>$75.00</td>
+                          <td>$150.00</td>
+                          <td>
+                              <span class="badge bg-warning bg-opacity-10 text-warning px-3 py-2 rounded-pill">
+                                  <i class="fas fa-clock me-1"></i>2025-04-15
+                              </span>
+                          </td>
+                          <td>
+                              <div class="form-check form-switch">
+                                  <input class="form-check-input" type="checkbox" role="switch" id="status2" checked>
+                                  <label class="form-check-label" for="status2">Active</label>
+                              </div>
+                          </td>
+                          <td>
+                              <div class="btn-group">
+                                  <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addCouponModal">
+                                      <i class="fas fa-edit"></i>
+                                  </button>
+                                  <button class="btn btn-sm btn-outline-danger">
+                                      <i class="fas fa-trash"></i>
+                                  </button>
+                              </div>
+                          </td>
+                      </tr>
+                      <tr class="align-middle">
+                          <td>New Year Special</td>
+                          <td>
+                              <span class="badge bg-light text-dark fw-normal px-3 py-2 rounded-3">
+                                  NEWYEAR30
+                              </span>
+                          </td>
+                          <td>
+                              <span class="badge bg-success px-3 py-2 rounded-pill">30%</span>
+                          </td>
+                          <td>$100.00</td>
+                          <td>$200.00</td>
+                          <td>
+                              <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill">
+                                  <i class="fas fa-times-circle me-1"></i>2025-01-15
+                              </span>
+                          </td>
+                          <td>
+                              <div class="form-check form-switch">
+                                  <input class="form-check-input" type="checkbox" role="switch" id="status3">
+                                  <label class="form-check-label" for="status3">Inactive</label>
+                              </div>
+                          </td>
+                          <td>
+                              <div class="btn-group">
+                                  <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addCouponModal">
+                                      <i class="fas fa-edit"></i>
+                                  </button>
+                                  <button class="btn btn-sm btn-outline-danger">
+                                      <i class="fas fa-trash"></i>
+                                  </button>
+                              </div>
+                          </td>
+                      </tr>
+                      <tr class="align-middle">
+                          <td>Weekend Flash Sale</td>
+                          <td>
+                              <span class="badge bg-light text-dark fw-normal px-3 py-2 rounded-3">
+                                  WEEKEND15
+                              </span>
+                          </td>
+                          <td>
+                              <span class="badge bg-success px-3 py-2 rounded-pill">15%</span>
+                          </td>
+                          <td>$25.00</td>
+                          <td>$75.00</td>
+                          <td>
+                              <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill">
+                                  <i class="fas fa-clock me-1"></i>2025-07-30
+                              </span>
+                          </td>
+                          <td>
+                              <div class="form-check form-switch">
+                                  <input class="form-check-input" type="checkbox" role="switch" id="status4" checked>
+                                  <label class="form-check-label" for="status4">Active</label>
+                              </div>
+                          </td>
+                          <td>
+                              <div class="btn-group">
+                                  <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addCouponModal">
+                                      <i class="fas fa-edit"></i>
+                                  </button>
+                                  <button class="btn btn-sm btn-outline-danger">
+                                      <i class="fas fa-trash"></i>
+                                  </button>
+                              </div>
+                          </td>
+                      </tr>
+                      <tr class="align-middle">
+                          <td>Black Friday Sale</td>
+                          <td>
+                              <span class="badge bg-light text-dark fw-normal px-3 py-2 rounded-3">
+                                  BLACK50
+                              </span>
+                          </td>
+                          <td>
+                              <span class="badge bg-success px-3 py-2 rounded-pill">50%</span>
+                          </td>
+                          <td>$200.00</td>
+                          <td>$500.00</td>
+                          <td>
+                              <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill">
+                                  <i class="fas fa-times-circle me-1"></i>2024-11-30
+                              </span>
+                          </td>
+                          <td>
+                              <div class="form-check form-switch">
+                                  <input class="form-check-input" type="checkbox" role="switch" id="status5">
+                                  <label class="form-check-label" for="status5">Inactive</label>
+                              </div>
+                          </td>
+                          <td>
+                              <div class="btn-group">
+                                  <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addCouponModal">
+                                      <i class="fas fa-edit"></i>
+                                  </button>
+                                  <button class="btn btn-sm btn-outline-danger">
+                                      <i class="fas fa-trash"></i>
+                                  </button>
+                              </div>
+                          </td>
+                      </tr>
+                  </tbody>
+              </table>
+          </div>
+      </div>
+  </div>
+
+  <!-- Add/Edit Coupon Modal -->
+<div class="modal fade" id="addCouponModal" tabindex="-1" aria-labelledby="addCouponModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="addCouponModalLabel">Add New Coupon</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <form id="couponForm">
+                  <div class="row mb-3">
+                      <div class="col-md-6">
+                          <label for="description" class="form-label">Name</label>
+                          <input type="text" class="form-control" id="name" onblur="isOnlyletters(event)" placeholder="e.g. Welcome Offer" required>
+                      </div>
+                      <div id="errorForName"></div>
+
+                      <div class="col-md-6">
+                          <label for="code" class="form-label">Coupon Code</label>
+                          <input type="text" class="form-control" id="code" placeholder="e.g. WELCOME10" style="text-transform: uppercase;" required>
+                          <div class="form-text">Code should be unique and uppercase.</div>
+                      </div>
+                      <div id="errorForCouponCode"></div>
+
+                  </div>
+                  <div class="row mb-3">
+                      <div class="col-md-4">
+                          <label for="percentage" class="form-label">Discount Percentage</label>
+                          <div class="input-group">
+                              <input type="number" class="form-control" id="percentage" min="0" max="100" onblur="validationForPercentage(event)" placeholder="e.g. 10" required>
+                              <span class="input-group-text">%</span>
+                          </div>
+                      </div>
+                      <div id="errorForPercentage"></div>
+
+                      <div class="col-md-4">
+                          <label for="minAmount" class="form-label">Min Total Amount</label>
+                          <div class="input-group">
+                              <span class="input-group-text">$</span>
+                              <input type="number" class="form-control" id="minAmount" min="0" step="0.01" placeholder="e.g. 50.00" required>
+                          </div>
+                      </div>
+                      <div id="errorForMinCartAmount"></div>
+                      <div class="col-md-4">
+                          <label for="maxDiscount" class="form-label">Max Discount</label>
+                          <div class="input-group">
+                              <span class="input-group-text">$</span>
+                              <input type="number" class="form-control" id="maxDiscount" min="0" step="0.01"  placeholder="e.g. 100.00" required>
+                          </div>
+                      </div>
+                      <div id="errorForMaxDiscount"></div>
+
+                  </div>
+                  <div class="row mb-3">
+                      <div class="col-md-6">
+                          <label for="expiryDate" class="form-label">Expiry Date</label>
+                          <input type="date" class="form-control" id="expDate" required>
+                      </div>
+                      <div id="errorForExpiryDate"></div>
+
+                      <div class="col-md-6">
+                          <label for="isActive" class="form-label">Status</label>
+                          <select class="form-select" id="isActive" required>
+                              <option value="1" selected>Active</option>
+                              <option value="0">Inactive</option>
+                          </select>
+                      </div>
+                  </div>
+              </form>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-primary" id="saveCoupon" >Save Coupon</button>
+          </div>
+      </div>
+  </div>
+</div>
+</div>
+
+<!-- Bootstrap and jQuery JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+<%-include('../../views/partials/admin/_footer')%>
+
+<script>
+    document.getElementById("expDate").addEventListener("change", function() {
+    const expDate = this.value;
+    if (!isFutureDate(expDate)) {
+        alert("Expiration date must be in the future!");
+        this.value = ""; // Clear input if invalid
+    }
+});
+    function isFutureDate(expDate) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Remove time part to compare only dates
+
+    const inputDate = new Date(expDate);
+    return inputDate > today; // Check if input date is in the future
+}
+
+    
+
+    function isOnlyletters(str){
+        str = str.target.value
+        if(!(/^[A-Za-z]+$/.test(str) || /\S/.test(str))){
+        document.getElementById("errorForName").innerHTML = '<p class="text-danger"><small>please enter a valid name</small></p>'
+
+        }else{
+        document.getElementById("errorForName").innerHTML = ''
+
+        }
+    }
+
+    function validationForPercentage(num){
+        num = num.target.value
+        console.log(typeof num)
+        console.log(!(num >=0 && num <= 100))
+        if(!(num >=0 && num <= 100)){
+        document.getElementById("errorForPercentage").innerHTML = '<p class="text-danger"><small>Enter a valid percentage under 100</small></p>'
+        }else{
+        document.getElementById("errorForPercentage").innerHTML = ''
+        }
+    }
+
+document.getElementById("saveCoupon").addEventListener("click",()=>{
+    const fromData = new FormData(document.getElementById("couponForm"));
+    const jsonData = {};
+
+    fromData.forEach((value,key)=>{
+        jsonData[key] = value
+    });
+    
+
+
+})
+</script>
+

@@ -433,26 +433,26 @@
         document.getElementById('savePersonalInfo').addEventListener('click',async function() {
             try{
                 
-             const name = document.getElementById("name")
-             const phone = document.getElementById("phone")
+             const name = document.getElementById("name");
+             const phone = document.getElementById("phone");
 
                 if(!validateName(name) && !phoneValidationCheck(phone)){
                     console.log("jhghgf")
                     return 
-                }
+                };
             // Get form values
             const data = new FormData(document.getElementById("personalInfoForm"))
-            let jsonData = {}
+            let jsonData = {};
             data.forEach((value,key)=>{
                 jsonData[key] = value
-            })
-            // send data to server using fetach
+            });
 
+            // send data to server using fetch
            const res = await fetch("api/editprofile",{
                 method:"put",
                 headers:{'content-Type':"application/json"},
                 body:JSON.stringify(jsonData)
-            })
+            }) 
             if(res.ok){
                 const response = await res.json()
                 // Update displayed values
