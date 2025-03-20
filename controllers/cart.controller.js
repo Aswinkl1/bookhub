@@ -65,7 +65,6 @@ const loadcartPage = async (req,res)=>{
     console.log("hi")
     const cart = await Cart.findOne({userId:userId}).populate("items.productId","productTitle productImage status isBlocked")
     if(!cart){
-      
       return res.status(400).render("cart",{cart:[]})
     }
     console.log("hh")
@@ -108,36 +107,17 @@ const removeFromCart = async (req,res)=>{
 
 }
 
-// ✅ **4. Remove Product from Cart**
-// exports.removeFromCart = async (req, res) => {
+// exports.clearCart = async (req, res) => {
 //   try {
-//     const { productId } = req.body;
 //     const userId = req.user.id;
 
-//     const cart = await Cart.findOneAndUpdate(
-//       { user: userId },
-//       { $pull: { items: { product: productId } } },
-//       { new: true }
-//     );
+//     await Cart.findOneAndUpdate({ user: userId }, { items: [] });
 
-//     res.json({ success: true, message: "Product removed from cart.", cart });
+//     res.json({ success: true, message: "Cart cleared successfully." });
 //   } catch (error) {
 //     res.status(500).json({ success: false, message: "Internal server error.", error: error.message });
 //   }
 // };
-
-// ✅ **5. Clear Cart**
-exports.clearCart = async (req, res) => {
-  try {
-    const userId = req.user.id;
-
-    await Cart.findOneAndUpdate({ user: userId }, { items: [] });
-
-    res.json({ success: true, message: "Cart cleared successfully." });
-  } catch (error) {
-    res.status(500).json({ success: false, message: "Internal server error.", error: error.message });
-  }
-};
 
 module.exports = { 
   addTocart,

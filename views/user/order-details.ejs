@@ -1,11 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Management</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<%-include('../../views/partials/user/_header')%>
+
+
+
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -53,33 +51,34 @@
         
         <!-- Order Listing -->
         <div class="order-listing">
-            <!-- Order 1 -->
-            <div class="card order-card order-delivered mb-3">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <h5 class="card-title">Order #ORD-2023-001</h5>
-                            <p class="text-muted">March 15, 2023</p>
-                        </div>
-                        <div class="col-md-3">
-                            <span class="badge badge-delivered">Delivered</span>
-                            <p class="mt-2">Total: $249.99</p>
-                        </div>
-                        <div class="col-md-3">
-                            <p>2 items</p>
-                            <p>Est. delivery: Delivered</p>
-                        </div>
-                        <div class="col-md-3 text-end">
-                            <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#orderDetailModal" data-order-id="ORD-2023-001">View Details</a>
-                            <a href="#" class="btn btn-sm btn-outline-success" onclick="downloadInvoice('ORD-2023-001')">
-                                <i class="fas fa-file-pdf"></i> Invoice
-                            </a>
-                            <button class="btn btn-sm btn-outline-danger mt-2" data-bs-toggle="modal" data-bs-target="#returnOrderModal" data-order-id="ORD-2023-001">Return Order</button>
+            <% for(let i=0;i<orderData.length;i++){ %>
+                <!-- Order 1 -->
+                <div class="card order-card order-delivered mb-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <h5 class="card-title text-truncate">Order <%=orderData[i].orderId %></h5>
+                                <p class="text-muted"> <%=orderData[i].orderDate.toISOString().split("T")[0].split("-").reverse().join("-")%></p>
+                            </div>
+                            <div class="col-md-3">
+                                <span class="badge badge-delivered">Delivered</span>
+                                <p class="mt-2">Total: <%=orderData[i].totalPrice %></p>
+                            </div>
+                            <div class="col-md-3">
+                                <p><%=orderData[i].items.length %> items</p>
+                                <!-- <p>Est. delivery: Delivered</p> -->
+                            </div>
+                            <div class="col-md-3 text-end">
+                                <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#orderDetailModal" data-order-id="ORD-2023-001">View Details</a>
+                                <a href="#" class="btn btn-sm btn-outline-success" onclick="downloadInvoice('ORD-2023-001')">
+                                    <i class="fas fa-file-pdf"></i> Invoice
+                                </a>
+                                <button class="btn btn-sm btn-outline-danger mt-2" data-bs-toggle="modal" data-bs-target="#returnOrderModal" data-order-id="ORD-2023-001">Return Order</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            
+            <% } %>
             <!-- Order 2 -->
             <div class="card order-card order-processing mb-3">
                 <div class="card-body">
@@ -578,4 +577,5 @@
         }
     </script>
 </body>
-</html>
+
+<%-include('../../views/partials/user/_footer')%>

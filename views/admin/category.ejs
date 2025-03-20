@@ -362,7 +362,7 @@
 
    <!-- Pagination -->
    <div class="p-3 bg-white border-top">
-    <nav aria-label="Customer list pagination">
+    <nav aria-label="Customer list pagination" style="margin-bottom: 17px;">
       <ul class="pagination custom-pagination justify-content-center mb-0">
         <!-- <li class="page-item disabled">
           <a class="page-link" href="#" tabindex="-1"><i class="bi bi-chevron-left"></i></a>
@@ -385,102 +385,6 @@
   <!-- Bootstrap JS Bundle with Popper -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   
-  <!-- JavaScript for adding categories and search -->
-  <!-- <script>
-    function addCategory() {
-      const categoryName = document.getElementById('categoryName').value;
-      const categoryDescription = document.getElementById('categoryDescription').value;
-      const offerPrice = document.getElementById('offerPrice').value;
-      const offerPercentage = document.getElementById('offerPercentage').value;
-      const statusActive = document.getElementById('statusActive').checked;
-      
-      if (!categoryName) {
-        alert('Please enter a category name');
-        return;
-      }
-      
-      // Create new row
-      const table = document.getElementById('categoryTable');
-      const newRow = table.insertRow(-1);
-      
-      // Create cells with category info
-      const nameCell = newRow.insertCell(0);
-      nameCell.innerHTML = `
-        <div>
-          <div class="category-name">${categoryName}</div>
-          <div class="category-description">${categoryDescription || 'No description'}</div>
-        </div>
-      `;
-      
-      // Create offer price cell
-      const priceCell = newRow.insertCell(1);
-      priceCell.innerText = offerPrice ? `$${offerPrice}` : '-';
-      
-      // Create offer percentage cell
-      const percentageCell = newRow.insertCell(2);
-      percentageCell.innerText = offerPercentage ? `${offerPercentage}%` : '-';
-      
-      // Create status cell
-      const statusCell = newRow.insertCell(3);
-      statusCell.innerHTML = statusActive ? 
-        '<span class="badge bg-success">Active</span>' : 
-        '<span class="badge bg-secondary">Inactive</span>';
-      
-      // Create list/unlist toggle cell
-      const toggleCell = newRow.insertCell(4);
-      toggleCell.innerHTML = `
-        <label class="status-toggle">
-          <input type="checkbox" ${statusActive ? 'checked' : ''}>
-          <span class="slider">
-            <span class="slider-text list">LIST</span>
-            <span class="slider-text unlist">UNLIST</span>
-          </span>
-        </label>
-      `;
-      
-      // Create actions cell
-      const actionsCell = newRow.insertCell(5);
-      actionsCell.innerHTML = `
-        <button class="btn btn-sm btn-outline-primary action-btn">
-          <i class="bi bi-pencil"></i> Edit
-        </button>
-      `;
-      
-      // Update category count
-      const countElement = document.getElementById('categoryCount');
-      countElement.innerText = parseInt(countElement.innerText) + 1;
-      
-      // Reset form
-      document.getElementById('categoryForm').reset();
-      
-      // Show success message
-      alert(`Category "${categoryName}" added successfully!`);
-    }
-    
-    function searchCategories() {
-      const input = document.getElementById('categorySearch');
-      const filter = input.value.toUpperCase();
-      const table = document.getElementById('categoryTable');
-      const rows = table.getElementsByTagName('tr');
-      
-      // Loop through all table rows, starting from index 1 to skip the header
-      for (let i = 1; i < rows.length; i++) {
-        const nameCell = rows[i].getElementsByTagName('td')[0];
-        if (nameCell) {
-          const nameElement = nameCell.getElementsByClassName('category-name')[0];
-          const descElement = nameCell.getElementsByClassName('category-description')[0];
-          const nameText = nameElement.textContent || nameElement.innerText;
-          const descText = descElement.textContent || descElement.innerText;
-          
-          if (nameText.toUpperCase().indexOf(filter) > -1 || descText.toUpperCase().indexOf(filter) > -1) {
-            rows[i].style.display = '';
-          } else {
-            rows[i].style.display = 'none';
-          }
-        }
-      }
-    }
-  </script> -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

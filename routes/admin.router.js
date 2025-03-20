@@ -42,5 +42,8 @@ router.post('/editProduct/:id',uploads.array("images",4),productController.postE
 
 // coupon
 router.get("/coupon",coupon.loadCouponPage)
+router.post("/coupon/editCoupons",coupon.getEditCoupon)
+router.put("/coupon/editCoupons",coupon.postEditCoupon)
+router.delete("/coupon/deleteCoupon/:id",coupon.deleteCoupon)
 
 module.exports = router

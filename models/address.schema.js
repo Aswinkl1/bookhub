@@ -63,6 +63,17 @@ const addressSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
+
+
+addressSchema.pre("save",async function (next) {
+    if(this.isDefault){
+        await mongoose.model('Address').updateMany(
+            {userId:this.userId,_id:{ $ne:this._id } },
+            {$set:{ isDefault:false } }
+        )
+    }
+    
+});
 const Address = mongoose.model('Address', addressSchema);
 
 module.exports = Address;

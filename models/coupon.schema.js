@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const {Schema} = mongoose;
 
 const couponSchema = new Schema({
-    description:{
+    name:{
         type:String,
         required:true
     },
@@ -27,6 +27,11 @@ const couponSchema = new Schema({
      expiryDate:{
         type:Date,
         required:true
+     },
+     status:{
+      type:String,
+      required:true,
+      
      }
 
 });

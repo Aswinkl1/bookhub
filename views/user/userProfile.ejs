@@ -532,8 +532,6 @@
 
         document.getElementById("verifyOtp").addEventListener('click',async ()=>{
             try{
-
-            
             console.log("hufh")
             const formData = new FormData(document.getElementById("otpInfoForm"))
             let jsondata = {}
@@ -560,7 +558,7 @@
                 console.log(responceData.email)
                 //clicking the cancel button in modal otp
                 console.log(document.getElementById("otp-cancel-btn"))
-             
+
                 document.getElementById("otp-cancel-btn").click()
                 
             }else{
