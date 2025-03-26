@@ -1,0 +1,238 @@
+<%-include('../../views/partials/user/_header')%>
+
+
+
+    <main class="main">
+        <div class="page-header breadcrumb-wrap">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="/" rel="nofollow">Home</a>
+                    <span></span> Shop
+                </div>
+            </div>
+        </div>
+        <section class="mt-50 mb-50">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="shop-product-fillter">
+                            <div class="totall-product">
+                                <p> We found <strong class="text-brand">688</strong> items for you!</p>
+                            </div>
+                            <div class="sort-by-product-area">
+                                <div class="sort-by-cover mr-10">
+                                    <div class="sort-by-product-wrap">
+                                        <div class="sort-by">
+                                            <span><i class="fi-rs-apps"></i>Show:</span>
+                                        </div>
+                                        <div class="sort-by-dropdown-wrap">
+                                            <span> 50 <i class="fi-rs-angle-small-down"></i></span>
+                                        </div>
+                                    </div>
+                                    <div class="sort-by-dropdown">
+                                        <ul>
+                                            <li><a class="active" href="#">50</a></li>
+                                            <li><a href="#">100</a></li>
+                                            <li><a href="#">150</a></li>
+                                            <li><a href="#">200</a></li>
+                                            <li><a href="#">All</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="sort-by-cover">
+                                    <div class="sort-by-product-wrap">
+                                        <div class="sort-by">
+                                            <span><i class="fi-rs-apps-sort"></i>Sort by:</span>
+                                        </div>
+                                        <div class="sort-by-dropdown-wrap">
+                                            <span> Featured <i class="fi-rs-angle-small-down"></i></span>
+                                        </div>
+                                    </div>
+                                    <div class="sort-by-dropdown " id="filter">
+                                        <ul>
+                                            <li><a class="active" >Featured</a></li>
+                                            <li><a data-sort='{"salePrice":1}'>Price: Low to High</a></li>
+                                            <li><a data-sort='{"salePrice":-1}''>Price: High to Low</a></li>
+                                            <li><a data-sort='{"productTitle":1}''>name: aA to zZ</a></li>
+                                            <li><a data-sort='{"productTitle":-1}'>name: zZ to aA</a></li>
+                                            <li><a data-sort="{price:-1}">Release Date</a></li>
+                                            <li><a data-sort="{price:-1}">Release Date</a></li>
+                                            <li><a hdata-sort="{price:-1}">Avg. Rating</a></li>
+                                        </ul>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row product-grid-3" id="row-div">
+                            <div class="col-lg-3 col-md-4">
+                                <div class="product-cart-wrap mb-30">
+                                    <div class="product-img-action-wrap">
+                                        <div class="product-img product-img-zoom">
+                                            <a href="shop-product-right.html">
+                                                <img class="default-img" src="assets/imgs/shop/product-2-1.jpg" alt="">
+                                                <img class="hover-img" src="assets/imgs/shop/product-2-2.jpg" alt="">
+                                            </a>
+                                        </div>
+                                        <div class="product-action-1">
+
+                                            <a aria-label="Add To Wishlist" class="action-btn hover-up" href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>
+                                        </div>
+                                        <div class="product-badges product-badges-position product-badges-mrg">
+                                            <span class="hot">Hot</span>
+                                        </div>
+                                    </div>
+                                    <div class="product-content-wrap">
+                                        <div class="product-category">
+                                            <a href="shop-grid-right.html">Music</a>
+                                        </div>
+                                        <h2><a href="shop-product-right.html">Colorful Pattern Shirts</a></h2>
+                                        <div class="rating-result" title="90%">
+                                            <span>
+                                                <span>90%</span>
+                                            </span>
+                                        </div>
+                                        <div class="product-price">
+                                            <span>$238.85 </span>
+                                            <span class="old-price">$245.8</span>
+                                        </div>
+                                        <div class="product-action-1 show">
+                                            <a aria-label="Add To Cart" class="action-btn hover-up" href="shop-cart.html"><i class="fi-rs-shopping-bag-add"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--pagination-->
+                        <div class="pagination-area mt-15 mb-sm-5 mb-lg-0">
+                            <nav aria-label="Page navigation example">
+                                <ul class="pagination justify-content-start">
+                                    <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">02</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">03</a></li>
+                                    <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">16</a></li>
+                                    <li class="page-item"><a class="page-link" href="#"><i class="fi-rs-angle-double-small-right"></i></a></li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+
+    <script>
+        const searchBar = document.querySelector('#search-bar')
+        const filter = document.querySelector('#filter')
+        let sort = "{}"
+        let search;
+        let category;
+        
+    async function renderProductDetails(products){
+        const parent = document.getElementById("row-div")
+        parent.innerHTML = ""
+            products.forEach(product =>{
+                const element = document.createElement("div")
+                element.classList.add('col-lg-3')
+                element.classList.add('col-md-4')
+                element.innerHTML = `
+                                <div class="product-cart-wrap mb-30">
+                                    <div class="product-img-action-wrap">
+                                        <div class="product-img product-img-zoom">
+                                            <a href="/product/${product._id}">
+                                                <img class="default-img" src="/uploads/products-images/${product.productImage[0]}" alt="">
+                                                <img class="hover-img" src="/uploads/products-images/${product.productImage[1]}" alt="">
+                                            </a>
+                                        </div>
+                                        <div class="product-action-1">
+
+                                            <a aria-label="Add To Wishlist" class="action-btn hover-up" href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>
+                                        </div>
+                                        <div class="product-badges product-badges-position product-badges-mrg">
+                                            <span class="hot">Hot</span>
+                                        </div>
+                                    </div>
+                                    <div class="product-content-wrap">
+                                        <div class="product-category">
+                                            <a href="/product/${product._id}">${product.category}</a>
+                                        </div>
+                                        <h2><a href="/product/${product._id}">${product.productTitle}</a></h2>
+                                        <div class="rating-result" title="90%">
+                                            <span>
+                                                <span>90%</span>
+                                            </span>
+                                        </div>
+                                        <div class="product-price">
+                                            <span>${product.salePrice}</span>
+                                            <span class="old-price">${product.regularPrice}</span>
+                                        </div>
+                                        <div class="product-action-1 show">
+                                            <a aria-label="Add To Cart" class="action-btn hover-up" href="shop-cart.html"><i class="fi-rs-shopping-bag-add"></i></a>
+                                        </div>
+                                    </div>
+                                </div>`
+
+                parent.appendChild(element)
+
+            })
+
+
+    }
+
+    async function fetchProductDetails(search="",sort='{}',page=1){
+
+        const response = await fetch(`api/shop?search=${search}&sort=${sort}&page=${page}`,{
+            method:"GET",
+            headers:{"Content-Type":"application/json"},
+        })
+        const jsonResponse = await response.json()
+        if(response.ok){
+            renderProductDetails(jsonResponse.productsData)
+        }else{
+            alert(jsonResponse.message)
+        }
+
+    }
+
+    function debounce(func,timer){
+        let timeOut;
+        return function(...args){
+            clearTimeout(timeOut)
+            timeOut = setTimeout(() => {
+                func.apply(this,args)
+            }, timer);
+        }
+    }
+
+
+    const debouncedFetch = debounce(fetchProductDetails,500)
+
+        document.addEventListener("DOMContentLoaded",(event)=>{
+            document.getElementById("search-bar").style.visibility = ""
+                fetchProductDetails()
+
+                searchBar.addEventListener('input',(e)=>{
+                    search = e.target.value.trim()
+                    debouncedFetch(search,sort)
+                })
+                
+                console.log(filter)
+                filter.addEventListener('click',function(e) {
+                    console.log("lhk")
+                    if(e.target.tagName == "A"){
+                        e.preventDefault()
+                        document.querySelectorAll('.sort-by-dropdown a').forEach(el => el.classList.remove('active'));
+                        e.target.classList.add('active')
+                        sort = e.target.getAttribute('data-sort');
+                        debouncedFetch(search,sort)
+
+                    }
+                })
+
+                
+        })
+
+    </script>
+    <%-include('../../views/partials/user/_footer')%>

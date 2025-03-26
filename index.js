@@ -10,6 +10,7 @@ const passport = require('./config/passport')
 const  morgan = require('morgan')
 const { url } = require('inspector')
 const mongoStore = require('connect-mongo');
+const User = require('./models/user.schema')
 db()
 
 
@@ -38,6 +39,7 @@ app.use(session({
     
 }));
 
+
 // app level middleware
 
 app.use(passport.initialize())
@@ -46,10 +48,16 @@ app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use(function(req, res, next) {
-//     res.locals.msg = req.session.msg || ""
-//     next();
-//   });
+app.use( async function(req, res, next) {
+    if (req.session && req.session.userId) {
+        
+        const user = await User.findById(req.session.userId); // Fetch from DB
+        
+        res.locals.user = user || null;
+        
+    }
+    next();
+  });
 
 
 

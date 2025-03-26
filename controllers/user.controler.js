@@ -79,6 +79,7 @@ async function sendVerificationEmail(email,otp) {
 const postSignUp = async (req,res)=>{
    try {
     const {email,password,name} = req.body
+    
     const findUser = await User.findOne({email})
     if(findUser){
         return res.render('signup',{message:"User with this email already exists"})
@@ -200,6 +201,68 @@ const postLoginPage = async (req,res)=>{
     }
 }
 
+const getForgetPassword = async (req,res)=>{
+    try {
+        res.render('forget-password')
+    } catch (error) {
+        
+    }
+}
+
+const verifyEmailForForgetPassword = async(req,res)=>{
+    try {
+        const {email} = req.body
+        const findUser = await User.findOne({email})
+        if(!findUser){
+          return  res.status(400).json({message:"email not found"})
+        }
+        
+        const otp = generateOtp()
+        // const emailSend = sendVerificationEmail(email,otp);
+        // if(!emailSend){
+        //     return res.status(400).json("email-error")
+        // }
+        
+        console.log("Otp send",otp);
+        req.session.userOtp = otp;
+        req.session.forgetPasswordUserId = findUser._id
+
+        // store things in session before rendering a resonce page
+        res.status(200).json("otp send to your email")
+    } catch (error) {
+        
+    }
+}
+
+
+const verifyOtpForForgetPassword = async (req,res)=>{
+    const {otp} = req.body
+    console.log(otp)
+    console.log(req.session.userOtp)
+    if(otp == req.session.userOtp){
+     return   res.status(200).json({message:"otp verification successfull"})
+    }
+    res.status(400).json({message:"invalid otp"})
+
+
+}
+
+const changePasswordForForgetPassword = async (req,res)=>{
+    try {
+        const password = req.body.password
+        console.log(req.session.forgetPasswordUserId)
+        const user = await User.findById(req.session.forgetPasswordUserId)
+        if(!user){
+            return res.status(400).json({message:"user not found"})
+        }
+        const passwordHash = await securePassword(password);
+        user.password = passwordHash
+        await user.save()
+        res.status(200).json({message:"password change successfull"})
+    } catch (error) {
+        
+    }
+}
 const logout = async (req,res)=>{
     try {
         req.session.destroy((err)=>{
@@ -338,7 +401,11 @@ module.exports = {
     getAccount,
     editProfile,
     editEmail,
-    verifyOtpForEditEmail
+    verifyOtpForEditEmail,
+    getForgetPassword,
+    verifyEmailForForgetPassword,
+    verifyOtpForForgetPassword,
+    changePasswordForForgetPassword
 
 
 }

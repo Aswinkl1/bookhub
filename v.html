@@ -3,579 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Management</title>
+    <title>Order Management Dashboard</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        .order-card {
+        :root {
+            --primary-color: #4a4a4a;
+            --secondary-color: #6c757d;
+            --accent-color: #007bff;
+            --background-light: #f4f6f9;
+            --card-bg: #ffffff;
+        }
+
+        * {
             transition: all 0.3s ease;
-            border-left: 5px solid #6c757d;
         }
-        .order-card:hover {
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
+
+        body {
+            background-color: var(--background-light);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         }
-        .order-pending { border-left-color: #ffc107; }
-        .order-delivered { border-left-color: #28a745; }
-        .order-cancelled { border-left-color: #dc3545; }
-        .order-processing { border-left-color: #17a2b8; }
-        .order-returned { border-left-color: #6610f2; }
-        .badge-pending { background-color: #ffc107; color: #000; }
-        .badge-delivered { background-color: #28a745; }
-        .badge-cancelled { background-color: #dc3545; }
-        .badge-processing { background-color: #17a2b8; }
-        .badge-returned { background-color: #6610f2; }
-        .search-bar {
+
+        .dashboard-wrapper {
+            background-color: var(--background-light);
+            padding: 20px;
+        }
+
+        .card-custom {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .card-header-custom {
+            background: linear-gradient(to right, #4a4a4a, #007bff);
+            color: white;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .table-custom {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .table-custom thead {
+            background-color: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 5px 10px;
             border-radius: 20px;
-            padding-left: 40px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: capitalize;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
-        .search-icon {
-            position: absolute;
-            left: 25px;
-            top: 10px;
-            color: #6c757d;
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: 6px;
+        }
+
+        .modal-custom .modal-content {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .modal-custom .modal-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .filter-section {
+            background-color: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .hover-effect:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .responsive-stack > * {
+                margin-bottom: 10px;
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container mt-4">
-        <h2 class="mb-4">Your Orders</h2>
-        
-        <!-- Search Bar -->
-        <div class="row mb-4">
-            <div class="col-md-6 position-relative">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" id="orderSearch" class="form-control search-bar" placeholder="Search orders by ID, product, or status...">
-            </div>
-        </div>
-        
-        <!-- Order Listing -->
-        <div class="order-listing">
-            <!-- Order 1 -->
-            <div class="card order-card order-delivered mb-3">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <h5 class="card-title">Order #ORD-2023-001</h5>
-                            <p class="text-muted">March 15, 2023</p>
-                        </div>
-                        <div class="col-md-3">
-                            <span class="badge badge-delivered">Delivered</span>
-                            <p class="mt-2">Total: $249.99</p>
-                        </div>
-                        <div class="col-md-3">
-                            <p>2 items</p>
-                            <p>Est. delivery: Delivered</p>
-                        </div>
-                        <div class="col-md-3 text-end">
-                            <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#orderDetailModal" data-order-id="ORD-2023-001">View Details</a>
-                            <a href="#" class="btn btn-sm btn-outline-success" onclick="downloadInvoice('ORD-2023-001')">
-                                <i class="fas fa-file-pdf"></i> Invoice
-                            </a>
-                            <button class="btn btn-sm btn-outline-danger mt-2" data-bs-toggle="modal" data-bs-target="#returnOrderModal" data-order-id="ORD-2023-001">Return Order</button>
+    <div class="container-fluid dashboard-wrapper">
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-custom hover-effect">
+                    <div class="card-header-custom">
+                        <h3 class="mb-0">
+                            <i class="bi bi-list-task me-2"></i>Order Management Dashboard
+                        </h3>
+                        <div>
+                            <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#filterModal">
+                                <i class="bi bi-funnel me-2"></i>Advanced Filters
+                            </button>
+                            <button class="btn btn-primary ms-2" data-bs-toggle="modal" data-bs-target="#newOrderModal">
+                                <i class="bi bi-plus-circle me-2"></i>Create Order
+                            </button>
                         </div>
                     </div>
-                </div>
-            </div>
-            
-            <!-- Order 2 -->
-            <div class="card order-card order-processing mb-3">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <h5 class="card-title">Order #ORD-2023-002</h5>
-                            <p class="text-muted">March 18, 2023</p>
-                        </div>
-                        <div class="col-md-3">
-                            <span class="badge badge-processing">Processing</span>
-                            <p class="mt-2">Total: $129.50</p>
-                        </div>
-                        <div class="col-md-3">
-                            <p>1 item</p>
-                            <p>Est. delivery: March 25, 2023</p>
-                        </div>
-                        <div class="col-md-3 text-end">
-                            <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#orderDetailModal" data-order-id="ORD-2023-002">View Details</a>
-                            <a href="#" class="btn btn-sm btn-outline-success" onclick="downloadInvoice('ORD-2023-002')">
-                                <i class="fas fa-file-pdf"></i> Invoice
-                            </a>
-                            <button class="btn btn-sm btn-outline-danger mt-2" data-bs-toggle="modal" data-bs-target="#cancelOrderModal" data-order-id="ORD-2023-002">Cancel Order</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Order 3 -->
-            <div class="card order-card order-pending mb-3">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <h5 class="card-title">Order #ORD-2023-003</h5>
-                            <p class="text-muted">March 20, 2023</p>
-                        </div>
-                        <div class="col-md-3">
-                            <span class="badge badge-pending">Pending</span>
-                            <p class="mt-2">Total: $350.00</p>
-                        </div>
-                        <div class="col-md-3">
-                            <p>3 items</p>
-                            <p>Est. delivery: March 27, 2023</p>
-                        </div>
-                        <div class="col-md-3 text-end">
-                            <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#orderDetailModal" data-order-id="ORD-2023-003">View Details</a>
-                            <a href="#" class="btn btn-sm btn-outline-success" onclick="downloadInvoice('ORD-2023-003')">
-                                <i class="fas fa-file-pdf"></i> Invoice
-                            </a>
-                            <button class="btn btn-sm btn-outline-danger mt-2" data-bs-toggle="modal" data-bs-target="#cancelOrderModal" data-order-id="ORD-2023-003">Cancel Order</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Order 4 -->
-            <div class="card order-card order-cancelled mb-3">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <h5 class="card-title">Order #ORD-2023-004</h5>
-                            <p class="text-muted">March 10, 2023</p>
-                        </div>
-                        <div class="col-md-3">
-                            <span class="badge badge-cancelled">Cancelled</span>
-                            <p class="mt-2">Total: $75.20</p>
-                        </div>
-                        <div class="col-md-3">
-                            <p>1 item</p>
-                            <p>Cancellation Date: March 11, 2023</p>
-                        </div>
-                        <div class="col-md-3 text-end">
-                            <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#orderDetailModal" data-order-id="ORD-2023-004">View Details</a>
-                            <a href="#" class="btn btn-sm btn-outline-success" onclick="downloadInvoice('ORD-2023-004')">
-                                <i class="fas fa-file-pdf"></i> Invoice
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Order 5 -->
-            <div class="card order-card order-returned mb-3">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <h5 class="card-title">Order #ORD-2023-005</h5>
-                            <p class="text-muted">March 5, 2023</p>
-                        </div>
-                        <div class="col-md-3">
-                            <span class="badge badge-returned">Returned</span>
-                            <p class="mt-2">Total: $199.99</p>
-                        </div>
-                        <div class="col-md-3">
-                            <p>1 item</p>
-                            <p>Return Date: March 12, 2023</p>
-                        </div>
-                        <div class="col-md-3 text-end">
-                            <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#orderDetailModal" data-order-id="ORD-2023-005">View Details</a>
-                            <a href="#" class="btn btn-sm btn-outline-success" onclick="downloadInvoice('ORD-2023-005')">
-                                <i class="fas fa-file-pdf"></i> Invoice
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Order Detail Modal -->
-    <div class="modal fade" id="orderDetailModal" tabindex="-1" aria-labelledby="orderDetailModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="orderDetailModalLabel">Order Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <h6>Order #<span id="detailOrderId">ORD-2023-001</span></h6>
-                            <p>Placed on: <span id="detailOrderDate">March 15, 2023</span></p>
-                        </div>
-                        <div class="col-md-6 text-end">
-                            <span class="badge badge-delivered" id="detailOrderStatus">Delivered</span>
-                        </div>
-                    </div>
-                    
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <h6>Shipping Address</h6>
-                            <p>John Doe<br>
-                            123 Main Street<br>
-                            Apt 4B<br>
-                            New York, NY 10001<br>
-                            United States</p>
-                        </div>
-                        <div class="col-md-6">
-                            <h6>Payment Method</h6>
-                            <p>Credit Card ending in 1234<br>
-                            Billing Address: Same as shipping</p>
-                        </div>
-                    </div>
-                    
-                    <h6>Order Items</h6>
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Price</th>
-                                    <th>Quantity</th>
-                                    <th>Total</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="orderItemsTable">
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <img src="https://via.placeholder.com/50" alt="Product" class="me-2">
-                                            <div>
-                                                <h6 class="mb-0">Wireless Headphones</h6>
-                                                <small class="text-muted">Black, Over-ear</small>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>$199.99</td>
-                                    <td>1</td>
-                                    <td>$199.99</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelItemModal" data-item-id="1" data-order-id="ORD-2023-001">
-                                            Cancel
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <img src="https://via.placeholder.com/50" alt="Product" class="me-2">
-                                            <div>
-                                                <h6 class="mb-0">Wireless Charger</h6>
-                                                <small class="text-muted">15W Fast Charge</small>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>$50.00</td>
-                                    <td>1</td>
-                                    <td>$50.00</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelItemModal" data-item-id="2" data-order-id="ORD-2023-001">
-                                            Cancel
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6>Order Timeline</h6>
-                            <ul class="list-group">
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>Order Placed</span>
-                                    <span>March 15, 2023</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>Order Processing</span>
-                                    <span>March 16, 2023</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>Order Shipped</span>
-                                    <span>March 17, 2023</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>Order Delivered</span>
-                                    <span>March 19, 2023</span>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h6 class="card-title">Order Summary</h6>
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <span>Subtotal:</span>
-                                        <span>$249.99</span>
-                                    </div>
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <span>Shipping:</span>
-                                        <span>$0.00</span>
-                                    </div>
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <span>Tax:</span>
-                                        <span>$20.00</span>
-                                    </div>
-                                    <hr>
-                                    <div class="d-flex justify-content-between">
-                                        <strong>Total:</strong>
-                                        <strong>$269.99</strong>
-                                    </div>
-                                </div>
+                    <div class="card-body">
+                        <div class="filter-section responsive-stack d-flex justify-content-between align-items-center">
+                            <div class="input-group" style="max-width: 300px;">
+                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                <input type="text" class="form-control" placeholder="Search orders...">
                             </div>
+                            <select class="form-select" style="max-width: 200px;">
+                                <option>All Statuses</option>
+                                <option>Pending</option>
+                                <option>Shipped</option>
+                                <option>Delivered</option>
+                            </select>
+                            <button class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-down-up me-2"></i>Sort
+                            </button>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-custom table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Customer</th>
+                                        <th>Date</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>ORD-001</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="/api/placeholder/40/40" class="rounded-circle me-2" alt="Customer">
+                                                John Doe
+                                            </div>
+                                        </td>
+                                        <td>2024-03-20</td>
+                                        <td>$299.99</td>
+                                        <td>
+                                            <span class="badge bg-warning status-badge">
+                                                <i class="bi bi-clock"></i> Pending
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <button class="btn btn-sm btn-outline-primary action-btn">
+                                                    <i class="bi bi-eye"></i> View
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-success action-btn">
+                                                    <i class="bi bi-pencil"></i> Edit
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <a href="#" class="btn btn-primary" onclick="downloadInvoice('ORD-2023-001')">
-                        <i class="fas fa-file-pdf"></i> Download Invoice
-                    </a>
-                </div>
             </div>
         </div>
     </div>
-    
-    <!-- Cancel Order Modal -->
-    <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+
+    <!-- Status Change Modal -->
+    <div class="modal fade modal-custom" id="statusChangeModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="cancelOrderModalLabel">Cancel Order</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title">Change Order Status</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Are you sure you want to cancel order #<span id="cancelOrderId">ORD-2023-002</span>?</p>
-                    <p>This action cannot be undone. The inventory will be updated accordingly.</p>
-                    <div class="mb-3">
-                        <label for="cancelReason" class="form-label">Reason for cancellation (optional)</label>
-                        <textarea class="form-control" id="cancelReason" rows="3" placeholder="Please provide a reason for cancellation (optional)"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Keep Order</button>
-                    <button type="button" class="btn btn-danger" id="confirmCancelOrder">Yes, Cancel Order</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Cancel Item Modal -->
-    <div class="modal fade" id="cancelItemModal" tabindex="-1" aria-labelledby="cancelItemModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="cancelItemModalLabel">Cancel Item</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to cancel this item from order #<span id="cancelItemOrderId">ORD-2023-001</span>?</p>
-                    <p>This action cannot be undone. The inventory will be updated accordingly.</p>
-                    <div class="mb-3">
-                        <label for="cancelItemReason" class="form-label">Reason for cancellation (optional)</label>
-                        <textarea class="form-control" id="cancelItemReason" rows="3" placeholder="Please provide a reason for cancellation (optional)"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Keep Item</button>
-                    <button type="button" class="btn btn-danger" id="confirmCancelItem">Yes, Cancel Item</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Return Order Modal -->
-    <div class="modal fade" id="returnOrderModal" tabindex="-1" aria-labelledby="returnOrderModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="returnOrderModalLabel">Return Order</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to return order #<span id="returnOrderId">ORD-2023-001</span>?</p>
-                    <p>This action cannot be undone. The inventory will be updated accordingly.</p>
-                    <div class="mb-3">
-                        <label for="returnReason" class="form-label">Reason for return (required)</label>
-                        <textarea class="form-control" id="returnReason" rows="3" placeholder="Please provide a reason for return" required></textarea>
-                        <div class="invalid-feedback">
-                            Please provide a reason for return.
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label">New Status</label>
+                            <select class="form-select">
+                                <option>Pending</option>
+                                <option>Processing</option>
+                                <option>Shipped</option>
+                                <option>Delivered</option>
+                                <option>Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Comments</label>
+                            <textarea class="form-control" rows="3" placeholder="Optional comments"></textarea>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" id="confirmReturnOrder">Return Order</button>
+                    <button type="button" class="btn btn-primary">Confirm Change</button>
                 </div>
             </div>
         </div>
     </div>
-    
-    <!-- Bootstrap JS and Popper.js -->
+
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- jsPDF for invoice generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    
-    <script>
-        // Search functionality
-        document.getElementById('orderSearch').addEventListener('keyup', function() {
-            let searchTerm = this.value.toLowerCase();
-            let orderCards = document.querySelectorAll('.order-card');
-            
-            orderCards.forEach(card => {
-                let orderText = card.textContent.toLowerCase();
-                if (orderText.includes(searchTerm)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        });
-        
-        // Order Detail Modal
-        let orderDetailModal = document.getElementById('orderDetailModal');
-        orderDetailModal.addEventListener('show.bs.modal', function (event) {
-            let button = event.relatedTarget;
-            let orderId = button.getAttribute('data-order-id');
-            
-            // Update modal with order details
-            document.getElementById('detailOrderId').textContent = orderId;
-            
-            // In a real application, you would fetch the order details from the server
-            // and update the modal content accordingly
-            
-            // For demo purposes, we'll just update the order ID
-            if (orderId === 'ORD-2023-001') {
-                document.getElementById('detailOrderStatus').textContent = 'Delivered';
-                document.getElementById('detailOrderStatus').className = 'badge badge-delivered';
-                document.getElementById('detailOrderDate').textContent = 'March 15, 2023';
-            } else if (orderId === 'ORD-2023-002') {
-                document.getElementById('detailOrderStatus').textContent = 'Processing';
-                document.getElementById('detailOrderStatus').className = 'badge badge-processing';
-                document.getElementById('detailOrderDate').textContent = 'March 18, 2023';
-            }
-        });
-        
-        // Cancel Order Modal
-        let cancelOrderModal = document.getElementById('cancelOrderModal');
-        cancelOrderModal.addEventListener('show.bs.modal', function (event) {
-            let button = event.relatedTarget;
-            let orderId = button.getAttribute('data-order-id');
-            document.getElementById('cancelOrderId').textContent = orderId;
-        });
-        
-        // Cancel Item Modal
-        let cancelItemModal = document.getElementById('cancelItemModal');
-        cancelItemModal.addEventListener('show.bs.modal', function (event) {
-            let button = event.relatedTarget;
-            let itemId = button.getAttribute('data-item-id');
-            let orderId = button.getAttribute('data-order-id');
-            document.getElementById('cancelItemOrderId').textContent = orderId;
-        });
-        
-        // Return Order Modal
-        let returnOrderModal = document.getElementById('returnOrderModal');
-        returnOrderModal.addEventListener('show.bs.modal', function (event) {
-            let button = event.relatedTarget;
-            let orderId = button.getAttribute('data-order-id');
-            document.getElementById('returnOrderId').textContent = orderId;
-        });
-        
-        // Confirm Cancel Order
-        document.getElementById('confirmCancelOrder').addEventListener('click', function() {
-            let orderId = document.getElementById('cancelOrderId').textContent;
-            let reason = document.getElementById('cancelReason').value;
-            
-            // In a real application, you would send this data to the server
-            console.log('Cancelling order:', orderId, 'Reason:', reason);
-            
-            // Close the modal
-            let modal = bootstrap.Modal.getInstance(cancelOrderModal);
-            modal.hide();
-            
-            // Show success message
-            alert('Order ' + orderId + ' has been cancelled successfully.');
-            
-            // Refresh the page or update the order status
-            location.reload();
-        });
-        
-        // Confirm Cancel Item
-        document.getElementById('confirmCancelItem').addEventListener('click', function() {
-            let orderId = document.getElementById('cancelItemOrderId').textContent;
-            let reason = document.getElementById('cancelItemReason').value;
-            
-            // In a real application, you would send this data to the server
-            console.log('Cancelling item from order:', orderId, 'Reason:', reason);
-            
-            // Close the modal
-            let modal = bootstrap.Modal.getInstance(cancelItemModal);
-            modal.hide();
-            
-            // Show success message
-            alert('Item has been cancelled from order ' + orderId + ' successfully.');
-            
-            // Close the order detail modal as well
-            let detailModal = bootstrap.Modal.getInstance(orderDetailModal);
-            detailModal.hide();
-            
-            // Refresh the page or update the order
-            location.reload();
-        });
-        
-        // Confirm Return Order
-        document.getElementById('confirmReturnOrder').addEventListener('click', function() {
-            let orderId = document.getElementById('returnOrderId').textContent;
-            let reason = document.getElementById('returnReason').value;
-            
-            // Validate that a reason is provided (it's mandatory)
-            if (!reason.trim()) {
-                document.getElementById('returnReason').classList.add('is-invalid');
-                return;
-            }
-            
-            // In a real application, you would send this data to the server
-            console.log('Returning order:', orderId, 'Reason:', reason);
-            
-            // Close the modal
-            let modal = bootstrap.Modal.getInstance(returnOrderModal);
-            modal.hide();
-            
-            // Show success message
-            alert('Return request for order ' + orderId + ' has been submitted successfully.');
-            
-            // Refresh the page or update the order status
-            location.reload();
-        });
-        
-        // Download Invoice
-        function downloadInvoice(orderId) {
-            // In a real application, you would generate the invoice on the server
-            // and provide a download link or generate it client-side using a library like jsPDF
-            
-            // For demo purposes, we'll just show an alert
-            alert('Downloading invoice for order ' + orderId);
-            
-            // Example of how you might generate a PDF invoice using jsPDF
-            // This is commented out because it requires proper setup of jsPDF
-            /*
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            doc.text('INVOICE', 105, 20, { align: 'center' });
-            doc.text('Order ID: ' + orderId, 20, 30);
-            doc.text('Date: ' + new Date().toLocaleDateString(), 20, 40);
-            doc.text('Customer: John Doe', 20, 50);
-            doc.text('Items:', 20, 70);
-            doc.text('1. Wireless Headphones - $199.99', 30, 80);
-            doc.text('2. Wireless Charger - $50.00', 30, 90);
-            doc.text('Subtotal: $249.99', 150, 110, { align: 'right' });
-            doc.text('Tax: $20.00', 150, 120, { align: 'right' });
-            doc.text('Total: $269.99', 150, 130, { align: 'right' });
-            
-            doc.save('invoice-' + orderId + '.pdf');
-            */
-        }
-    </script>
 </body>
 </html>

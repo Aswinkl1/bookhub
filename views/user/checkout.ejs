@@ -377,7 +377,7 @@
                              <!-- Product Item 2 -->
                         <% for(let i=0;i< cart.items.length;i++) {%>
                             <div class="product-item d-flex">
-                                <img src="/uploads/products-images/<%= cart.items[i].productId.productImage[0] %>" alt="Product" class="product-image me-3">
+                                <img src="/uploads/products-images/<%= cart.items[i].productId.productImage[1]%>" alt="Product" class="product-image me-3">
                                 <div class="flex-grow-1">
                                     <h6 class="product-name"><%=cart.items[i].productId.productTitle %></h6>
                                     <div class="d-flex justify-content-between align-items-center">
@@ -453,8 +453,8 @@
                     <h3 class="mb-3">Order Placed Successfully!</h3>
                     <p class="text-muted mb-4">Thank you for your purchase. Your order #ORD123456 has been confirmed and will be delivered soon.</p>
                     <div class="d-flex justify-content-center gap-3">
-                        <a href="#" class="btn btn-outline-primary px-4">View Order Details</a>
-                        <a href="#" class="btn btn-primary px-4">Continue Shopping</a>
+                        <a href="/order" class="btn btn-outline-primary px-4">View Order Details</a>
+                        <a href="/" class="btn btn-primary px-4">Continue Shopping</a>
                     </div>
                 </div>
             </div>

@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const {userAuth }= require('../middleware/auth')
 const controller = require('../controllers/user.controler');
 const passport = require('passport');
 const address = require("../controllers/address.controller")
@@ -7,6 +8,7 @@ const cart = require("../controllers/cart.controller")
 const coupon = require("../controllers/coupon.controller")
 const checkout = require("../controllers/checkout.controller")
 const order = require("../controllers/order.controller")
+const product = require('../controllers/product.controller')
 
 
 
@@ -22,6 +24,11 @@ router.get('/login',controller.loadLoginPage);
 router.post('/verify-otp',controller.verifyOtp)
 
 router.post('/resend-otp',controller.resendOtp)
+// forget Pasword
+router.get("/forgetPassword",controller.getForgetPassword)
+router.patch("/verify-email-for-forgetPassword",controller.verifyEmailForForgetPassword)
+router.patch("/forgetPassword-verfy-otp",controller.verifyOtpForForgetPassword)
+router.patch("/forgetPassword-passwordChange",controller.changePasswordForForgetPassword)
 
 router.get('/auth/google',passport.authenticate('google',{scope:['profile','email']}))
 
@@ -30,41 +37,55 @@ router.get('/auth/google/callback',passport.authenticate('google',{failureRedire
     res.redirect('/')
 })
 
+
+
 router.post('/login',controller.postLoginPage)
 
-router.get('/logout',controller.logout)
+router.get('/logout',userAuth,controller.logout)
 
-router.get('/account',controller.getAccount)
+router.get('/account',userAuth,controller.getAccount)
 
 // api for progile
-router.put("/api/editprofile",controller.editProfile);
-router.put("/api/editEmail",controller.editEmail);
-router.patch("/api/verifyOtpForEmail",controller.verifyOtpForEditEmail)
+router.put("/api/editprofile",userAuth,controller.editProfile);
+router.put("/api/editEmail",userAuth,controller.editEmail);
+router.patch("/api/verifyOtpForEmail",userAuth,controller.verifyOtpForEditEmail)
 
 // address
-router.get("/account/addresses",address.getShowAddresses); // just rendering the address page
-router.get('/api/addresses',address.loadShowAddress) // loading the address data
-router.get("/account/addAddress",address.getAddAddresses);
-router.post("/account/addAddress",address.postAddAddress);
-router.get("/account/editAddress",address.getEditAddress)
-router.put("/account/editAddress",address.postEditAddress)
-router.delete('/account/deleteAddress',address.deleteAddress)
+router.get("/account/addresses",userAuth,address.getShowAddresses); // just rendering the address page
+router.get('/api/addresses',userAuth,address.loadShowAddress) // loading the address data
+router.get("/account/addAddress",userAuth,address.getAddAddresses);
+router.post("/account/addAddress",userAuth,address.postAddAddress);
+router.get("/account/editAddress",userAuth,address.getEditAddress)
+router.put("/account/editAddress",userAuth,address.postEditAddress)
+router.delete('/account/deleteAddress',userAuth,address.deleteAddress)
 
 // Cart 
-router.post("/cart/addToCart",cart.addTocart)
-router.get('/cart',cart.loadcartPage)
-router.patch("/cart/updatecart",cart.addTocart)
-router.delete("/cart/removeCart",cart.removeFromCart)
+router.post("/cart/addToCart",userAuth,cart.addTocart)
+router.get('/cart',userAuth,cart.loadcartPage)
+router.patch("/cart/updatecart",userAuth,cart.addTocart)
+router.delete("/cart/removeCart",userAuth,cart.removeFromCart)
 
 // coupon
 router.post("/addCoupons",coupon.addCoupons)
 
 // Checkout
-router.get("/checkout",checkout.loadCheckout)
+router.get("/checkout",userAuth,checkout.loadCheckout)
 
 // order
-router.post('/placeOrder',order.addOrder)
-router.get('/order',order.getUserOrders)
+router.post('/placeOrder',userAuth,order.addOrder)
+router.get('/order',userAuth,order.getUserOrders)
+router.get('/order/:id',userAuth,order.getOrderById)
+router.put('/cancelOrder/:orderId',userAuth,order.cancelOrder)
+router.put('/cancelProduct/:orderId/:productId',userAuth,order.cancelSingleProduct)
+router.put('/returnOrder/:orderId',userAuth,order.returnOrder)
+router.put('/order/return/:productId/:orderId',order.productReturn)
+
+
+//product -shop
+router.get('/shop',product.renderShopPage)
+router.get('/api/shop',product.fetchAvailableProducts )
+router.get('/product/:id',product.getProductForUser)
+
 
 
 

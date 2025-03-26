@@ -2,580 +2,793 @@
 
 
 
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
     <style>
-        .order-card {
-            transition: all 0.3s ease;
-            border-left: 5px solid #6c757d;
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --success-color: #0bb4aa;
+            --info-color: #4cc9f0;
+            --warning-color: #f72585;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
-        .order-card:hover {
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .order-details-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 1.25rem 1.5rem;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .order-progress {
+            padding: 1.5rem;
+        }
+        
+        .order-progress .progress {
+            height: 8px;
+            border-radius: 8px;
+            background-color: #e9ecef;
+        }
+        
+        .order-progress .progress-bar {
+            background: linear-gradient(to right, var(--primary-color), var(--info-color));
+            border-radius: 8px;
+        }
+        
+        .step-icon {
+            height: 50px;
+            width: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .step-active .step-icon {
+            background-color: var(--primary-color);
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .step-pending .step-icon {
+            background-color: #f8f9fa;
+            color: #adb5bd;
+            border: 2px dashed #dee2e6;
+        }
+        
+        .step-line {
+            width: 100%;
+            position: absolute;
+            top: 25px;
+            left: 50%;
+            height: 2px;
+            background-color: #dee2e6;
+            z-index: -1;
+        }
+        
+        .product-card {
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            transition: transform 0.2s;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .product-img {
+            object-fit: cover;
+            width: 120px;
+            height: 120px;
+            border-radius: 8px;
+        }
+        
+        .badge-status {
+            font-size: 0.85rem;
+            padding: 0.5rem 0.85rem;
+            border-radius: 30px;
+        }
+        
+        .btn {
+            border-radius: 8px;
+            padding: 0.6rem 1.2rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
             transform: translateY(-2px);
         }
-        .order-pending { border-left-color: #ffc107; }
-        .order-delivered { border-left-color: #28a745; }
-        .order-cancelled { border-left-color: #dc3545; }
-        .order-processing { border-left-color: #17a2b8; }
-        .order-returned { border-left-color: #6610f2; }
-        .badge-pending { background-color: #ffc107; color: #000; }
-        .badge-delivered { background-color: #28a745; }
-        .badge-cancelled { background-color: #dc3545; }
-        .badge-processing { background-color: #17a2b8; }
-        .badge-returned { background-color: #6610f2; }
-        .search-bar {
-            border-radius: 20px;
-            padding-left: 40px;
+        
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
         }
-        .search-icon {
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+        }
+        
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+        }
+        
+        .action-icon {
+            height: 40px;
+            width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background-color: var(--light-bg);
+            color: var(--primary-color);
+            margin-right: 0.5rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .action-icon:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .order-summary-box {
+            background-color: #f8f9ff;
+            border-radius: 10px;
+            padding: 1.5rem;
+        }
+        
+        .payment-method-card {
+            background: linear-gradient(45deg, #4361ee, #3a0ca3);
+            color: white;
+            border-radius: 12px;
+            padding: 1.2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .payment-method-card::before {
+            content: '';
             position: absolute;
-            left: 25px;
-            top: 10px;
+            top: -50px;
+            right: -50px;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .order-summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            color: #555;
+        }
+        
+        .order-total {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #000;
+            border-top: 2px dashed #e9ecef;
+            padding-top: 1rem;
+            margin-top: 0.5rem;
+        }
+        
+        .alert-shipping {
+            background-color: #ebf9ff;
+            border-left: 4px solid var(--info-color);
+            border-radius: 8px;
+        }
+        
+        .section-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+        
+        .bg-light-gray {
+            background-color: #f5f7fb;
+        }
+        
+        .modal-content {
+            border: none;
+            border-radius: 16px;
+        }
+        
+        .modal-header {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 1.25rem 1.5rem;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            border: 1px solid #dce1e9;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.15);
+            border-color: var(--primary-color);
+        }
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-bottom: 1.5rem;
+        }
+        
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -30px;
+            top: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            z-index: 1;
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: -24px;
+            top: 12px;
+            width: 1px;
+            height: 100%;
+            background-color: #dee2e6;
+        }
+        
+        .timeline-item:last-child::after {
+            display: none;
+        }
+        
+        .timeline-date {
+            font-size: 0.8rem;
             color: #6c757d;
+            margin-bottom: 0.25rem;
+        }
+        
+        .chip {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 30px;
+            background-color: #f0f2f5;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        @media (max-width: 767px) {
+            .step-container {
+                margin-bottom: 2rem;
+            }
+            
+            .product-img {
+                width: 80px;
+                height: 80px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container mt-4">
-        <h2 class="mb-4">Your Orders</h2>
-        
-        <!-- Search Bar -->
-        <div class="row mb-4">
-            <div class="col-md-6 position-relative">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" id="orderSearch" class="form-control search-bar" placeholder="Search orders by ID, product, or status...">
+    <div class="container-fluid py-5 order-details-container">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <span id="orderId" hidden><%= order.orderId %></span>
+            <div>
+                <h2 class="fw-bold">Order Details</h2>
+                <div class="d-flex align-items-center">
+                    <span class="badge bg-success text-white me-2 badge-status"><%=order.status%></span>
+                    <p class="text-muted mb-0">Order # <%= order.orderId %>• Placed on March 15, 2025</p>
+                </div>
+            </div>
+            <div class="d-flex">
+                <div class="action-icon me-2">
+                    <i class="bi bi-printer"></i>
+                </div>
+                <div class="action-icon">
+                    <i class="bi bi-download"></i>
+                </div>
             </div>
         </div>
-        
-        <!-- Order Listing -->
-        <div class="order-listing">
-            <% for(let i=0;i<orderData.length;i++){ %>
-                <!-- Order 1 -->
-                <div class="card order-card order-delivered mb-3">
+
+        <div class="row gy-4">
+            <div class="col-lg-8">
+                <!-- Order Status -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="section-title mb-0"><i class="bi bi-truck"></i> Shipment Status</h5>
+                    </div>
+                    <div class="order-progress">
+                        <div class="position-relative mb-5">
+                            <div class="row position-relative">
+                                <div class="col-3 step-container">
+                                    <div class="step-active text-center">
+                                        <div class="step-icon">
+                                            <i class="bi bi-check-lg"></i>
+                                        </div>
+                                        <span class="d-block fw-medium">Ordered</span>
+                                        <small class="text-muted">Mar 15</small>
+                                    </div>
+                                </div>
+                                <div class="col-3 step-container">
+                                    <div class="step-active text-center">
+                                        <div class="step-icon">
+                                            <i class="bi bi-check-lg"></i>
+                                        </div>
+                                        <span class="d-block fw-medium">Processing</span>
+                                        <small class="text-muted">Mar 16</small>
+                                    </div>
+                                </div>
+                                <div class="col-3 step-container">
+                                    <div class="step-pending text-center">
+                                        <div class="step-icon">
+                                            <i class="bi bi-box-seam"></i>
+                                        </div>
+                                        <span class="d-block fw-medium">Shipped</span>
+                                        <small class="text-muted">Mar 18</small>
+                                    </div>
+                                </div>
+                                <div class="col-3 step-container">
+                                    <div class="step-pending text-center">
+                                        <div class="step-icon">
+                                            <i class="bi bi-house-door"></i>
+                                        </div>
+                                        <span class="d-block fw-medium">Delivered</span>
+                                        <small class="text-muted">Expected: Mar 26</small>
+                                    </div>
+                                </div>
+                                <div class="step-line"></div>
+                            </div>
+                        </div>
+                        <div class="progress mb-4">
+                            <div class="progress-bar" role="progressbar" style="width: 50%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        
+                        <div class="alert alert-shipping d-flex p-3">
+                            <div class="me-3 fs-4 text-info">
+                                <i class="bi bi-info-circle"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">Package in Transit</h6>
+                                <p class="mb-0">Your package is on its way! Expected delivery: March 26, 2025.</p>
+                                <div class="mt-2">
+                                    <a href="#" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-box-arrow-up-right me-1"></i> Track Package
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Items -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="section-title mb-0"><i class="bi bi-bag"></i> Order Items (<%=order.items.length%>)</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Product 1 -->
+                         <% order.items.forEach((item) =>{ %>
+                        <div class="card product-card shadow-sm mb-3">
+                            <div class="card-body p-3">
+                                <div class="row align-items-center">
+                                    <div class="col-md-2 col-4 mb-3 mb-md-0">
+                                        <img src="/api/placeholder/120/120" alt="Product 1" class="product-img">
+                                    </div>
+                                    <div class="col-md-6 col-8 mb-3 mb-md-0">
+                                        <h5 class="mb-1"><%= item.productId.productTitle %></h5>
+                                        <p class="mb-1 text-muted">SKU: HDPHN-BLK-001</p>
+                                        <div class="d-flex flex-wrap mt-2">
+                                            <span class="chip">Black</span>
+                                            <span class="chip">Noise Cancelling</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 col-6 text-md-center">
+                                        <div class="mb-1 text-muted small">Quantity</div>
+                                        <span class="fw-semibold"><%= item.quantity %></span>
+                                    </div>
+                                    <div class="col-md-2 col-6 text-end">
+                                        <div class="mb-1 text-muted small">Price</div>
+                                        <div class="fw-semibold">₹<%= item.price %></div>
+                                        <% if(item.status == "Delivered"){ %>
+                                            <button class="btn btn-sm btn-outline-primary mt-2" id="return-product-btn" data-bs-toggle="modal" data-orderId="<%= order._id %>" data-productId="<%= item.productId._id %>" data-bs-target="#returnModal">
+                                                Return Item
+                                            </button>
+                                        <% } else if(item.status == "Pending" || item.status == "Shipped" ) { %>
+                                            <button class="btn btn-sm btn-outline-primary mt-2" id="return-product-btn" data-bs-toggle="modal" data-orderId="<%= order._id %>" data-productId="<%= item.productId._id %>" data-bs-target="#returnModal">
+                                                cancel Item
+                                            </button>
+                                        <% } else { %>
+                                            <span class="badge bg-success text-white me-2 badge-status pr-2"><%=item.status%></span>
+                                        <% } %>
+
+
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <% }) %>
+                        
+                    </div>
+                </div>
+                
+                <!-- Shipping Details -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="section-title mb-0"><i class="bi bi-geo-alt"></i> Shipping Details</h5>
+                        <!-- <button class="btn btn-sm btn-outline-primary">Edit</button> -->
+                    </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-md-3">
-                                <h5 class="card-title text-truncate">Order <%=orderData[i].orderId %></h5>
-                                <p class="text-muted"> <%=orderData[i].orderDate.toISOString().split("T")[0].split("-").reverse().join("-")%></p>
+                            <div class="col-md-6 mb-4 mb-md-0">
+                                <h6 class="text-uppercase text-muted mb-3">Shipping Address</h6>
+                                <h5 class="mb-2"><%=order.addressId.fullName%></h5>
+                                <p class="mb-1"><%=order.addressId.streetAddress%></p>
+                                <p class="mb-1"></p>
+                                <p class="mb-1"><%=order.addressId.city%>, <%=order.addressId.state%> , <%=order.addressId.postalCode%></p>
+                                <p class="mb-0"><%=order.addressId.country%></p>
+                                <div class="d-flex align-items-center mt-3">
+                                    <i class="bi bi-telephone me-2 text-muted"></i>
+                                    <p class="mb-0"><%=order.addressId.phoneNumber%></p>
+                                </div>
                             </div>
-                            <div class="col-md-3">
-                                <span class="badge badge-delivered">Delivered</span>
-                                <p class="mt-2">Total: <%=orderData[i].totalPrice %></p>
-                            </div>
-                            <div class="col-md-3">
-                                <p><%=orderData[i].items.length %> items</p>
-                                <!-- <p>Est. delivery: Delivered</p> -->
-                            </div>
-                            <div class="col-md-3 text-end">
-                                <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#orderDetailModal" data-order-id="ORD-2023-001">View Details</a>
-                                <a href="#" class="btn btn-sm btn-outline-success" onclick="downloadInvoice('ORD-2023-001')">
-                                    <i class="fas fa-file-pdf"></i> Invoice
-                                </a>
-                                <button class="btn btn-sm btn-outline-danger mt-2" data-bs-toggle="modal" data-bs-target="#returnOrderModal" data-order-id="ORD-2023-001">Return Order</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            <% } %>
-            <!-- Order 2 -->
-            <div class="card order-card order-processing mb-3">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <h5 class="card-title">Order #ORD-2023-002</h5>
-                            <p class="text-muted">March 18, 2023</p>
-                        </div>
-                        <div class="col-md-3">
-                            <span class="badge badge-processing">Processing</span>
-                            <p class="mt-2">Total: $129.50</p>
-                        </div>
-                        <div class="col-md-3">
-                            <p>1 item</p>
-                            <p>Est. delivery: March 25, 2023</p>
-                        </div>
-                        <div class="col-md-3 text-end">
-                            <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#orderDetailModal" data-order-id="ORD-2023-002">View Details</a>
-                            <a href="#" class="btn btn-sm btn-outline-success" onclick="downloadInvoice('ORD-2023-002')">
-                                <i class="fas fa-file-pdf"></i> Invoice
-                            </a>
-                            <button class="btn btn-sm btn-outline-danger mt-2" data-bs-toggle="modal" data-bs-target="#cancelOrderModal" data-order-id="ORD-2023-002">Cancel Order</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Order 3 -->
-            <div class="card order-card order-pending mb-3">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <h5 class="card-title">Order #ORD-2023-003</h5>
-                            <p class="text-muted">March 20, 2023</p>
-                        </div>
-                        <div class="col-md-3">
-                            <span class="badge badge-pending">Pending</span>
-                            <p class="mt-2">Total: $350.00</p>
-                        </div>
-                        <div class="col-md-3">
-                            <p>3 items</p>
-                            <p>Est. delivery: March 27, 2023</p>
-                        </div>
-                        <div class="col-md-3 text-end">
-                            <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#orderDetailModal" data-order-id="ORD-2023-003">View Details</a>
-                            <a href="#" class="btn btn-sm btn-outline-success" onclick="downloadInvoice('ORD-2023-003')">
-                                <i class="fas fa-file-pdf"></i> Invoice
-                            </a>
-                            <button class="btn btn-sm btn-outline-danger mt-2" data-bs-toggle="modal" data-bs-target="#cancelOrderModal" data-order-id="ORD-2023-003">Cancel Order</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Order 4 -->
-            <div class="card order-card order-cancelled mb-3">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <h5 class="card-title">Order #ORD-2023-004</h5>
-                            <p class="text-muted">March 10, 2023</p>
-                        </div>
-                        <div class="col-md-3">
-                            <span class="badge badge-cancelled">Cancelled</span>
-                            <p class="mt-2">Total: $75.20</p>
-                        </div>
-                        <div class="col-md-3">
-                            <p>1 item</p>
-                            <p>Cancellation Date: March 11, 2023</p>
-                        </div>
-                        <div class="col-md-3 text-end">
-                            <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#orderDetailModal" data-order-id="ORD-2023-004">View Details</a>
-                            <a href="#" class="btn btn-sm btn-outline-success" onclick="downloadInvoice('ORD-2023-004')">
-                                <i class="fas fa-file-pdf"></i> Invoice
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Order 5 -->
-            <div class="card order-card order-returned mb-3">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <h5 class="card-title">Order #ORD-2023-005</h5>
-                            <p class="text-muted">March 5, 2023</p>
-                        </div>
-                        <div class="col-md-3">
-                            <span class="badge badge-returned">Returned</span>
-                            <p class="mt-2">Total: $199.99</p>
-                        </div>
-                        <div class="col-md-3">
-                            <p>1 item</p>
-                            <p>Return Date: March 12, 2023</p>
-                        </div>
-                        <div class="col-md-3 text-end">
-                            <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#orderDetailModal" data-order-id="ORD-2023-005">View Details</a>
-                            <a href="#" class="btn btn-sm btn-outline-success" onclick="downloadInvoice('ORD-2023-005')">
-                                <i class="fas fa-file-pdf"></i> Invoice
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Order Detail Modal -->
-    <div class="modal fade" id="orderDetailModal" tabindex="-1" aria-labelledby="orderDetailModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="orderDetailModalLabel">Order Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <h6>Order #<span id="detailOrderId">ORD-2023-001</span></h6>
-                            <p>Placed on: <span id="detailOrderDate">March 15, 2023</span></p>
-                        </div>
-                        <div class="col-md-6 text-end">
-                            <span class="badge badge-delivered" id="detailOrderStatus">Delivered</span>
-                        </div>
-                    </div>
-                    
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <h6>Shipping Address</h6>
-                            <p>John Doe<br>
-                            123 Main Street<br>
-                            Apt 4B<br>
-                            New York, NY 10001<br>
-                            United States</p>
-                        </div>
-                        <div class="col-md-6">
-                            <h6>Payment Method</h6>
-                            <p>Credit Card ending in 1234<br>
-                            Billing Address: Same as shipping</p>
-                        </div>
-                    </div>
-                    
-                    <h6>Order Items</h6>
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Price</th>
-                                    <th>Quantity</th>
-                                    <th>Total</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="orderItemsTable">
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <img src="https://via.placeholder.com/50" alt="Product" class="me-2">
-                                            <div>
-                                                <h6 class="mb-0">Wireless Headphones</h6>
-                                                <small class="text-muted">Black, Over-ear</small>
+                            <div class="col-md-6">
+                                <h6 class="text-uppercase text-muted mb-3">Shipping Method</h6>
+                                <div class="d-flex align-items-start">
+                                    <i class="bi bi-truck fs-4 me-2 text-primary"></i>
+                                    <div>
+                                        <h5 class="mb-1">FedEx Express Delivery</h5>
+                                        <p class="mb-1">Tracking Number: <span class="fw-semibold">FX-9876543210</span></p>
+                                        <div class="mt-3">
+                                            <h6 class="mb-2">Shipping Updates</h6>
+                                            <div class="timeline">
+                                                <div class="timeline-item">
+                                                    <div class="timeline-date">March 18, 2025 - 10:23 AM</div>
+                                                    <div>Package has left the facility in Chicago, IL</div>
+                                                </div>
+                                                <div class="timeline-item">
+                                                    <div class="timeline-date">March 17, 2025 - 4:15 PM</div>
+                                                    <div>Shipment prepared at warehouse</div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </td>
-                                    <td>$199.99</td>
-                                    <td>1</td>
-                                    <td>$199.99</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelItemModal" data-item-id="1" data-order-id="ORD-2023-001">
-                                            Cancel
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <img src="https://via.placeholder.com/50" alt="Product" class="me-2">
-                                            <div>
-                                                <h6 class="mb-0">Wireless Charger</h6>
-                                                <small class="text-muted">15W Fast Charge</small>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>$50.00</td>
-                                    <td>1</td>
-                                    <td>$50.00</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelItemModal" data-item-id="2" data-order-id="ORD-2023-001">
-                                            Cancel
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6>Order Timeline</h6>
-                            <ul class="list-group">
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>Order Placed</span>
-                                    <span>March 15, 2023</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>Order Processing</span>
-                                    <span>March 16, 2023</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>Order Shipped</span>
-                                    <span>March 17, 2023</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>Order Delivered</span>
-                                    <span>March 19, 2023</span>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h6 class="card-title">Order Summary</h6>
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <span>Subtotal:</span>
-                                        <span>$249.99</span>
-                                    </div>
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <span>Shipping:</span>
-                                        <span>$0.00</span>
-                                    </div>
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <span>Tax:</span>
-                                        <span>$20.00</span>
-                                    </div>
-                                    <hr>
-                                    <div class="d-flex justify-content-between">
-                                        <strong>Total:</strong>
-                                        <strong>$269.99</strong>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <a href="#" class="btn btn-primary" onclick="downloadInvoice('ORD-2023-001')">
-                        <i class="fas fa-file-pdf"></i> Download Invoice
-                    </a>
-                </div>
             </div>
-        </div>
-    </div>
-    
-    <!-- Cancel Order Modal -->
-    <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="cancelOrderModalLabel">Cancel Order</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to cancel order #<span id="cancelOrderId">ORD-2023-002</span>?</p>
-                    <p>This action cannot be undone. The inventory will be updated accordingly.</p>
-                    <div class="mb-3">
-                        <label for="cancelReason" class="form-label">Reason for cancellation (optional)</label>
-                        <textarea class="form-control" id="cancelReason" rows="3" placeholder="Please provide a reason for cancellation (optional)"></textarea>
+            
+            <div class="col-lg-4">
+                <!-- Order Summary -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="section-title mb-0"><i class="bi bi-receipt"></i> Order Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="order-summary-box mb-4">
+                            <div class="order-summary-item">
+                                <span>Subtotal</span>
+                                <span>₹<%=order.totalPrice - 50%></span>
+                            </div>
+                            <div class="order-summary-item">
+                                <span>Shipping</span>
+                                <span>₹00</span>
+                            </div>
+                            <div class="order-summary-item">
+                                <span>Tax</span>
+                                <span>₹50</span>
+                            </div>
+                            <div class="order-summary-item order-total">
+                                <span>Total</span>
+                                <span>₹<%=order.totalPrice%></span>
+                            </div>
+                        </div>
+                        
+                        <h6 class="text-uppercase text-muted mb-3">Payment Method</h6>
+                        <div class="payment-method-card mb-4">
+                            <div class="row">
+                                <div class="col-3">
+                                    <i class="bi bi-credit-card fs-1"></i>
+                                </div>
+                                <div class="col-9">
+                                    <h6 class="mb-1">Visa •••• 4567</h6>
+                                    <small>Expiry: 05/27</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary w-100 mb-3">
+                            <i class="bi bi-headset me-2"></i> Contact Support
+                        </button>
+                        <% if(order.status == "Pending" || order.status == "Shipped"){ %>
+                            <button class="btn btn-outline-primary w-100" id="cancel-order-button" data-bs-toggle="modal" data-bs-target="#cancelModal">
+                                <i class="bi bi-x-circle me-2"></i> Cancel Order
+                            </button>
+                        <% } else if(order.status == "Delivered"){ %>
+                            <button class="btn btn-outline-primary w-100" id="return-order-button" data-bs-toggle="modal" data-bs-target="#returnModal">
+                                <i class="bi bi-x-circle me-2"></i> return Order
+                            </button>
+                        <% }else { %>
+                            <button class="btn btn-outline-primary w-100" id="return-order-button" disabled data-bs-toggle="" data-bs-target="">
+                                <i class="bi bi-x-circle me-2"></i> <%= order.status %>
+                            </button>
+                        <% } %>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Keep Order</button>
-                    <button type="button" class="btn btn-danger" id="confirmCancelOrder">Yes, Cancel Order</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Cancel Item Modal -->
-    <div class="modal fade" id="cancelItemModal" tabindex="-1" aria-labelledby="cancelItemModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="cancelItemModalLabel">Cancel Item</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to cancel this item from order #<span id="cancelItemOrderId">ORD-2023-001</span>?</p>
-                    <p>This action cannot be undone. The inventory will be updated accordingly.</p>
-                    <div class="mb-3">
-                        <label for="cancelItemReason" class="form-label">Reason for cancellation (optional)</label>
-                        <textarea class="form-control" id="cancelItemReason" rows="3" placeholder="Please provide a reason for cancellation (optional)"></textarea>
+                
+                <!-- Customer Support -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="section-title mb-0"><i class="bi bi-question-circle"></i> Need Help?</h5>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Keep Item</button>
-                    <button type="button" class="btn btn-danger" id="confirmCancelItem">Yes, Cancel Item</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Return Order Modal -->
-    <div class="modal fade" id="returnOrderModal" tabindex="-1" aria-labelledby="returnOrderModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="returnOrderModalLabel">Return Order</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to return order #<span id="returnOrderId">ORD-2023-001</span>?</p>
-                    <p>This action cannot be undone. The inventory will be updated accordingly.</p>
-                    <div class="mb-3">
-                        <label for="returnReason" class="form-label">Reason for return (required)</label>
-                        <textarea class="form-control" id="returnReason" rows="3" placeholder="Please provide a reason for return" required></textarea>
-                        <div class="invalid-feedback">
-                            Please provide a reason for return.
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="me-3 fs-3 text-primary">
+                                <i class="bi bi-chat-dots"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">Live Chat</h6>
+                                <p class="mb-0 text-muted small">Available 24/7</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="me-3 fs-3 text-primary">
+                                <i class="bi bi-telephone"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">Call Us</h6>
+                                <p class="mb-0 text-muted small">1-800-123-4567</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <div class="me-3 fs-3 text-primary">
+                                <i class="bi bi-envelope"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">Email Support</h6>
+                                <p class="mb-0 text-muted small">support@example.com</p>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="mt-4 pt-3 border-top">
+            <div class="d-flex justify-content-between">
+                <a href="/order" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i> Back to Orders
+                </a>
+                <a href="/shop" class="btn btn-primary">
+                    <i class="bi bi-bag me-2"></i> Continue Shopping
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Return Modal -->
+    <div class="modal fade" id="returnModal" tabindex="-1" aria-labelledby="returnModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="returnModalLabel">Return Item</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form >
+                       
+                        <div class="mb-4">
+                            <label for="returnComments" class="form-label">Reason for Return</label>
+                            <textarea class="form-control" id="returnReason" rows="3" placeholder="Please provide details about your return..."></textarea>
+                        </div>
+                        
+                    </form>
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" id="confirmReturnOrder">Return Order</button>
+                    <button type="button" class="btn btn-primary" id="product-return-submit">Submit Return Request</button>
                 </div>
             </div>
         </div>
     </div>
-    
-    <!-- Bootstrap JS and Popper.js -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- jsPDF for invoice generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    
+
+    <!-- Cancel Order Modal -->
+    <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelModalLabel">Cancel Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-exclamation-circle text-warning display-1"></i>
+                    </div>
+                    <h4 class="text-center mb-3">Are you sure?</h4>
+                    <p class="text-center">You are about to cancel order #ORD-2023-45678.</p>
+                    <div class="alert alert-warning">
+                        <small><i class="bi bi-info-circle me-2"></i> This action cannot be undone. Any payments will be refunded within 5-7 business days.</small>
+                    </div>
+                    <form >
+                           
+                        <div class="mb-4">
+                            <label for="cancelComments" class="form-label">Reason for cancel</label>
+                            <textarea class="form-control" id="cancelReason" rows="3" placeholder="Please provide details about your cancel..."></textarea>
+                        </div>
+                        
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Keep Order</button>
+                    <button type="button" id="cancel-submit-button" class="btn btn-danger">Yes, Cancel Order</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+
     <script>
-        // Search functionality
-        document.getElementById('orderSearch').addEventListener('keyup', function() {
-            let searchTerm = this.value.toLowerCase();
-            let orderCards = document.querySelectorAll('.order-card');
-            
-            orderCards.forEach(card => {
-                let orderText = card.textContent.toLowerCase();
-                if (orderText.includes(searchTerm)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
+
+        let productId ;
+        const orderId = document.getElementById("orderId").innerText
+        
+        document.addEventListener('DOMContentLoaded',()=>{
+            const returnModal = document.getElementById("returnModal")
+            returnModal.addEventListener("show.bs.modal",(e)=>{
+                const button = e.relatedTarget
+                console.log(button)
+                 productId = button.getAttribute("data-productid")
+                 
+            })
+
+            // single product return modal fetch request 
+            document.getElementById("product-return-submit").addEventListener("click",async (e)=>{
+                const reason = document.getElementById("returnReason").value
+                
+                console.log(reason)
+                const response = await fetch(`/order/return/${productId}/${orderId}`,{
+                    method:"PUT",
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({reason})
+                })
+
+                const jsonResponse = await response.json()
+                if(response.ok){
+                    document.getElementById("return-product-btn").disabled = true
+                    console.log("success")
+                }else{
+                    console.log("error")
+                    alert(jsonResponse.error)
                 }
+
             });
+
+            // cancel an order 
+            document.getElementById("cancel-submit-button").addEventListener("click",async(e)=>{
+                const reason = document.getElementById("cancelReason").value
+                
+                const response = await fetch('/cancelOrder/'+orderId,{
+                    method:"PUT",
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({reason})
+                })
+
+                const jsonResponse = await response.json()
+
+                if(response.ok){
+                    showAlert("success","Good job",jsonResponse.message)
+                    document.getElementById("cancel-order-button").disabled = true
+                    document.getElementById("cancel-order-button").innerHTML = "cancelled"
+
+                }else{
+                    showAlert("error","error",jsonResponse.message)
+                    
+                }
+            })
         });
-        
-        // Order Detail Modal
-        let orderDetailModal = document.getElementById('orderDetailModal');
-        orderDetailModal.addEventListener('show.bs.modal', function (event) {
-            let button = event.relatedTarget;
-            let orderId = button.getAttribute('data-order-id');
-            
-            // Update modal with order details
-            document.getElementById('detailOrderId').textContent = orderId;
-            
-            // In a real application, you would fetch the order details from the server
-            // and update the modal content accordingly
-            
-            // For demo purposes, we'll just update the order ID
-            if (orderId === 'ORD-2023-001') {
-                document.getElementById('detailOrderStatus').textContent = 'Delivered';
-                document.getElementById('detailOrderStatus').className = 'badge badge-delivered';
-                document.getElementById('detailOrderDate').textContent = 'March 15, 2023';
-            } else if (orderId === 'ORD-2023-002') {
-                document.getElementById('detailOrderStatus').textContent = 'Processing';
-                document.getElementById('detailOrderStatus').className = 'badge badge-processing';
-                document.getElementById('detailOrderDate').textContent = 'March 18, 2023';
-            }
-        });
-        
-        // Cancel Order Modal
-        let cancelOrderModal = document.getElementById('cancelOrderModal');
-        cancelOrderModal.addEventListener('show.bs.modal', function (event) {
-            let button = event.relatedTarget;
-            let orderId = button.getAttribute('data-order-id');
-            document.getElementById('cancelOrderId').textContent = orderId;
-        });
-        
-        // Cancel Item Modal
-        let cancelItemModal = document.getElementById('cancelItemModal');
-        cancelItemModal.addEventListener('show.bs.modal', function (event) {
-            let button = event.relatedTarget;
-            let itemId = button.getAttribute('data-item-id');
-            let orderId = button.getAttribute('data-order-id');
-            document.getElementById('cancelItemOrderId').textContent = orderId;
-        });
-        
-        // Return Order Modal
-        let returnOrderModal = document.getElementById('returnOrderModal');
-        returnOrderModal.addEventListener('show.bs.modal', function (event) {
-            let button = event.relatedTarget;
-            let orderId = button.getAttribute('data-order-id');
-            document.getElementById('returnOrderId').textContent = orderId;
-        });
-        
-        // Confirm Cancel Order
-        document.getElementById('confirmCancelOrder').addEventListener('click', function() {
-            let orderId = document.getElementById('cancelOrderId').textContent;
-            let reason = document.getElementById('cancelReason').value;
-            
-            // In a real application, you would send this data to the server
-            console.log('Cancelling order:', orderId, 'Reason:', reason);
-            
-            // Close the modal
-            let modal = bootstrap.Modal.getInstance(cancelOrderModal);
-            modal.hide();
-            
-            // Show success message
-            alert('Order ' + orderId + ' has been cancelled successfully.');
-            
-            // Refresh the page or update the order status
-            location.reload();
-        });
-        
-        // Confirm Cancel Item
-        document.getElementById('confirmCancelItem').addEventListener('click', function() {
-            let orderId = document.getElementById('cancelItemOrderId').textContent;
-            let reason = document.getElementById('cancelItemReason').value;
-            
-            // In a real application, you would send this data to the server
-            console.log('Cancelling item from order:', orderId, 'Reason:', reason);
-            
-            // Close the modal
-            let modal = bootstrap.Modal.getInstance(cancelItemModal);
-            modal.hide();
-            
-            // Show success message
-            alert('Item has been cancelled from order ' + orderId + ' successfully.');
-            
-            // Close the order detail modal as well
-            let detailModal = bootstrap.Modal.getInstance(orderDetailModal);
-            detailModal.hide();
-            
-            // Refresh the page or update the order
-            location.reload();
-        });
-        
-        // Confirm Return Order
-        document.getElementById('confirmReturnOrder').addEventListener('click', function() {
-            let orderId = document.getElementById('returnOrderId').textContent;
-            let reason = document.getElementById('returnReason').value;
-            
-            // Validate that a reason is provided (it's mandatory)
-            if (!reason.trim()) {
-                document.getElementById('returnReason').classList.add('is-invalid');
-                return;
-            }
-            
-            // In a real application, you would send this data to the server
-            console.log('Returning order:', orderId, 'Reason:', reason);
-            
-            // Close the modal
-            let modal = bootstrap.Modal.getInstance(returnOrderModal);
-            modal.hide();
-            
-            // Show success message
-            alert('Return request for order ' + orderId + ' has been submitted successfully.');
-            
-            // Refresh the page or update the order status
-            location.reload();
-        });
-        
-        // Download Invoice
-        function downloadInvoice(orderId) {
-            // In a real application, you would generate the invoice on the server
-            // and provide a download link or generate it client-side using a library like jsPDF
-            
-            // For demo purposes, we'll just show an alert
-            alert('Downloading invoice for order ' + orderId);
-            
-            // Example of how you might generate a PDF invoice using jsPDF
-            // This is commented out because it requires proper setup of jsPDF
-            /*
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            doc.text('INVOICE', 105, 20, { align: 'center' });
-            doc.text('Order ID: ' + orderId, 20, 30);
-            doc.text('Date: ' + new Date().toLocaleDateString(), 20, 40);
-            doc.text('Customer: John Doe', 20, 50);
-            doc.text('Items:', 20, 70);
-            doc.text('1. Wireless Headphones - $199.99', 30, 80);
-            doc.text('2. Wireless Charger - $50.00', 30, 90);
-            doc.text('Subtotal: $249.99', 150, 110, { align: 'right' });
-            doc.text('Tax: $20.00', 150, 120, { align: 'right' });
-            doc.text('Total: $269.99', 150, 130, { align: 'right' });
-            
-            doc.save('invoice-' + orderId + '.pdf');
-            */
+
+
+
+
+
+        function showAlert(icon,title,message){
+            Swal.fire({
+            title: title,
+            text: message,
+            icon: icon
+            });
         }
+        //sweet alert end
+
+
+
+
     </script>
-</body>
+
 
 <%-include('../../views/partials/user/_footer')%>

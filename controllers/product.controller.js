@@ -231,11 +231,103 @@ async function postEditProduct(req, res) {
     }
 }
 
+
+
+const deleteProduct = async (req, res) => {
+    try {
+        const { id } = req.body; // Get ID from request body
+
+        // Check if ID is provided
+        if (!id) {
+            return res.status(400).json({ success: false, message: "Product ID is required" });
+        }
+
+        // Find and delete the product
+        const deletedProduct = await Product.findByIdAndDelete(id);
+
+        // If product not found
+        if (!deletedProduct) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        // Success response
+        res.status(200).json({ success: true, message: "Product deleted successfully" });
+
+    } catch (error) {
+        console.error("Error deleting product:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+
+
+
+
+// user side product controller 
+const getProductForUser = async (req,res)=>{
+    try {
+        const productId = req.params.id
+        const product = await Product.findById(productId)
+        console.log(product)
+        if(!product){
+          return  res.status(400).json("product not found")
+        }
+        res.render('product-details.ejs',{product:product})
+
+
+    } catch (error) {
+        
+    }
+}
+
+
+const renderShopPage = async (req,res)=>{
+    try {
+        res.render('shop')
+    } catch (error) {
+        console.log(error)
+
+    }
+}
+
+
+const fetchAvailableProducts  = async (req,res)=>{
+    try {
+        const page = req.query.page || 1;
+        const limit = 4
+        const search = req.query.search || ""
+        const skip = (page - 1) * limit
+        // console.log(skip)
+        console.log(req.query)
+        const sort = JSON.parse(req.query.sort) || {}
+        // sort = JSON.parse(sort)
+        console.log(sort)
+
+        const products =await Product.find({isBlocked:false,productTitle:{$regex:search}}).skip(skip).sort(sort).limit(limit)
+
+        // console.log(products)
+        
+        if(!products){
+            return res.status(400).json({message:"products not found"})
+        }
+        res.status(200).json({productsData:products})
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({message:"some internal error "})
+    }
+}
+
+
 module.exports = {
+    
     getProductAddPage,
     addproducts,
     getAllProducts,
     getEditProducts,
-    postEditProduct
+    postEditProduct,
+    getProductForUser,
+    deleteProduct,
+    renderShopPage,
+    fetchAvailableProducts 
 
 }

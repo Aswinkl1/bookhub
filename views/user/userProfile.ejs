@@ -191,7 +191,7 @@
                                 <div class="info-icon bg-primary">
                                     <i class="fas fa-birthday-cake"></i>
                                 </div>
-                                <strong>Date of Birth:</strong> <span id="user-dob"><%= profile.dateOfBirth.toISOString().split("T")[0].split("-").reverse().join("-") %></span>
+                                <strong>Date of Birth:</strong> <span id="user-dob"><%= profile.dateOfBirth?.toISOString().split("T")[0].split("-").reverse().join("-") %></span>
                             </li>
                             <li class="list-group-item">
                                 <div class="info-icon bg-primary">
@@ -277,7 +277,7 @@
 
                         <div class="mb-3">
                             <label for="dob" class="form-label">Date of Birth</label>
-                            <input type="date" class="form-control" name="dateOfBirth" id="dob" value="<%= profile.dateOfBirth.toISOString().split('T')[0]%>">
+                            <input type="date" class="form-control" name="dateOfBirth" id="dob" value="<%= profile.dateOfBirth?.toISOString().split('T')[0]%>">
                         </div>
                         <input type="text" name="id" value="<%=profile._id%>" hidden id="">
                         <div class="mb-3">

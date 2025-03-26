@@ -9,6 +9,8 @@ const storage = require('../helpers/multer')
 const uploads = multer({storage:storage})
 const productController = require('../controllers/product.controller')
 const coupon = require("../controllers/coupon.controller")
+const order = require('../controllers/order.controller')
+const { route } = require('./user.router')
 
 
 router.get('/login',controller.loadLogin)
@@ -38,6 +40,7 @@ router.post("/addProducts",uploads.array("images",4),productController.addproduc
 router.get('/products',productController.getAllProducts)
 router.get('/editProduct',productController.getEditProducts)
 router.post('/editProduct/:id',uploads.array("images",4),productController.postEditProduct)
+router.put('/products/delete',productController.deleteProduct)
 
 
 // coupon
@@ -45,5 +48,9 @@ router.get("/coupon",coupon.loadCouponPage)
 router.post("/coupon/editCoupons",coupon.getEditCoupon)
 router.put("/coupon/editCoupons",coupon.postEditCoupon)
 router.delete("/coupon/deleteCoupon/:id",coupon.deleteCoupon)
+
+router.get("/order",order.renderOrderList)
+router.get("/api/order",order.getOrderData)
+router.get("/api/order/:id",)
 
 module.exports = router

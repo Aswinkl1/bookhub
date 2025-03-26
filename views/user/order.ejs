@@ -1,0 +1,723 @@
+<%-include('../../views/partials/user/_header')%>
+
+
+
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .order-card {
+            transition: all 0.3s ease;
+            border-left: 5px solid #6c757d;
+        }
+        .order-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        .order-pending { border-left-color: #ffc107; }
+        .order-delivered { border-left-color: #28a745; }
+        .order-cancelled { border-left-color: #dc3545; }
+        .order-processing { border-left-color: #17a2b8; }
+        .order-returned { border-left-color: #6610f2; }
+        .badge-pending { background-color: #ffc107; color: #000; }
+        .badge-delivered { background-color: #28a745; }
+        .badge-cancelled { background-color: #dc3545; }
+        .badge-processing { background-color: #17a2b8; }
+        .badge-returned { background-color: #6610f2; }
+        .search-bar {
+            border-radius: 20px;
+            padding-left: 40px;
+        }
+        .search-icon {
+            position: absolute;
+            left: 25px;
+            top: 10px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 class="mb-4">Your Orders</h2>
+        
+        <!-- Search Bar -->
+        <div class="row mb-4">
+            <div class="col-md-6 position-relative">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="orderSearch" class="form-control search-bar" placeholder="Search orders by ID, product, or status...">
+            </div>
+        </div>
+        
+        <!-- Order Listing -->
+        <div class="order-listing">
+            <% for(let i=0;i<orderData.length;i++){ %>
+                <!-- Order 1 -->
+                <div class="card order-card order-delivered mb-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <h5 class="card-title text-truncate">Order <%=orderData[i].orderId %></h5>
+                                <p class="text-muted"> <%=orderData[i].orderDate.toISOString().split("T")[0].split("-").reverse().join("-")%></p>
+                            </div>
+                            <div class="col-md-3">
+                                <span class="badge badge-delivered " id="status<%=orderData[i].orderId %>"><%=orderData[i].status%></span>
+                                <p class="mt-2">Total: <%=orderData[i].totalPrice %></p>
+                            </div>
+                            <div class="col-md-3">
+                                <p><%=orderData[i].items.length %> items</p>
+                                <!-- <p>Est. delivery: Delivered</p> -->
+                            </div>
+                            <div class="col-md-3 text-end">
+                                <a href="/order/<%=orderData[i]._id%>" class="btn btn-sm btn-outline-primary">View Details</a>
+                                <% if(orderData[i].status =='Delivered'){ %>
+                                    <a href="#" class="btn btn-sm btn-outline-success" onclick="downloadInvoice('ORD-2023-001')">
+                                        <i class="fas fa-file-pdf"></i> Invoice
+                                    </a>
+                                    <button class="btn btn-sm btn-outline-danger mt-2" data-bs-toggle="modal" data-bs-target="#returnOrderModal" data-order-id="<%=orderData[i].orderId %>">Return Order</button>
+                                <%}else{%>
+                                <button class="btn btn-sm btn-outline-danger mt-2" data-bs-toggle="modal" data-bs-target="#cancelOrderModal" data-order-id="<%=orderData[i].orderId %>">Cancel Order</button>
+                                <%}%>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+            <!-- Order 2 -->
+            
+            
+            <!-- Order 3 -->
+            
+            <!-- Order 4 -->
+            
+            <!-- Order 5 -->
+           
+        </div>
+    </div>
+    
+    <!-- Order Detail Modal -->
+    <div class="modal fade" id="orderDetailModal" tabindex="-1" aria-labelledby="orderDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header order-detail-modal">
+                    <h5 class="modal-title" id="orderDetailModalLabel">Order Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modal-order-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6>Order #<span id="detailOrderId">ORD-2023-001</span></h6>
+                            <p>Placed on: <span id="detailOrderDate">March 15, 2023</span></p>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <span class="badge badge-delivered" id="detailOrderStatus">Delivered</span>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6>Shipping Address</h6>
+                            <p>John Doe<br>
+                            123 Main Street<br>
+                            Apt 4B<br>
+                            New York, NY 10001<br>
+                            United States</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Payment Method</h6>
+                            <p>Credit Card ending in 1234<br>
+                            Billing Address: Same as shipping</p>
+                        </div>
+                    </div>
+                    
+                    <h6>Order Items</h6>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orderItemsTable">
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="https://via.placeholder.com/50" alt="Product" class="me-2">
+                                            <div>
+                                                <h6 class="mb-0">Wireless Headphones</h6>
+                                                <small class="text-muted">Black, Over-ear</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>$199.99</td>
+                                    <td>1</td>
+                                    <td>$199.99</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelItemModal" data-item-id="1" data-order-id="ORD-2023-001">
+                                            Cancel
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="https://via.placeholder.com/50" alt="Product" class="me-2">
+                                            <div>
+                                                <h6 class="mb-0">Wireless Charger</h6>
+                                                <small class="text-muted">15W Fast Charge</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>$50.00</td>
+                                    <td>1</td>
+                                    <td>$50.00</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelItemModal" data-item-id="2" data-order-id="ORD-2023-001">
+                                            Cancel
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Order Timeline</h6>
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>Order Placed</span>
+                                    <span>March 15, 2023</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>Order Processing</span>
+                                    <span>March 16, 2023</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>Order Shipped</span>
+                                    <span>March 17, 2023</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>Order Delivered</span>
+                                    <span>March 19, 2023</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">Order Summary</h6>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Subtotal:</span>
+                                        <span>$249.99</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Shipping:</span>
+                                        <span>$0.00</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Tax:</span>
+                                        <span>$20.00</span>
+                                    </div>
+                                    <hr>
+                                    <div class="d-flex justify-content-between">
+                                        <strong>Total:</strong>
+                                        <strong>$269.99</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancel">Close</button>
+                    <a href="#" class="btn btn-primary" onclick="downloadInvoice('ORD-2023-001')">
+                        <i class="fas fa-file-pdf"></i> Download Invoice
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cancel Order Modal -->
+    <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelOrderModalLabel">Cancel Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to cancel order #<span id="cancelOrderId">ORD-2023-002</span></p>
+                    <p>This action cannot be undone. The inventory will be updated accordingly.</p>
+                    <div class="mb-3">
+                        <label for="cancelReason" class="form-label">Reason for cancellation (optional)</label>
+                        <textarea class="form-control" id="cancelReason" rows="3" placeholder="Please provide a reason for cancellation (optional)"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancel">No, Keep Order</button>
+                    <button type="button" class="btn btn-danger" id="confirmCancelOrder">Yes, Cancel Order</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cancel Item Modal -->
+    <div class="modal fade" id="cancelItemModal" tabindex="-1" aria-labelledby="cancelItemModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelItemModalLabel">Cancel Item</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to cancel this item from order #<span id="cancelItemOrderId">ORD-2023-001</span>?</p>
+                    <p >Are you sure you want to cancel this item from order #<span  id="cancelItemId">ORD-2023-001</span>?</p>
+                    <p>This action cannot be undone. The inventory will be updated accordingly.</p>
+                    <div class="mb-3">
+                        <label for="cancelItemReason" class="form-label">Reason for cancellation (optional)</label>
+                        <textarea class="form-control" id="cancelItemReason" rows="3" placeholder="Please provide a reason for cancellation (optional)"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancel-item">No, Keep Item</button>
+                    <button type="button" class="btn btn-danger" id="confirmCancelItem">Yes, Cancel Item</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Return Order Modal -->
+    <div class="modal fade" id="returnOrderModal" tabindex="-1" aria-labelledby="returnOrderModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="returnOrderModalLabel">Return Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to return order #<span id="returnOrderId">ORD-2023-001</span>?</p>
+                    <p>This action cannot be undone. The inventory will be updated accordingly.</p>
+                    <div class="mb-3">
+                        <label for="returnReason" class="form-label">Reason for return (required)</label>
+                        <textarea class="form-control" id="returnReason" rows="3" placeholder="Please provide a reason for return" required></textarea>
+                        <div class="invalid-feedback">
+                            Please provide a reason for return.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmReturnOrder">Return Order</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jsPDF for invoice generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <script>
+        // showing alert fucntion
+        function showAlert(icon, title, timer = 1500) {
+            Swal.fire({
+            icon: icon, // "success" or "error"
+            title: title,
+            showConfirmButton: true,
+            timer: timer
+            });
+        }
+
+        // Search functionality
+        document.getElementById('orderSearch').addEventListener('keyup', function() {
+            let searchTerm = this.value.toLowerCase();
+            let orderCards = document.querySelectorAll('.order-card');
+            
+            orderCards.forEach(card => {
+                let orderText = card.textContent.toLowerCase();
+                if (orderText.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+        
+        // // Order Detail Modal
+        // let orderDetailModal = document.getElementById('orderDetailModal');
+        // orderDetailModal.addEventListener('show.bs.modal', function (event) {
+        //     let button = event.relatedTarget;
+        //     let orderId = button.getAttribute('data-order-id');
+            
+        //     // Update modal with order details
+        //     document.getElementById('detailOrderId').textContent = orderId;
+            
+        //     // In a real application, you would fetch the order details from the server
+        //     // and update the modal content accordingly
+            
+        //     // For demo purposes, we'll just update the order ID
+        //     if (orderId === 'ORD-2023-001') {
+        //         document.getElementById('detailOrderStatus').textContent = 'Delivered';
+        //         document.getElementById('detailOrderStatus').className = 'badge badge-delivered';
+        //         document.getElementById('detailOrderDate').textContent = 'March 15, 2023';
+        //     } else if (orderId === 'ORD-2023-002') {
+        //         document.getElementById('detailOrderStatus').textContent = 'Processing';
+        //         document.getElementById('detailOrderStatus').className = 'badge badge-processing';
+        //         document.getElementById('detailOrderDate').textContent = 'March 18, 2023';
+        //     }
+        // });
+        
+
+        // this fun is not needed 
+       async function getOrderDetails(id){
+            try {
+                console.log("fh")
+                const response = await fetch('/getOneOrder/'+id,{
+                    method:"GET",
+                    headers:{"Content-Type":'application/json'},
+                    
+                })
+
+
+                const jsonResponse = await response.json()
+                if(response.ok){
+                    const modalContent = document.querySelector("#orderDetailModal .modal-content");
+                    if (modalContent) {
+                        modalContent.innerHTML = ""; // Clears the existing modal content
+                    }
+
+                    // Add new data to modal
+                    modalContent.innerHTML = orderModalBodyData(jsonResponse.order);
+                    console.log(jsonResponse.order)
+                }else{
+                    console.log("er")
+                }
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        
+        // Cancel Order Modal
+        let cancelOrderModal = document.getElementById('cancelOrderModal');
+        cancelOrderModal.addEventListener('show.bs.modal', function (event) {
+            let button = event.relatedTarget;
+            let orderId = button.getAttribute('data-order-id');
+            document.getElementById('cancelOrderId').textContent = orderId;
+        });
+
+        
+        // Cancel Item Modal
+        let cancelItemModal = document.getElementById('cancelItemModal');
+        cancelItemModal.addEventListener('show.bs.modal', function (event) {
+            
+            let button = event.relatedTarget;
+            let itemId = button.getAttribute('data-item-id');
+            let orderId = button.getAttribute('data-order-id');
+            console.log(itemId)
+            console.log(orderId)
+            document.getElementById('cancelItemOrderId').textContent = orderId;
+            document.getElementById('cancelItemId').textContent = itemId;
+        });
+        
+        // Return Order Modal
+        let returnOrderModal = document.getElementById('returnOrderModal');
+        returnOrderModal.addEventListener('show.bs.modal', function (event) {
+            
+
+            let button = event.relatedTarget;
+            console.log("bthb"+button)
+            let orderId = button.getAttribute('data-order-id');
+            document.getElementById('returnOrderId').textContent = orderId;
+        });
+        
+        // Confirm Cancel Order
+        document.getElementById('confirmCancelOrder').addEventListener('click',async function() {
+            let orderId = document.getElementById('cancelOrderId').textContent;
+            let reason = document.getElementById('cancelReason').value.trim();
+            
+            // fetch requets
+            const response = await fetch(`/cancelOrder/${orderId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ reason })
+        });
+            const jsonResponse = await response.json()
+
+            if(response.ok){
+                console.log("order cancelled")
+                showAlert("success",jsonResponse.message)
+                document.getElementById("status"+orderId).innerHTML = "Cancelled"
+            }else{
+                showAlert("error",jsonResponse.message)
+            }
+
+
+            // Close the modal
+            let activeModal = bootstrap.Modal.getInstance(document.querySelector(".modal.show"));
+            if (activeModal)
+            {
+                activeModal.hide();
+                document.querySelectorAll(".modal-backdrop").forEach(el => el.remove()); // Remove backdrops
+                document.body.classList.remove("modal-open");
+            }
+            
+       
+            
+        });
+        
+        // Confirm Cancel Item
+        document.getElementById('confirmCancelItem').addEventListener('click',async function() {
+            let orderId = document.getElementById('cancelItemOrderId').textContent;
+            let reason = document.getElementById('cancelItemReason').value;
+            let productId = document.getElementById('cancelItemId').textContent;
+            // fetch requets
+            const response = await fetch(`/cancelProduct/${orderId}/${productId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ reason })
+        });
+            const jsonResponse = await response.json()
+
+            if(response.ok){
+                console.log("order cancelled")
+                showAlert("success",jsonResponse.message)
+                // document.getElementById("status"+orderId).innerHTML = "Cancelled"
+               
+
+            }else{
+                showAlert("error",jsonResponse.message)
+            }
+
+            closeAllModals()
+            // Get modal instance
+        
+        });
+        
+        function closeAllModals() {
+            document.querySelectorAll('.modal.show').forEach(modalElement => {
+                let modalInstance = bootstrap.Modal.getInstance(modalElement);
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
+            });
+
+            // Remove all modal backdrops after Bootstrap finishes closing modals
+            setTimeout(() => {
+                document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+                    backdrop.remove();
+                });
+
+                // Restore body scrolling and remove modal-open class
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = 'auto';
+            }, 300); // Small delay ensures Bootstrap's hide transition completes
+        }
+
+        // reinstis
+        document.querySelectorAll("[data-bs-toggle='modal']").forEach(button => {
+            button.addEventListener("click", function () {
+                let targetModalId = this.getAttribute("data-bs-target");
+                let modalElement = document.querySelector(targetModalId);
+
+                // Destroy old Bootstrap instance (if it exists) before creating a new one
+                let oldModalInstance = bootstrap.Modal.getInstance(modalElement);
+                if (oldModalInstance) {
+                    oldModalInstance.dispose();
+                }
+
+                // Create a new modal instance and show it
+                let newModalInstance = new bootstrap.Modal(modalElement);
+                newModalInstance.show();
+            });
+        });
+
+
+
+
+        // Confirm Return Order
+        document.getElementById('confirmReturnOrder').addEventListener('click',async function() {
+            let orderId = document.getElementById('returnOrderId').textContent;
+            let reason = document.getElementById('returnReason').value;
+            
+            // Validate that a reason is provided (it's mandatory)
+            if (!reason.trim()) {
+                document.getElementById('returnReason').classList.add('is-invalid');
+                return;
+            }
+
+            // fetch requets
+            const response = await fetch(`/returnOrder/${orderId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ reason })
+        });
+            const jsonResponse = await response.json()
+
+            if(response.ok){
+                console.log("order cancelled")
+                showAlert("success",jsonResponse.message)
+                document.getElementById("status"+orderId).innerHTML = "Returned"
+            }else{
+                showAlert("error",jsonResponse.message)
+            }
+            
+            
+        });
+        
+        // Download Invoice
+        function downloadInvoice(orderId) {
+            // In a real application, you would generate the invoice on the server
+            // and provide a download link or generate it client-side using a library like jsPDF
+            
+            // For demo purposes, we'll just show an alert
+            alert('Downloading invoice for order ' + orderId);
+            
+            // Example of how you might generate a PDF invoice using jsPDF
+            // This is commented out because it requires proper setup of jsPDF
+            /*
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.text('INVOICE', 105, 20, { align: 'center' });
+            doc.text('Order ID: ' + orderId, 20, 30);
+            doc.text('Date: ' + new Date().toLocaleDateString(), 20, 40);
+            doc.text('Customer: John Doe', 20, 50);
+            doc.text('Items:', 20, 70);
+            doc.text('1. Wireless Headphones - $199.99', 30, 80);
+            doc.text('2. Wireless Charger - $50.00', 30, 90);
+            doc.text('Subtotal: $249.99', 150, 110, { align: 'right' });
+            doc.text('Tax: $20.00', 150, 120, { align: 'right' });
+            doc.text('Total: $269.99', 150, 130, { align: 'right' });
+            
+            doc.save('invoice-' + orderId + '.pdf');
+            */
+        }
+
+
+
+        function orderModalBodyData(data){
+            let product = ""
+            data.items.forEach(item=>{
+                product += `
+                                 <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="https://via.placeholder.com/50" alt="Product" class="me-2">
+                                            <div>
+                                                <h6 class="mb-0">${item.productId.productTitle}</h6>
+                                                <small class="text-muted">${item.productId.authorname}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>${item.price}</td>
+                                    <td>${item.quantity}</td>
+                                    <td>${item.price * item.quantity}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelItemModal" data-item-id="${item.productId._id}" data-order-id="${data.orderId}">
+                                            Cancel
+                                        </button>
+                                    </td>
+                                </tr>`
+            })
+            return `
+            <div class="modal-header order-detail-modal">
+                    <h5 class="modal-title" id="orderDetailModalLabel">Order Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modal-order-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6>Order #<span id="detailOrderId">${data.orderId}</span></h6>
+                            <p>Placed on: <span id="detailOrderDate">${data.orderDate}</span></p>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <span class="badge badge-delivered" id="detailOrderStatus">${data.status}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6>Shipping Address</h6>
+                            <p>
+                                ${data.addressId.fullName}<br>
+                                ${data.addressId.streetAddress ? data.addressId.streetAddress : "N/A"}<br>
+                                ${data.addressId.apartment ? data.addressId.apartment + "<br>" : ""}
+                                ${data.addressId.landmark ? data.addressId.landmark + "<br>" : ""}
+                                ${data.addressId.city}, ${data.addressId.state} - ${data.addressId.postalCode}<br>
+                                ${data.addressId.country}<br>
+                                Phone: ${data.addressId.phoneNumber}
+                            </p>
+                        </div>
+
+
+                        <div class="col-md-6">
+                            <h6>Payment Method</h6>
+                            <p>Cash on Delivery<br>
+                            Billing Address: Same as shipping</p>
+                        </div>
+                    </div>
+                    
+                    <h6>Order Items</h6>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orderItemsTable">
+                                ${product}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="row">
+                        
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">Order Summary</h6>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Subtotal:</span>
+                                        <span>${data.totalPrice}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Shipping:</span>
+                                        <span>$0.00</span>
+                                    </div>
+                                    
+                                    <hr>
+                                    <div class="d-flex justify-content-between">
+                                        <strong>Total:</strong>
+                                        <strong>${data.totalPrice}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <a href="#" class="btn btn-primary" onclick="downloadInvoice('ORD-2023-001')">
+                        <i class="fas fa-file-pdf"></i> Download Invoice
+                    </a>
+                </div>`
+        }
+
+       
+    
+    </script>
+</body>
+
+<%-include('../../views/partials/user/_footer')%>
