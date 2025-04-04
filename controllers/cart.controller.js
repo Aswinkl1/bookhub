@@ -1,6 +1,6 @@
 const Cart = require("../models/cart.schema");
 const Product = require("../models/product.schema");
-// const Wishlist = require("../models/Wishlist");
+const Wishlist = require("../models/wishlist.schema");
  
 
 const addTocart = async (req,res)=>{
@@ -46,6 +46,12 @@ const addTocart = async (req,res)=>{
     cart.items.push({productId:productId,quantity:quantity,price:price})
   }
   const result =await cart.save()
+
+  const wishlist = await Wishlist.findOneAndUpdate(
+    {userId},
+    { $pull:{ items: productId} },
+    {new:true}
+  )
   const totalPrice = result.items[existingProductIndex]?.totalPrice || ""
 
   res.status(200).json({message:"product added to cart",quantity:quantity,totalPrice:totalPrice});

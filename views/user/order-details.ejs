@@ -469,11 +469,11 @@
                                         <div class="mb-1 text-muted small">Price</div>
                                         <div class="fw-semibold">₹<%= item.price %></div>
                                         <% if(item.status == "Delivered"){ %>
-                                            <button class="btn btn-sm btn-outline-primary mt-2" id="return-product-btn" data-bs-toggle="modal" data-orderId="<%= order._id %>" data-productId="<%= item.productId._id %>" data-bs-target="#returnModal">
+                                            <button class="btn btn-sm btn-outline-primary mt-2 return-product-btn" id="return-product-btn" data-bs-toggle="modal" data-orderId="<%= order._id %>" data-productId="<%= item.productId._id %>" data-bs-target="#returnModal">
                                                 Return Item
                                             </button>
                                         <% } else if(item.status == "Pending" || item.status == "Shipped" ) { %>
-                                            <button class="btn btn-sm btn-outline-primary mt-2" id="return-product-btn" data-bs-toggle="modal" data-orderId="<%= order._id %>" data-productId="<%= item.productId._id %>" data-bs-target="#returnModal">
+                                            <button class="btn btn-sm btn-outline-primary mt-2" id="cancel-product-btn" data-bs-toggle="modal" data-orderId="<%= order._id %>" data-productId="<%= item.productId._id %>" data-bs-target="#cancelProductModal">
                                                 cancel Item
                                             </button>
                                         <% } else { %>
@@ -586,7 +586,7 @@
                                 <i class="bi bi-x-circle me-2"></i> Cancel Order
                             </button>
                         <% } else if(order.status == "Delivered"){ %>
-                            <button class="btn btn-outline-primary w-100" id="return-order-button" data-bs-toggle="modal" data-bs-target="#returnModal">
+                            <button class="btn btn-outline-primary w-100" id="return-order-button" data-bs-toggle="modal" data-bs-target="#return-order-Modal">
                                 <i class="bi bi-x-circle me-2"></i> return Order
                             </button>
                         <% }else { %>
@@ -648,8 +648,8 @@
         </div>
     </div>
 
-    <!-- Return Modal -->
-    <div class="modal fade" id="returnModal" tabindex="-1" aria-labelledby="returnModalLabel" aria-hidden="true">
+    <!-- Return single  Modal -->
+   <div class="modal fade" id="returnModal" tabindex="-1" aria-labelledby="returnModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -669,6 +669,31 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-primary" id="product-return-submit">Submit Return Request</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Return order modal -->
+    <div class="modal fade" id="return-order-Modal" tabindex="-1" aria-labelledby="returnModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="returnModalLabel">Return Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form >
+                       
+                        <div class="mb-4">
+                            <label for="returnComments" class="form-label">Reason for Return</label>
+                            <textarea class="form-control" id="returnOrderReason" rows="3" placeholder="Please provide details about your return..."></textarea>
+                        </div>
+                        
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="order-return-submit">Submit Return Request</button>
                 </div>
             </div>
         </div>
@@ -708,6 +733,40 @@
         </div>
     </div>
 
+
+    <!-- cancel modal for single product -->
+    <div class="modal fade" id="cancelProductModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelModalLabel">Cancel Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-exclamation-circle text-warning display-1"></i>
+                    </div>
+                    <h4 class="text-center mb-3">Are you sure?</h4>
+                    <p class="text-center">You are about to cancel order #ORD-2023-45678.</p>
+                    <div class="alert alert-warning">
+                        <small><i class="bi bi-info-circle me-2"></i> This action cannot be undone. Any payments will be refunded within 5-7 business days.</small>
+                    </div>
+                    <form >
+                           
+                        <div class="mb-4">
+                            <label for="cancelComments" class="form-label">Reason for cancel</label>
+                            <textarea class="form-control" id="cancelReason" rows="3" placeholder="Please provide details about your cancel..."></textarea>
+                        </div>
+                        
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Keep Order</button>
+                    <button type="button" id="cancel-product-submit-button" class="btn btn-danger">Yes, Cancel Order</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
@@ -716,11 +775,20 @@
 
         let productId ;
         const orderId = document.getElementById("orderId").innerText
-        
+        let button
         document.addEventListener('DOMContentLoaded',()=>{
             const returnModal = document.getElementById("returnModal")
+            const cancelProductModal = document.getElementById("cancelProductModal")
+
             returnModal.addEventListener("show.bs.modal",(e)=>{
-                const button = e.relatedTarget
+                 button = e.relatedTarget
+                console.log(button)
+                 productId = button.getAttribute("data-productid")
+                 
+            })
+
+            cancelProductModal.addEventListener("show.bs.modal",(e)=>{
+                 button = e.relatedTarget
                 console.log(button)
                  productId = button.getAttribute("data-productid")
                  
@@ -739,12 +807,49 @@
 
                 const jsonResponse = await response.json()
                 if(response.ok){
-                    document.getElementById("return-product-btn").disabled = true
-                    console.log("success")
+                    showAlert("success",jsonResponse.message)
+                    button.disabled = true
+                    button.innerHTML = "Return Pending"
+                    
+                }else{
+                    showAlert("error",jsonResponse.error)
+
+                }
+                closeModal()
+
+            });
+
+            // order return
+            document.getElementById("order-return-submit").addEventListener("click",async (e)=>{
+                const reason = document.getElementById("returnOrderReason").value
+                
+                console.log(reason)
+                const response = await fetch(`/returnOrder/${orderId}`,{
+                    method:"PUT",
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({reason})
+                })
+
+                const jsonResponse = await response.json()
+                if(response.ok){
+                    showAlert("success",jsonResponse.message)
+                    document.getElementById("return-order-button").disabled = true
+                    document.getElementById("return-order-button").innerHTML = "Return Pending"
+                    // Get all buttons with the class 'return-product-btn'
+                    let buttons = document.querySelectorAll('.return-product-btn');
+
+                    // Loop through each button and disable it, then change its inner HTML
+                    buttons.forEach(function(button) {
+                        button.disabled = true;  // Disable the button
+                        button.innerHTML = "Return pending";  // Change the button text
+                    });
+
                 }else{
                     console.log("error")
-                    alert(jsonResponse.error)
+                    showAlert("error",jsonResponse.message,"")
+
                 }
+                closeModal()
 
             });
 
@@ -764,17 +869,53 @@
                     showAlert("success","Good job",jsonResponse.message)
                     document.getElementById("cancel-order-button").disabled = true
                     document.getElementById("cancel-order-button").innerHTML = "cancelled"
-
                 }else{
                     showAlert("error","error",jsonResponse.message)
                     
                 }
+                closeModal()
             })
+            
+            // cancel single product
+            document.getElementById("cancel-product-submit-button").addEventListener("click",async(e)=>{
+                const reason = document.getElementById("cancelReason").value
+                
+                const response = await fetch(`/cancelProduct/${orderId}/${productId}`,{
+                    method:"PUT",
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({reason})
+                })
+
+                const jsonResponse = await response.json()
+
+                if(response.ok){
+                    showAlert("success","Good job",jsonResponse.message)
+                    
+                    button.disabled = true; // Disable the button
+                    button.innerHTML = "Cancelled";
+                }else{
+                    showAlert("error","error",jsonResponse.message)
+                    
+                }
+                closeModal()
+            })
+        
+        
+        
+        
+        
         });
 
 
 
+        function closeModal(params) {
+            $('.modal').modal('hide');
+            setTimeout(() => {
+                $('.modal-backdrop').remove();
+                $('body').removeClass('modal-open');
+            }, 300); // Wait for animation to complete
 
+        }
 
         function showAlert(icon,title,message){
             Swal.fire({

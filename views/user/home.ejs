@@ -124,7 +124,7 @@
                             <button class="nav-link" id="nav-tab-three" data-bs-toggle="tab" data-bs-target="#tab-three" type="button" role="tab" aria-controls="tab-three" aria-selected="false">New added</button>
                         </li>
                     </ul>
-                    <a href="#" class="view-more d-none d-md-flex">View More<i class="fi-rs-angle-double-small-right"></i></a>
+                    <a href="/shop" class="view-more d-none d-md-flex">View More<i class="fi-rs-angle-double-small-right"></i></a>
                 </div>
                 <!--End nav-tabs-->
                 <div class="tab-content wow fadeIn animated" id="myTabContent">
@@ -144,7 +144,7 @@
                                             </div>
                                             <div class="product-action-1">
                                                 <a aria-label="Quick view" class="action-btn hover-up" data-bs-toggle="modal" data-bs-target="#quickViewModal"><i class="fi-rs-eye"></i></a>
-                                                <a aria-label="Add To Wishlist" class="action-btn hover-up" href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>
+                                                <a aria-label="Add To Wishlist" class="action-btn hover-up" onclick="addToWishlist('<%=locals.product[i]._id%>')"><i class="fi-rs-heart"></i></a>
                                                 <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a>
                                             </div>
                                             <div class="product-badges product-badges-position product-badges-mrg">
@@ -187,7 +187,34 @@
     </main>
 
 <script>
-   async function addToCart(productId){
+
+    function showAlert(icon,title,text) {
+        Swal.fire({
+        title: title,
+        text: text,
+        icon: icon
+        });
+    }
+    async function addToWishlist(productId) {
+        console.log("evide unde")
+        const response = await fetch('/api/wishlist',{
+            method:"POST",
+            headers:{'Content-Type':"application/json"},
+            body:JSON.stringify({productId})
+        })
+
+        const jsonResponce = await response.json()
+
+        if(response.ok){
+            showAlert("success",jsonResponce.message,"")
+        }else{
+            showAlert("error",jsonResponce.error,"")
+
+        }
+        
+    }
+
+    async function addToCart(productId){
         const responce =await fetch('/cart/addToCart',{
             method:'POST',
             headers:{"Content-Type":"application/json"},
@@ -197,6 +224,13 @@
             })
         })
 
+        // when the user was not logedin . the middlware was redirecting to login page 
+        // so at that time i got the error . using this it is solved
+        // if user is loged in redirected will be false 
+        if(responce.redirected){
+                window.location = responce.url
+            }
+            
         const jsonResponce = await responce.json()
         if(responce.ok){
             Swal.fire({
@@ -212,5 +246,6 @@
             });
         }
     }
+
 </script>
     <%-include('../../views/partials/user/_footer')%>

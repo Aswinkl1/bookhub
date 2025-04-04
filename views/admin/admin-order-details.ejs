@@ -1,0 +1,305 @@
+
+<%-include('../../views/partials/admin/_header')%>
+
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Order detail</h2>
+            <p>Details for Order ID: <%=order.orderId %></p>
+        </div>
+    </div>
+    <div id="orderId" hidden><%=order._id %></div>
+    <div class="card">
+        <header class="card-header">
+            <div class="row align-items-center">
+                <div class="col-lg-6 col-md-6 mb-lg-0 mb-15">
+                    <span>
+                        <i class="material-icons md-calendar_today"></i> <b>Wed, Aug 13, 2022, 4:34PM</b>
+                    </span> <br>
+                    <small class="text-muted" >Order ID: <%=order.orderId %></small>
+                </div>
+                <div class="col-lg-6 col-md-6 ms-auto text-md-end">
+                    <select class="form-select d-inline-block mb-lg-0 mb-15 mw-200" id="order-status">
+                        <option value="Pending">Pending</option>
+                        <option value="Shipped">Shipped</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Cancelled">Cancelled</option>
+                        <option value="Returned">Returned</option>
+                        <option value="Return-pending">Return-pending</option>
+                    </select>
+                    <a class="btn btn-primary" id="saveOrderStatusBtn">Save</a>
+                    <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a>
+                </div>
+            </div>
+        </header> <!-- card-header end// -->
+        <div class="card-body">
+            <div class="row mb-50 mt-20 order-info-wrap">
+                <div class="col-md-4">
+                    <article class="icontext align-items-start">
+                        <span class="icon icon-sm rounded-circle bg-primary-light">
+                            <i class="text-primary material-icons md-person"></i>
+                        </span>
+                        <div class="text">
+                            <h6 class="mb-1">Customer</h6>
+                            <!-- <p id="userId" hidden><%=order.userId._id%></p> -->
+                            <input type="text" id="userId"hidden value="<%=order.userId._id%>">
+                            <p class="mb-1">
+                                <%=order.userId.name %> <br> <%=order.userId.email %> <br> <%=order.userId.phone %>
+                            </p>
+                            <a href="#">View profile</a>
+                        </div>
+                    </article>
+                </div> <!-- col// -->
+                <div class="col-md-4">
+                    <article class="icontext align-items-start">
+                        <span class="icon icon-sm rounded-circle bg-primary-light">
+                            <i class="text-primary material-icons md-local_shipping"></i>
+                        </span>
+                        <div class="text">
+                            <h6 class="mb-1">Order info</h6>
+                            <p class="mb-1">
+                                Shipping: Fargo express <br> Pay method: card <br> Status: new
+                            </p>
+                            <a href="#">Download info</a>
+                        </div>
+                    </article>
+                </div> <!-- col// -->
+                <div class="col-md-4">
+                    <article class="icontext align-items-start">
+                        <span class="icon icon-sm rounded-circle bg-primary-light">
+                            <i class="text-primary material-icons md-place"></i>
+                        </span>
+                        <div class="text">
+                            <h6 class="mb-1">Deliver to</h6>
+                            <p class="mb-1">
+                                City: <%=order.addressId.city %> ,<%=order.addressId.state %> <br><%=order.addressId.streetAddress %><br> <%=order.addressId.postalCode %>
+                            </p>
+                            <a href="#">View profile</a>
+                        </div>
+                    </article>
+                </div> <!-- col// -->
+            </div> <!-- row // -->
+            <div class="row">
+                <div class="col-lg-7">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th width="40%">Product</th>
+                                    <th width="10%">Unit Price</th>
+                                    <th width="20%">Quantity</th>
+                                    <th width="10%">Status</th>
+                                    <th width="20%" class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <%for(let i=0;i < order.items.length;i++){ %>
+                                    <tr>
+                                        <td>
+                                            <a class="itemside" href="#">
+                                                <div class="left">
+                                                    <img src="assets/imgs/items/1.jpg" width="40" height="40" class="img-xs" alt="Item">
+                                                </div>
+                                                <div class="info">  <%=order.items[i].productId.productTitle %> </div>
+                                            </a>
+                                        </td>
+                                        <td>  <%=order.items[i].price %> </td>
+                                        <td> <%=order.items[i].quantity %> </td>
+                                        <td><button type="button"  class="btn btn-primary changeStatusForproductButton" data-bs-toggle="modal" data-product-id="<%=order.items[i].productId._id %>" data-status="<%=order.items[i].status%>" data-bs-target="#orderStatusModal">
+                                            Edit
+                                        </button></td>
+                                        <td class="text-end"> <%=order.items[i].quantity * order.items[i].price%></td>
+
+                                    </tr>
+                                    
+                                <% } %>
+                                <tr>
+                                    <td colspan="5">
+                                        <article class="float-end">
+                                            <dl class="dlist">
+                                                <dt>Subtotal:</dt>
+                                                <dd><%= order.totalPrice %></dd>
+                                            </dl>
+                                            <dl class="dlist">
+                                                <dt>Shipping cost:</dt>
+                                                <dd>00.00</dd>
+                                            </dl>
+                                            <dl class="dlist">
+                                                <dt>Grand total:</dt>
+                                                <dd> <b class="h5"><%= order.totalPrice %></b> </dd>
+                                            </dl>
+                                            <dl class="dlist">
+                                                <dt class="text-muted">Status:</dt>
+                                                <dd>
+                                                    <span class="badge rounded-pill alert-success text-success">Payment done</span>
+                                                </dd>
+                                            </dl>
+                                        </article>
+                                    </td>
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                    </div> <!-- table-responsive// -->
+                    <a class="btn btn-primary" href="page-orders-tracking.html">View Order Tracking</a>
+                </div> <!-- col// -->
+                <div class="col-lg-1"></div>
+                <div class="col-lg-4">
+                    <div class="box shadow-sm bg-light">
+                        <h6 class="mb-15">Payment info</h6>
+                        <p>
+                            <img src="assets/imgs/card-brands/2.png" class="border" height="20"> Master Card **** **** 4768 <br>
+                            Business name: Grand Market LLC <br>
+                            Phone: +1 (800) 555-154-52
+                        </p>
+                    </div>
+                    <div class="h-25 pt-4">
+                        <div class="mb-3">
+                            <label>Notes</label>
+                            <textarea class="form-control" name="notes" id="notes" placeholder="Type some note"></textarea>
+                        </div>
+                        <button class="btn btn-primary">Save note</button>
+                    </div>
+                </div> <!-- col// -->
+            </div>
+
+            <!-- modal for change status of product -->
+            <div class="modal fade" id="orderStatusModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Update Order Status</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <select class="form-select" id="orderStatusSelect">
+                                <option value="">Choose Status</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Shipped">Shipped</option>
+                                <option value="Delivered">Delivered</option>
+                                <option value="Cancelled">Cancelled</option>
+                                <option value="Return-pending">Return Pending</option>
+                                <option value="Returned">Returned</option>
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" id="saveStatusBtn">Save Status</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- card-body end// -->
+    </div> <!-- card end// -->
+</section>
+
+<script>
+
+    function showAlert(icon,text,message) {
+        Swal.fire({
+        title: message,
+        text: text,
+        icon: icon
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded',function (e){
+        
+        const orderId = document.getElementById("orderId").innerText
+        const orderStatusSelect = document.getElementById("order-status")
+        const productStatusSelect = document.getElementById("orderStatusSelect")
+        const currentOrderStatus = '<%=order.status %>'
+        const userId = document.getElementById("userId").value || '<%=order.userId._id %> '
+        console.log("currentOrder"+currentOrderStatus)
+        changeSelectOptions(orderStatusSelect,currentOrderStatus)
+        document.querySelectorAll(".changeStatusForproductButton").forEach(button => {
+            button.addEventListener("click", function () {
+                console.log("jk")
+                const productId = this.getAttribute('data-product-id')
+                const currentStatus = this.getAttribute('data-status')
+                document.getElementById("saveStatusBtn").setAttribute("data-product-id", productId);
+                
+                changeSelectOptions(productStatusSelect,currentStatus) // change the options 
+            });
+
+        });
+        document.getElementById("saveStatusBtn").addEventListener("click", async function (){
+            const newStatus =  document.getElementById("orderStatusSelect").value
+            const productId = this.getAttribute('data-product-id')
+            console.log(userId.length)
+            const response = await fetch(`/admin/api/order/change-status/${orderId}/${productId}`,{
+                method:"PATCH",
+                headers:{"Content-Type":"application/json"},
+                body:JSON.stringify({newStatus,userId})
+            })
+
+            const jsonResponse = await response.json()
+
+            if(response.ok){
+                showAlert("success",jsonResponse.message,"")
+                const updatedButton = document.querySelector(`.changeStatusForproductButton[data-product-id="${productId}"]`);
+                if (updatedButton) {
+                    updatedButton.setAttribute("data-status", newStatus);
+                }
+
+            }else{
+                showAlert("error".jsonResponse.error,"")
+            }
+
+            var modalElement = document.getElementById('orderStatusModal');
+            var modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    } else {
+                        modalElement.classList.remove('show');
+                        document.body.classList.remove('modal-open');
+                        document.querySelector('.modal-backdrop').remove();
+                    }
+            
+        });
+
+
+        document.getElementById("saveOrderStatusBtn").addEventListener("click",async ()=>{
+            const newStatus = orderStatusSelect.value
+            const response = await fetch(`/admin/api/order/change-status/${orderId}`,{
+                method:"PATCH",
+                headers:{'Content-Type':"application/json"},
+                body:JSON.stringify({newStatus,userId})
+            })
+
+            const jsonResponse = await response.json()
+
+            if(response.ok){
+                showAlert("success",jsonResponse.message,"")
+                changeSelectOptions(orderStatusSelect,newStatus)
+            }else{
+                showAlert("error",jsonResponse.error,"")
+            }
+        })
+        
+
+});
+
+    function changeSelectOptions(selectElement,currentStatus) {
+        
+        const statusOption = {
+            "Pending":["Pending","Shipped","Delivered","Cancelled"],
+            "Shipped":["Shipped","Delivered","Cancelled"],
+            "Return-pending":["Returned","Return-pending"],
+            "Delivered":["Delivered"],
+            "Cancelled":"Cancelled",
+            "Returned":["Returned"]
+        }
+
+        Array.from(selectElement.options).forEach(option =>{
+            if(!statusOption[currentStatus].includes(option.value)){
+                option.remove()
+            }
+        });
+
+        selectElement.value = currentStatus
+    }
+
+
+</script>
+<%-include('../../views/partials/admin/_footer')%>

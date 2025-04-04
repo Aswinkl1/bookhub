@@ -9,38 +9,35 @@ const coupon = require("../controllers/coupon.controller")
 const checkout = require("../controllers/checkout.controller")
 const order = require("../controllers/order.controller")
 const product = require('../controllers/product.controller')
-
+const wishlist = require("../controllers/wishlist.contoller")
 
 
 router.get('/',controller.HomePageLoad);
 
 router.get('/pageNotFound',controller.pageNotFound);
 
+//Signup
 router.get('/signup',controller.loadSignUp);
 router.post('/signup',controller.postSignUp)
-
-router.get('/login',controller.loadLoginPage);
-
 router.post('/verify-otp',controller.verifyOtp)
-
 router.post('/resend-otp',controller.resendOtp)
+
 // forget Pasword
 router.get("/forgetPassword",controller.getForgetPassword)
 router.patch("/verify-email-for-forgetPassword",controller.verifyEmailForForgetPassword)
 router.patch("/forgetPassword-verfy-otp",controller.verifyOtpForForgetPassword)
 router.patch("/forgetPassword-passwordChange",controller.changePasswordForForgetPassword)
 
+//Google
 router.get('/auth/google',passport.authenticate('google',{scope:['profile','email']}))
-
 router.get('/auth/google/callback',passport.authenticate('google',{failureRedirect:'/signup'}),(req,res)=>{
     // req.session.user
     res.redirect('/')
 })
 
-
-
+// Login
+router.get('/login',controller.loadLoginPage);
 router.post('/login',controller.postLoginPage)
-
 router.get('/logout',userAuth,controller.logout)
 
 router.get('/account',userAuth,controller.getAccount)
@@ -70,6 +67,7 @@ router.post("/addCoupons",coupon.addCoupons)
 
 // Checkout
 router.get("/checkout",userAuth,checkout.loadCheckout)
+router.get("/coupon/validate",order.validateCoupon)
 
 // order
 router.post('/placeOrder',userAuth,order.addOrder)
@@ -78,15 +76,20 @@ router.get('/order/:id',userAuth,order.getOrderById)
 router.put('/cancelOrder/:orderId',userAuth,order.cancelOrder)
 router.put('/cancelProduct/:orderId/:productId',userAuth,order.cancelSingleProduct)
 router.put('/returnOrder/:orderId',userAuth,order.returnOrder)
-router.put('/order/return/:productId/:orderId',order.productReturn)
-
-
+router.put('/order/return/:productId/:orderId',userAuth,order.productReturn)
+router.post("/razorpay/create-order",userAuth,order.payWithRazorpay)
 //product -shop
 router.get('/shop',product.renderShopPage)
 router.get('/api/shop',product.fetchAvailableProducts )
 router.get('/product/:id',product.getProductForUser)
 
+// wishlist
+router.get('/wishlist',userAuth,wishlist.getWishlistRender)
+router.get('/api/wishlist',userAuth,wishlist.loadWishlistDetails)
+router.post('/api/wishlist',userAuth,wishlist.addToWishlist)
+router.delete('/api/wishlist/:productId',userAuth,wishlist.removeFromWishlist)
 
+// w
 
 
 

@@ -64,65 +64,36 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row product-grid-3" id="row-div">
-                            <div class="col-lg-3 col-md-4">
-                                <div class="product-cart-wrap mb-30">
-                                    <div class="product-img-action-wrap">
-                                        <div class="product-img product-img-zoom">
-                                            <a href="shop-product-right.html">
-                                                <img class="default-img" src="assets/imgs/shop/product-2-1.jpg" alt="">
-                                                <img class="hover-img" src="assets/imgs/shop/product-2-2.jpg" alt="">
-                                            </a>
-                                        </div>
-                                        <div class="product-action-1">
-
-                                            <a aria-label="Add To Wishlist" class="action-btn hover-up" href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>
-                                        </div>
-                                        <div class="product-badges product-badges-position product-badges-mrg">
-                                            <span class="hot">Hot</span>
-                                        </div>
-                                    </div>
-                                    <div class="product-content-wrap">
-                                        <div class="product-category">
-                                            <a href="shop-grid-right.html">Music</a>
-                                        </div>
-                                        <h2><a href="shop-product-right.html">Colorful Pattern Shirts</a></h2>
-                                        <div class="rating-result" title="90%">
-                                            <span>
-                                                <span>90%</span>
-                                            </span>
-                                        </div>
-                                        <div class="product-price">
-                                            <span>$238.85 </span>
-                                            <span class="old-price">$245.8</span>
-                                        </div>
-                                        <div class="product-action-1 show">
-                                            <a aria-label="Add To Cart" class="action-btn hover-up" href="shop-cart.html"><i class="fi-rs-shopping-bag-add"></i></a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div onclick="" class="row product-grid-3" id="row-div">
+                            
                         </div>
-                        <!--pagination-->
-                        <div class="pagination-area mt-15 mb-sm-5 mb-lg-0">
-                            <nav aria-label="Page navigation example">
-                                <ul class="pagination justify-content-start">
-                                    <li class="page-item active"><a class="page-link" href="#">01</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">02</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">03</a></li>
-                                    <li class="page-item"><a class="page-link dot" href="#">...</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">16</a></li>
-                                    <li class="page-item"><a class="page-link" href="#"><i class="fi-rs-angle-double-small-right"></i></a></li>
-                                </ul>
-                            </nav>
-                        </div>
+                        
                     </div>
                 </div>
             </div>
         </section>
     </main>
     
+<!-- Pagination -->
+<div class="p-3 bg-white border-top">
+    <nav aria-label="Customer list pagination" style="margin-bottom: 17px;">
+      <ul class="pagination custom-pagination justify-content-center mb-0" id="pagination">
+        <!-- <li class="page-item disabled">
+          <a class="page-link" href="#" tabindex="-1"><i class="bi bi-chevron-left"></i></a>
+        </li> -->
 
+        <!-- <% for(let i=1;i<=10;i++){%>
+            <li class="page-item <%= (i==1)?'active':'' %>">
+            <a class="page-link" href="?page=<%=i%>"> <%= i%></a>
+            </li>
+        <%}%> -->
+
+        <!-- <li class="page-item">
+        <a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a>
+        </li> -->
+      </ul>
+    </nav>
+  </div>
     <script>
         const searchBar = document.querySelector('#search-bar')
         const filter = document.querySelector('#filter')
@@ -130,6 +101,22 @@
         let search;
         let category;
         
+        function pagination(currentpage,totalPage) {
+            const parent = document.getElementById("pagination")
+            parent.innerHTML = ""
+            for(let i=1;i<=totalPage;i++){
+                const child = document.createElement('li')
+                child.classList.add('page-item')
+                if(i== currentpage){
+                    child.classList.add('active')
+                }
+                child.innerHTML = ` <a class="page-link" onclick="fetchProductDetails('','{}',${i})">${i}</a> `
+                parent.appendChild(child)
+            }
+
+//Uncaught SyntaxError: Unexpected end of input (at shop:809:22)
+            
+        }
     async function renderProductDetails(products){
         const parent = document.getElementById("row-div")
         parent.innerHTML = ""
@@ -169,7 +156,7 @@
                                             <span class="old-price">${product.regularPrice}</span>
                                         </div>
                                         <div class="product-action-1 show">
-                                            <a aria-label="Add To Cart" class="action-btn hover-up" href="shop-cart.html"><i class="fi-rs-shopping-bag-add"></i></a>
+                                            <a aria-label="Add To Cart"  class="action-btn hover-up" onclick="addToCart('${product._id}')"><i class="fi-rs-shopping-bag-add"></i></a>
                                         </div>
                                     </div>
                                 </div>`
@@ -177,23 +164,25 @@
                 parent.appendChild(element)
 
             })
-
+            
 
     }
 
     async function fetchProductDetails(search="",sort='{}',page=1){
 
-        const response = await fetch(`api/shop?search=${search}&sort=${sort}&page=${page}`,{
+        const response = await fetch(`/api/shop?search=${search}&sort=${sort}&page=${page}`,{
             method:"GET",
             headers:{"Content-Type":"application/json"},
         })
         const jsonResponse = await response.json()
         if(response.ok){
+            console.log("yo")
             renderProductDetails(jsonResponse.productsData)
+            pagination(jsonResponse.currentPage,jsonResponse.totalPages)
         }else{
             alert(jsonResponse.message)
         }
-
+        
     }
 
     function debounce(func,timer){
@@ -233,6 +222,40 @@
 
                 
         })
+
+
+
+    
+        async function addToCart(productId){
+            console.log("inside funcitonn of cart")
+            const responce =await fetch('/cart/addToCart',{
+                method:'POST',
+                headers:{"Content-Type":"application/json"},
+                body:JSON.stringify({
+                    productId:productId,
+                    quantity:1
+                })
+            })
+            if(responce.redirected){
+                window.location = responce.url
+            }
+        const jsonResponce = await responce.json()
+            if(responce.ok){
+                Swal.fire({
+                title: "Good job!",
+                text: jsonResponce.message,
+                icon: "success"
+                });
+            }else{
+                Swal.fire({
+                title: "Error",
+                text: jsonResponce.message,
+                icon: "error"
+                });
+            }
+
+
+        }
 
     </script>
     <%-include('../../views/partials/user/_footer')%>

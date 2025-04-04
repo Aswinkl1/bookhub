@@ -303,14 +303,15 @@ const fetchAvailableProducts  = async (req,res)=>{
         // sort = JSON.parse(sort)
         console.log(sort)
 
-        const products =await Product.find({isBlocked:false,productTitle:{$regex:search}}).skip(skip).sort(sort).limit(limit)
-
+        const products = await Product.find({isBlocked:false,productTitle:{$regex:search}}).skip(skip).sort(sort).limit(limit)
+        const totalNumberOfProduct = await Product.find({isBlocked:false}).countDocuments()
+        const totalPages = Math.ceil(totalNumberOfProduct/limit)
         // console.log(products)
         
         if(!products){
             return res.status(400).json({message:"products not found"})
         }
-        res.status(200).json({productsData:products})
+        res.status(200).json({productsData:products,currentPage:page,totalPages})
     } catch (error) {
         console.log(error)
         res.status(400).json({message:"some internal error "})

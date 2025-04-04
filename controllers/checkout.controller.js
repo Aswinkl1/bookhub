@@ -3,6 +3,10 @@ const router = express.Router()
 const Address = require("../models/address.schema")
 const Cart = require("../models/cart.schema")
 
+
+
+
+
 const loadCheckout = async (req,res)=>{
     const userId = req.session.userId
     console.log(userId)
@@ -28,6 +32,9 @@ const loadCheckout = async (req,res)=>{
    return res.render("checkout",{address,cart,totalRegularprice})
 
 }
+
+
+
 
 
 

@@ -10,7 +10,7 @@ const uploads = multer({storage:storage})
 const productController = require('../controllers/product.controller')
 const coupon = require("../controllers/coupon.controller")
 const order = require('../controllers/order.controller')
-const { route } = require('./user.router')
+
 
 
 router.get('/login',controller.loadLogin)
@@ -44,13 +44,15 @@ router.put('/products/delete',productController.deleteProduct)
 
 
 // coupon
-router.get("/coupon",coupon.loadCouponPage)
-router.post("/coupon/editCoupons",coupon.getEditCoupon)
-router.put("/coupon/editCoupons",coupon.postEditCoupon)
-router.delete("/coupon/deleteCoupon/:id",coupon.deleteCoupon)
+router.get("/coupon",adminAuth,coupon.loadCouponPage)
+router.post("/coupon/editCoupons",adminAuth,coupon.getEditCoupon)
+router.put("/coupon/editCoupons",adminAuth,coupon.postEditCoupon)
+router.delete("/coupon/deleteCoupon/:id",adminAuth,coupon.deleteCoupon)
+
 
 router.get("/order",order.renderOrderList)
 router.get("/api/order",order.getOrderData)
-router.get("/api/order/:id",)
-
+router.get("/order/:id",order.getOrderDetail)
+router.patch('/api/order/change-status/:orderId/:productId',order.changeStatusForProduct)
+router.patch('/api/order/change-status/:orderId',order.changeOrderStatus)
 module.exports = router
