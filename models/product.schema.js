@@ -22,7 +22,7 @@ const productSchema = new Schema({
     },
     salePrice:{
         type:Number,
-        required:true
+        // required:true
     },
     productOffer:{
         type:Number,
@@ -30,7 +30,7 @@ const productSchema = new Schema({
     },
     quantity:{
         type:Number,
-        // default:true
+
     },
     productImage:{
         type:[String],
@@ -51,11 +51,36 @@ const productSchema = new Schema({
     language:{
         type:String,
         required:true
+    },
+    productOffer:{
+        discountPercentage:{
+            type:Number,
+            default:0
+        },
+        isActive:{
+            type:Boolean,
+            default:false
+        },
+        offerName:{
+            type:String,
+            
+        }
     }
 },{timestamps:true});
+
+productSchema.pre("save",function (next){
+    if(this.productOffer?.isActive && this.productOffer.discountPercentage >0){
+        const percentage = this.productOffer.discountPercentage
+        this.salePrice = this.regularPrice * (1- (percentage/100))
+    }else{
+        this.salePrice = this.regularPrice
+    }
+    next()
+});
 
 
 const product = mongoose.model('Product',productSchema)
 
 module.exports = product
+
 

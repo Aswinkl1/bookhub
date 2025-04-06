@@ -4,22 +4,46 @@ const env = require('dotenv').config()
 const bcrypt = require('bcrypt')
 const { json } = require('express')
 const Product = require("../models/product.schema")
+const Category = require('../models/category.schema')
+
+async function compareOffers(product,categoryId){
+
+    const category =await Category.findById(categoryId)
+    // console.log(category)
+    // console.log(category.name)
+    if(!category.categoryOffer?.isActive){
+        console.log("dh")
+        return product.salePrice
+
+    }
+    const offerPriceOfCategory = Math.round(product.regularPrice * (1- (category.categoryOffer.discountPercentage/100)))
+    // console.log(offerPriceOfCategory)
+    if(offerPriceOfCategory < product.salePrice){
+        
+        return offerPriceOfCategory
+    }
+    return product.salePrice
+}
 
 const HomePageLoad = async (req,res)=>{
     try{
         const userId = req.session.userId
-        const product = await Product.find()
-        console.log(product)
-        // console.log(data)
+        const products = await Product.find()
+
+        for(let product of products){
+            product.salePrice = await compareOffers(product,product.category)
+        }
+
+
         if(userId){
             const userData = await User.findOne({_id:userId});
-            res.render('home',{user:userData,product:product});
+            res.render('home',{user:userData,product:products});
         }else{
             
-            res.render('home',{product:product});
+            res.render('home',{product:products});
         }
     }catch (e){
-
+        console.log(e)
         console.log("Home doesnt load ")
         
     }
@@ -405,7 +429,8 @@ module.exports = {
     getForgetPassword,
     verifyEmailForForgetPassword,
     verifyOtpForForgetPassword,
-    changePasswordForForgetPassword
+    changePasswordForForgetPassword,
+    compareOffers
 
 
 }

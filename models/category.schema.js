@@ -17,8 +17,14 @@ const categorySchema = new Schema({
         default:true
     },
     categoryOffer:{
-        type:Number,
-        default:0
+        discountPercentage:{
+            type:Number,
+            default:0
+        },
+        isActive:{
+            type:Boolean,
+            default:false
+        },
     },
     createdAt:{
         type:Date,

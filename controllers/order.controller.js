@@ -6,7 +6,7 @@ const Wallet = require("../models/wallet.schema");
 const Transaction = require('../models/transaction.schema')
 const Razorpay = require("razorpay")
 const Coupon = require("../models/coupon.schema")
-
+const User = require("../models/user.schema")
 
 const razorpayInstance = new Razorpay({
     key_id:process.env.key_id,
@@ -34,6 +34,7 @@ const payWithRazorpay = async (req,res)=>{
 
 const validateCoupon = async (req,res)=>{
     const {couponCode,cartTotal} = req.query
+    const {userId} = req.session
 
     const coupon = await Coupon.findOne({code:couponCode,status:"1"})
     console.log(coupon)
@@ -48,6 +49,11 @@ const validateCoupon = async (req,res)=>{
 
     if(!(coupon.minCartAmount <= +cartTotal)){
         return res.status(400).json({error:`You need to add items worth ${coupon.minCartAmount} to use this coupon.`})
+    }
+    
+    const user = await User.findById(userId)
+    if(user.usedCoupons.includes(coupon._id)){
+        return res.status(400).json({error:`You have already used this coupon.`})
     }
 
     let discountAmount = (coupon.discountPercentage * cartTotal) / 100
@@ -69,13 +75,14 @@ const addOrder = async (req, res) => {
     try {
         const userId = req.session.userId
         const addressId = req.body.addressId
-        const paymentMethod = req.body.paymentMethod
-        console.log(paymentMethod)
+        const {paymentMethod,cartTotal,couponId} = req.body
+        
         const cart = await Cart.findOne({ userId }).populate("items.productId");
 
         if (!cart || cart.items.length === 0) {
             return res.status(400).json({ message: "Your cart is empty." });
         }
+
 
         // Calculate total price
         const orderItems = cart.items.map(item => {
@@ -85,22 +92,27 @@ const addOrder = async (req, res) => {
                 price: item.price
             };
         });
-        console.log(cart.items[0].price)
+
         // Create new order
         const newOrder = new Order({
 
             userId,
             items: orderItems,
-            totalPrice:cart.totalPrice, // amount the customer paid 
+            totalPrice:cartTotal, // amount the customer paid 
             addressId:addressId,
             paymentMethod:paymentMethod
 
         });
 
         await newOrder.save();
+        if(couponId){
+
+            const user = await User.findOne({_id:userId})
+            user.usedCoupons.push(couponId)
+            user.save()
+        }
 
         // Reduce stock for each product
-
         for (const item of cart.items) {
             await Product.findByIdAndUpdate(
                 item.productId._id,

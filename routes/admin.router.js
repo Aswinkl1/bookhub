@@ -55,4 +55,10 @@ router.get("/api/order",order.getOrderData)
 router.get("/order/:id",order.getOrderDetail)
 router.patch('/api/order/change-status/:orderId/:productId',order.changeStatusForProduct)
 router.patch('/api/order/change-status/:orderId',order.changeOrderStatus)
+
+// Product offer
+router.get("/product-offer/:id",productController.getProductOffer)
+router.post("/product/addOffer",productController.addProductOffer)
+router.get("/edit-offer/:id",productController.getEditProductOffer)
+router.put("/product/edit-offer",productController.putEditProduct)
 module.exports = router

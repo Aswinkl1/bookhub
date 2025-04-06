@@ -4159,7 +4159,7 @@ body.aside-mini .menu-aside .menu-item.has-submenu .menu-link:after {
 }
 
 footer.main-footer {
-  bottom: 0;
+  /* bottom: 0; */
   padding: 30px 3%;
   position: absolute;
   right: 0;

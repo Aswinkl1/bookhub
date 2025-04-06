@@ -1,6 +1,7 @@
 const Cart = require("../models/cart.schema");
 const Product = require("../models/product.schema");
 const Wishlist = require("../models/wishlist.schema");
+const {compareOffers} = require("./user.controler")
  
 
 const addTocart = async (req,res)=>{
@@ -26,7 +27,8 @@ const addTocart = async (req,res)=>{
     return res.status(400).json({message:"Not enough stock available"});
   }
 
-  const price = product.salePrice
+  const price = await compareOffers(product,product.category)
+  
 
   let cart = await Cart.findOne({userId:userId});
   if(!cart){

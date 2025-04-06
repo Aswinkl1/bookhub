@@ -49,6 +49,10 @@ const userSchema = new Schema({
          type: Schema.Types.ObjectId,
           ref: "Address"
     }],
+    usedCoupons:[{
+        type:Schema.Types.ObjectId,
+        ref:"coupon"
+    }],
     // cart:[{
     //     type:Schema.Types.ObjectId,
     //     ref:'Cart'

@@ -71,8 +71,20 @@
 
                     </div>
                     <div class="col-lg-1 col-sm-2 col-4 col-date">
-                        <span>02.11.2022</span>
+                        <% if(data[i].productOffer?.offerName){ %>
+
+                            <a href="/admin/edit-offer/<%=data[i]._id%>" class="btn btn-sm font-sm rounded btn-brand">
+                                <i class="material-icons md-edit"></i> Edit Offer
+                            </a>
+                        
+                        <% } else{ %>
+                        <a href="/admin/product-offer/<%=data[i]._id%>" class="btn btn-sm font-sm rounded btn-brand">
+                            <i class="material-icons md-edit"></i> Add Offer
+                        </a>
+                        <% } %>
+
                     </div>
+                    
                     <div class="col-lg-2 col-sm-2 col-4 col-action text-end">
                         <a href="/admin/editProduct/?id=<%= data[i]._id %>" class="btn btn-sm font-sm rounded btn-brand">
                             <i class="material-icons md-edit"></i> Edit
@@ -80,6 +92,7 @@
                         <a onclick="deleteProduct('<%= data[i]._id %>')" class="btn btn-sm font-sm btn-light rounded">
                             <i class="material-icons md-delete_forever"></i> Delete
                         </a>
+
                     </div>
                 </div> <!-- row .// -->
                

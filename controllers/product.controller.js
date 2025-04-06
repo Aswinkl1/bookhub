@@ -5,7 +5,7 @@ const fs = require('fs')
 const path = require('path')
 const sharp = require('sharp')
 const category = require("../models/category.schema")
-
+const {compareOffers} = require("./user.controler")
 
 const getProductAddPage = async (req,res)=>{
     try {
@@ -269,6 +269,7 @@ const getProductForUser = async (req,res)=>{
         const productId = req.params.id
         const product = await Product.findById(productId)
         console.log(product)
+        product.salePrice = await compareOffers(product,product.category)
         if(!product){
           return  res.status(400).json("product not found")
         }
@@ -304,10 +305,13 @@ const fetchAvailableProducts  = async (req,res)=>{
         console.log(sort)
 
         const products = await Product.find({isBlocked:false,productTitle:{$regex:search}}).skip(skip).sort(sort).limit(limit)
+
         const totalNumberOfProduct = await Product.find({isBlocked:false}).countDocuments()
         const totalPages = Math.ceil(totalNumberOfProduct/limit)
         // console.log(products)
-        
+        for(let product of products){
+            product.salePrice = await compareOffers(product,product.category)
+        }
         if(!products){
             return res.status(400).json({message:"products not found"})
         }
@@ -316,6 +320,76 @@ const fetchAvailableProducts  = async (req,res)=>{
         console.log(error)
         res.status(400).json({message:"some internal error "})
     }
+}
+
+
+// product offer 
+
+const getProductOffer = async (req,res)=>{
+    try {
+        const productId = req.params.id
+        res.render("add-offer",{productId})
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+const addProductOffer = async (req,res)=>{
+    try {
+        
+        const {offerName,isActive,discountPercentage,productId} = req.body
+
+        const product = await Product.findOne({_id:productId})
+        if(!product){
+            return res.status(400).json({error:"product not found"})
+        }
+        product.productOffer.discountPercentage = discountPercentage
+        product.productOffer.isActive = isActive
+        product.productOffer.offerName = offerName
+        product.save()
+        
+        res.status(200).json({message:"offer added successfull",redirect:"/admin/products/"})
+    } catch (error) {
+        console.log(error)
+    }
+
+}
+
+const getEditProductOffer = async (req,res)=>{
+    try {
+        const productId = req.params.id
+        console.log(productId)
+        const product = await Product.findOne({_id:productId})
+        if(!product){
+            return res.status(400).json({error:"product not found"})
+        }
+        res.render("edit-offer",{product})
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+const putEditProduct = async (req,res)=>{
+    try {
+        
+        const {offerName,isActive,discountPercentage,productId} = req.body
+
+        const product = await Product.findOne({_id:productId})
+        if(!product){
+            return res.status(400).json({error:"product not found"})
+        }
+
+        product.productOffer.discountPercentage = discountPercentage
+        product.productOffer.isActive = isActive
+        product.productOffer.offerName = offerName
+        product.save()
+        
+        res.status(200).json({message:"offer added successfull",redirect:"/admin/products/"})
+    } catch (error) {
+        console.log(error)
+    }
+
 }
 
 
@@ -329,6 +403,10 @@ module.exports = {
     getProductForUser,
     deleteProduct,
     renderShopPage,
-    fetchAvailableProducts 
+    fetchAvailableProducts,
+    getProductOffer,
+    addProductOffer,
+    getEditProductOffer,
+    putEditProduct
 
 }

@@ -499,7 +499,7 @@
                     const responce = await fetch('/placeOrder',{
                         method:"POST",
                         headers:{"Content-Type":"application/json"},
-                        body:JSON.stringify({addressId,paymentMethod,})
+                        body:JSON.stringify({addressId,paymentMethod,cartTotal,couponId})
                     });
 
                     const jsonResponce = await responce.json()
@@ -548,14 +548,14 @@
                         currency: order.currency,
                         order_id: order.id,
                         handler: function (response) {
-                        palceOrder(paymentMethod,totalPrice,couponId)
+                        palceOrder(paymentMethod,totalPrice,couponId.value)
                         }
                         };
                         var rzp = new Razorpay(options);
                         rzp.open();
                         }
                 }else{
-                    palceOrder(paymentMethod,totalPrice,couponId)
+                    palceOrder(paymentMethod,totalPrice,couponId.value)
                 }
                 
                 
@@ -595,7 +595,7 @@
                 }else{
                     console.log("error")
                     couponError.innerHTML = `<p class="text-danger"><small>${jsonResponse.error}</small></p>`
-                    
+
                 }
             })
         

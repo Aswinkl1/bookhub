@@ -30,15 +30,22 @@ const CategoryInfo = async (req,res)=>{
 
 const addCategory = async (req,res)=>{
     
-    const {name,description} = req.body
+    const {name,description,status,discountPercentage} = req.body
+   
     try {
         const existingCategory = await Category.findOne({name:name})
         if(existingCategory) {
             return res.status(400).json({error:"Category already exists"})
         }
         const newCategory = new Category({
-            name,description
+            name,
+            description,
+            categoryOffer:{
+                discountPercentage,
+                isActive:(!!+status)
+            }
         })
+
         await  newCategory.save()
         return res.status(200).json({message:"category added successfully"})
     } catch (error) {
@@ -73,7 +80,6 @@ const getUnlistCategory = async (req,res)=>{
     }
 }
 
-
 const getEditCategory = async (req,res)=>{
     const id = req.query.id
     const category =await Category.findOne({_id:id})
@@ -85,7 +91,7 @@ const postEditcategory = async (req,res)=>{
     try {
         const id = req.params.id
         console.log(req.body)
-        const {name,description} = req.body
+        const {name,description,discountPercentage,status} = req.body
         const existingcategory = await Category.findOne({name,_id:{$ne:id}});
         if(existingcategory){
             return res.status(400).json({error:"Category exists, Please choose another name"})
@@ -99,6 +105,8 @@ const postEditcategory = async (req,res)=>{
         const updateCategory = await Category.findById(id)
         updateCategory.name = name;
         updateCategory.description = description
+        updateCategory.categoryOffer.discountPercentage = discountPercentage
+        updateCategory.categoryOffer.isActive = (!!status)
         await updateCategory.save()
         console.log(updateCategory)
 
@@ -116,6 +124,7 @@ const postEditcategory = async (req,res)=>{
         res.status(500).json({error:"Internal server eror"})
     }
 }
+
 
 module.exports ={
     CategoryInfo,

@@ -235,6 +235,17 @@
             <label for="categoryDescription" class="form-label">Description</label>
             <textarea class="form-control" value="" id="description" name="description" placeholder="Enter category description" required><%=category.description%></textarea>
           </div>
+          <div class="row mb-3">
+            
+            <div class="col">
+              <label for="offerPercentage" class="form-label">Offer %</label>
+              <div class="input-group">
+                <input type="number" class="form-control" value="<%=category.categoryOffer.discountPercentage %>" id="discountPercentage" placeholder="0" min="0" max="100">
+                <span class="input-group-text">%</span>
+              </div>
+            </div>
+          </div>
+
           <!-- <div class="row mb-3">
             <div class="col">
               <label for="offerPrice" class="form-label">Offer Price</label>
@@ -262,9 +273,31 @@
               <label class="form-check-label" for="statusInactive">Inactive</label>
             </div>
           </div> -->
+          <div class="mb-3">
+            <label class="form-label d-block">Status</label>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" 
+                     type="radio" name="statusRadio"
+                     id="statusActive" value="1"
+                     <% if (category.categoryOffer.isActive) { %> checked <% } %>>
+              <label class="form-check-label" for="statusActive">Active</label>
+            </div>
+            
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" 
+                     type="radio" name="statusRadio"
+                     id="statusInactive" value="0"
+                     <% if (!category.categoryOffer.isActive) { %> checked <% } %>>
+              <label class="form-check-label" for="statusInactive">Inactive</label>
+            </div>
+            
+          </div>
+          
+          
+          
           <div class="d-grid">
             <button type="submit" class="btn btn-primary" >
-              <i class="bi bi-plus-circle me-2"></i>Add Category
+              <i class="bi bi-plus-circle me-2"></i>Edit Category
             </button>
           </div>
         </form>
@@ -286,12 +319,14 @@
         }
         const name = document.getElementById("name").value
         const id = document.getElementById("id").value; 
+        const discountPercentage = document.getElementById("discountPercentage").value
+        const status = document.querySelector('input[name="statusRadio"]:checked').value;
         
         const description = document.getElementById("description").value
         fetch(`/admin/editCategory/${id}`,{
             method:"POST",
             headers:{'content-type':'application/json'},
-            body:JSON.stringify({name,description})
+            body:JSON.stringify({name,description,discountPercentage,status})
         }).then((response)=>{
             if(!response.ok){
                 return response.json().then(err=>{
@@ -340,7 +375,13 @@
             const name = document.getElementById("name").value.trim()
             const description = document.getElementById("description").value.trim()
             isValid = true
+            const discountPercentage = document.getElementById("discountPercentage").value
+
             console.log("val")
+            if (discountPercentage < 0 || discountPercentage > 100) {
+                alert('Offer percentage must be between 0 and 100');
+                isValid = false
+            }
             if(name ===""){
                 displayErrormessage("name-error","Please enter a name")
                 isValid = false

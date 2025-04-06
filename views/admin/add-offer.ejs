@@ -1,0 +1,115 @@
+<%-include('../../views/partials/admin/_header')%>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        .form-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        .page-title {
+            color: #3b5998;
+            margin-bottom: 30px;
+        }
+        .btn-submit {
+            background-color: #4267B2;
+            border-color: #4267B2;
+        }
+        .btn-submit:hover {
+            background-color: #3b5998;
+            border-color: #3b5998;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-container bg-white">
+            <h2 class="page-title text-center">Add New Offer</h2>
+            
+            <form id="offerForm" action="/asw">
+                <div class="mb-4">
+                    <input type="text" value="<%=productId%>" hidden id="productId">
+                    <label for="offerName" class="form-label">Offer Name</label>
+                    <input type="text" class="form-control" id="offerName" placeholder="Enter offer name" required>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="offerPercentage" class="form-label">Offer Percentage (%)</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="offerPercentage" placeholder="Enter percentage" min="0" max="100" required>
+                        <span class="input-group-text">%</span>
+                    </div>
+                    <div class="form-text">Enter a value between 0 and 100</div>
+                </div>
+                
+               
+                
+               
+                
+                <div class="mb-4">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="isActive" checked>
+                        <label class="form-check-label" for="isActive">Active Status</label>
+                    </div>
+                    <div class="form-text">Toggle to activate or deactivate this offer</div>
+                </div>
+                
+                
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="button" class="btn btn-outline-secondary me-md-2">Cancel</button>
+                    <button type="submit" id="offerFormSubmit" class="btn btn-primary btn-submit">Add Offer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.getElementById('offerForm').addEventListener('submit',async function(event) {
+            event.preventDefault();
+            
+            // Get values
+            const offerName = document.getElementById('offerName').value;
+            const discountPercentage = document.getElementById('offerPercentage').value;
+            const isActive = document.getElementById('isActive').checked;
+            const productId = document.getElementById("productId").value
+            // Simple validation
+            if (discountPercentage < 0 || discountPercentage > 100) {
+                alert('Offer percentage must be between 0 and 100');
+                return;
+            }
+            console.log(offerName,isActive,discountPercentage,productId)
+            
+            
+            const response = await fetch("/admin/product/addOffer",{
+                method:"POST",
+                headers:{"Content-Type":"application/json"},
+                body:JSON.stringify({offerName,isActive,discountPercentage,productId})
+            })
+
+            const jsonResponse = await response.json()
+            if(response.ok){
+
+                Swal.fire({
+                    icon: "success",
+                    title: "Offer edited",
+                    confirmButtonText: "OK"
+                }).then((result) => {
+            
+                    window.location = jsonResponse.redirect;
+                });
+            }else{
+                console.log("error")
+            }
+            
+        });
+    </script>
+
+<%-include('../../views/partials/admin/_footer')%>
+
+
