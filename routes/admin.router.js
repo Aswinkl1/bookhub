@@ -10,7 +10,7 @@ const uploads = multer({storage:storage})
 const productController = require('../controllers/product.controller')
 const coupon = require("../controllers/coupon.controller")
 const order = require('../controllers/order.controller')
-
+const sales = require("../controllers/sales.controller")
 
 
 router.get('/login',controller.loadLogin)
@@ -61,4 +61,12 @@ router.get("/product-offer/:id",productController.getProductOffer)
 router.post("/product/addOffer",productController.addProductOffer)
 router.get("/edit-offer/:id",productController.getEditProductOffer)
 router.put("/product/edit-offer",productController.putEditProduct)
+
+//sales report
+router.get("/sales-report",sales.salesReportRender)
+router.get('/api/sales-report',sales.getSalesReport)
+router.get('/api/sales-report/download/pdf',sales.getSalesReportPDF)
+router.get('/api/sales-report/download/excel',sales.getSalesReportExcel)
+
+
 module.exports = router

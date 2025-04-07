@@ -1,56 +1,622 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Razorpay Payment</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Report Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f5f7fb;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .container-fluid {
+            padding: 2rem;
+        }
+        
+        .dashboard-header {
+            margin-bottom: 2rem;
+        }
+        
+        .dashboard-title {
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        
+        .dashboard-subtitle {
+            color: #7f8c8d;
+            font-size: 1rem;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            background-color: #ffffff;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .card-metric {
+            border-left: none;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-metric::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 100%;
+            border-radius: 6px 0 0 6px;
+        }
+        
+        .card-metric.sales::before {
+            background: linear-gradient(to bottom, #4a6cf7, #3b82f6);
+        }
+        
+        .card-metric.amount::before {
+            background: linear-gradient(to bottom, #10b981, #059669);
+        }
+        
+        .card-metric.discount::before {
+            background: linear-gradient(to bottom, #f97316, #ea580c);
+        }
+        
+        .custom-date-inputs {
+            display: none;
+        }
+        
+        .report-filters {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .filter-title {
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+        }
+        
+        .form-control, .form-select {
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+            border-color: #3b82f6;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #4a6cf7, #3b82f6);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #3b5ef8, #2d74f5);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4);
+        }
+        
+        .btn-outline-primary {
+            border: 1px solid #3b82f6;
+            color: #3b82f6;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .btn-outline-success {
+            border: 1px solid #10b981;
+            color: #10b981;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+        }
+        
+        .btn-outline-success:hover {
+            background-color: #10b981;
+            color: white;
+        }
+        
+        .icon-shape {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-size: 1.25rem;
+        }
+        
+        .text-primary {
+            color: #3b82f6 !important;
+        }
+        
+        .text-success {
+            color: #10b981 !important;
+        }
+        
+        .text-warning {
+            color: #f97316 !important;
+        }
+        
+        .pagination .page-link {
+            border-radius: 8px;
+            margin: 0 3px;
+            border: none;
+            color: #3b82f6;
+        }
+        
+        .pagination .page-item.active .page-link {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .table {
+            margin-bottom: 0;
+        }
+        
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .table td {
+            font-size: 0.95rem;
+            vertical-align: middle;
+            padding: 1rem 0.75rem;
+        }
+        
+        .badge {
+            font-weight: 500;
+            padding: 0.5em 0.75em;
+            border-radius: 6px;
+        }
+        
+        .download-section {
+            padding: 1.5rem;
+        }
+        
+        .download-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+        
+        .download-description {
+            color: #64748b;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-check-input:checked {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-box .form-control {
+            padding-left: 2.5rem;
+            border-radius: 8px;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+        }
+        
+        .no-data-message {
+            text-align: center;
+            padding: 2rem;
+            color: #64748b;
+        }
+        
+        .coupon-badge {
+            font-size: 0.75rem;
+            padding: 0.35em 0.65em;
+            border-radius: 0.5rem;
+        }
+    </style>
 </head>
 <body>
-  <h1>Razorpay Payment Gateway Integration</h1>
-  <form id="payment-form">
-    <label for="amount">Amount:</label>
-    <input type="number" id="amount" name="amount" required>
-    <button type="button" onclick="payNow()">Pay Now</button>
-  </form>
+    <div class="container-fluid">
+        <div class="row dashboard-header">
+            <div class="col">
+                <h1 class="dashboard-title">Sales Report Dashboard</h1>
+                <p class="dashboard-subtitle">Track and analyze your sales performance with flexible reporting options</p>
+            </div>
+        </div>
 
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-  <script>
-    async function payNow() {
-      const amount = document.getElementById('amount').value;
+        <!-- Report Filters Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card report-filters">
+                    <div class="filter-title">Report Filters</div>
+                    <form id="reportFiltersForm">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-3">
+                                <label class="form-label">Date Range Type</label>
+                                <select class="form-select" id="dateRangeType">
+                                    <option value="day">Daily (1 Day)</option>
+                                    <option value="week" selected>Weekly</option>
+                                    <option value="month">Monthly</option>
+                                    <option value="year">Yearly</option>
+                                    <option value="custom">Custom Date Range</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-3 custom-date-inputs">
+                                <label class="form-label">Start Date</label>
+                                <input type="date" class="form-control" id="startDate">
+                            </div>
+                            
+                            <div class="col-md-3 custom-date-inputs">
+                                <label class="form-label">End Date</label>
+                                <input type="date" class="form-control" id="endDate">
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <button type="button" id="generateReport" class="btn btn-primary w-100">
+                                    <i class="fas fa-sync-alt me-2"></i>Generate Report
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
 
-      // Create order by calling the server endpoint
-      const response = await fetch('/create-order', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ amount, currency: 'INR', receipt: 'receipt#1', notes: {} })
-      });
+        <!-- Key Metrics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card card-metric sales mb-4">
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col">
+                                <h6 class="text-muted mb-1">Overall Sales Count</h6>
+                                <h3 class="fw-bold" id="salesCount">1,258</h3>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon-shape bg-primary bg-opacity-10 text-primary">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-sm mb-0 mt-3">
+                            <span class="text-success me-2"><i class="fas fa-arrow-up"></i> 12.5%</span>
+                            <span class="text-muted">Since last period</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card card-metric amount mb-4">
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col">
+                                <h6 class="text-muted mb-1">Overall Order Amount</h6>
+                                <h3 class="fw-bold" id="orderAmount">$89,542</h3>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon-shape bg-success bg-opacity-10 text-success">
+                                    <i class="fas fa-dollar-sign"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-sm mb-0 mt-3">
+                            <span class="text-success me-2"><i class="fas fa-arrow-up"></i> 8.3%</span>
+                            <span class="text-muted">Since last period</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card card-metric discount mb-4">
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col">
+                                <h6 class="text-muted mb-1">Overall Discount</h6>
+                                <h3 class="fw-bold" id="overallDiscount">$12,183</h3>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon-shape bg-warning bg-opacity-10 text-warning">
+                                    <i class="fas fa-tags"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-sm mb-0 mt-3">
+                            <span class="text-danger me-2"><i class="fas fa-arrow-down"></i> 3.2%</span>
+                            <span class="text-muted">Since last period</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-      const order = await response.json();
+        <!-- Download Options and Detailed Sales Table in two sections -->
+        <div class="row">
+            <!-- Download Section -->
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0">Download Report</h5>
+                    </div>
+                    <div class="card-body download-section">
+                        <p class="download-description">Export your data in your preferred format with all current filters applied</p>
+                        
+                        <div class="d-grid gap-3 mb-4">
+                            <button class="btn btn-outline-primary" type="button">
+                                <i class="far fa-file-pdf me-2"></i>Download as PDF
+                            </button>
+                            <button class="btn btn-outline-success" type="button">
+                                <i class="far fa-file-excel me-2"></i>Download as Excel
+                            </button>
+                        </div>
+                        
+                        <div class="form-check mt-4">
+                            <input class="form-check-input" type="checkbox" id="applyFiltersDownload" checked>
+                            <label class="form-check-label" for="applyFiltersDownload">
+                                Apply current filters to downloaded report
+                            </label>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="text-center">
+                            <small class="text-muted">Need help with your report?</small>
+                            <div class="mt-2">
+                                <a href="#" class="btn btn-sm btn-light">View Tutorial</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Detailed Sales Table -->
+            <div class="col-md-8 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Detailed Sales Report</h5>
+                        <div class="search-box" style="width: 250px">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" class="form-control form-control-sm" placeholder="Search orders...">
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Order ID</th>
+                                        <th>Customer</th>
+                                        <th>Items</th>
+                                        <th>Subtotal</th>
+                                        <th>Discount</th>
+                                        <th>Coupon</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Apr 05, 2025</td>
+                                        <td>ORD-7829</td>
+                                        <td>John Smith</td>
+                                        <td>5</td>
+                                        <td>$142.50</td>
+                                        <td class="text-danger">-$12.50</td>
+                                        <td><span class="badge bg-primary bg-opacity-10 text-primary coupon-badge">SPRING10</span></td>
+                                        <td class="fw-bold">$130.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Apr 05, 2025</td>
+                                        <td>ORD-7830</td>
+                                        <td>Emily Johnson</td>
+                                        <td>2</td>
+                                        <td>$86.75</td>
+                                        <td>$0.00</td>
+                                        <td>-</td>
+                                        <td class="fw-bold">$86.75</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Apr 04, 2025</td>
+                                        <td>ORD-7825</td>
+                                        <td>Michael Brown</td>
+                                        <td>8</td>
+                                        <td>$245.99</td>
+                                        <td class="text-danger">-$20.00</td>
+                                        <td><span class="badge bg-primary bg-opacity-10 text-primary coupon-badge">NEWUSER20</span></td>
+                                        <td class="fw-bold">$225.99</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Apr 04, 2025</td>
+                                        <td>ORD-7824</td>
+                                        <td>Amanda Lee</td>
+                                        <td>3</td>
+                                        <td>$78.45</td>
+                                        <td class="text-danger">-$5.00</td>
+                                        <td><span class="badge bg-primary bg-opacity-10 text-primary coupon-badge">LOYALTY5</span></td>
+                                        <td class="fw-bold">$73.45</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Apr 03, 2025</td>
+                                        <td>ORD-7820</td>
+                                        <td>Robert Wilson</td>
+                                        <td>1</td>
+                                        <td>$129.99</td>
+                                        <td>$0.00</td>
+                                        <td>-</td>
+                                        <td class="fw-bold">$129.99</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Apr 03, 2025</td>
+                                        <td>ORD-7819</td>
+                                        <td>Jennifer Taylor</td>
+                                        <td>4</td>
+                                        <td>$168.75</td>
+                                        <td class="text-danger">-$15.00</td>
+                                        <td><span class="badge bg-primary bg-opacity-10 text-primary coupon-badge">WELCOME15</span></td>
+                                        <td class="fw-bold">$153.75</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center p-3 border-top">
+                            <div class="text-muted small">Showing 6 of 128 orders</div>
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination pagination-sm mb-0">
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="#" tabindex="-1"><i class="fas fa-chevron-left"></i></a>
+                                    </li>
+                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#"><i class="fas fa-chevron-right"></i></a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-      // Open Razorpay Checkout
-      const options = {
-        key: 'YOUR_KEY_ID', // Replace with your Razorpay key_id
-        amount: '50000', // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-        currency: 'INR',
-        name: 'Acme Corp',
-        description: 'Test Transaction',
-        order_id: 'order_IluGWxBm9U8zJ8', // This is the order_id created in the backend
-        callback_url: 'http://localhost:3000/payment-success', // Your success URL
-        prefill: {
-          name: 'Gaurav Kumar',
-          email: 'gaurav.kumar@example.com',
-          contact: '9999999999'
-        },
-        theme: {
-          color: '#F37254'
-        },
-      };
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toggle custom date inputs based on date range type selection
+        document.getElementById('dateRangeType').addEventListener('change', function() {
+            if (this.value === 'custom') {
+                document.querySelectorAll('.custom-date-inputs').forEach(el => {
+                    el.style.display = 'block';
+                });
+            } else {
+                document.querySelectorAll('.custom-date-inputs').forEach(el => {
+                    el.style.display = 'none';
+                });
+            }
+        });
 
-      const rzp = new Razorpay(options);
-      rzp.open();
-    }
-  </script>
+        function fetchdata(){
+            const response = await fetch("",{
+                
+            })
+        }
+        // Simulate report generation
+        document.getElementById('generateReport').addEventListener('click', function() {
+            // Show loading state
+            this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Generating...';
+            this.disabled = true;
+            const SelectedValue = document.getElementById("dateRangeType").value
+            // Simulate API call delay
+            if (SelectedValue === "custom") {
+                const start = document.getElementById("startDate").value;
+                const end = document.getElementById("endDate").value;
+
+                if (!start || !end) {
+                    alert("Please select both start and end dates.");
+                    return;
+                }
+                console.log(start)
+                console.log(end)
+                console.log(SelectedValue)
+                // Example: Redirect to server-side route with query params
+                // window.location.href = `/admin/sales-report?filter=custom&start=${start}&end=${end}`;
+                } else {
+                // No need for dates, just filter type
+                // window.location.href = `/admin/sales-report?filter=${selectedFilter}`;
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            setTimeout(() => {
+                // Update metrics with new "data"
+                document.getElementById('salesCount').textContent = '1,482';
+                document.getElementById('orderAmount').textContent = '$94,327';
+                document.getElementById('overallDiscount').textContent = '$13,568';
+                
+                // Reset button state
+                this.innerHTML = '<i class="fas fa-sync-alt me-2"></i>Generate Report';
+                this.disabled = false;
+                
+                // Show success message
+                const alertHtml = `
+                    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <i class="fas fa-check-circle fa-lg"></i>
+                            </div>
+                            <div>
+                                <strong>Success!</strong> Report generated successfully for the selected period.
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `;
+                document.querySelector('.dashboard-header').insertAdjacentHTML('afterend', alertHtml);
+            }, 1500);
+        });
+    </script>
 </body>
 </html>

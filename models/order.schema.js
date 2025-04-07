@@ -45,9 +45,13 @@ const orderSchema = new Schema({
     },
     paymentStatus: {
         type: String,
-        enum: ["Pending", "Completed", "Refunded"],
+        enum: ["Pending", "Paid", "Refunded"],
         default: "Pending"
     },
+    discountAmount:{
+        type:Number,
+        default:0
+    }
 }, { timestamps: true });
 
 const Order = mongoose.model('Order', orderSchema);

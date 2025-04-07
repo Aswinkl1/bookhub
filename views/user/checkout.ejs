@@ -442,7 +442,7 @@
                             </div> -->
                             <div class="summary-row">
                                 <span>Discount</span>
-                                <span class="text-discount">-<%=totalRegularprice - cart.totalPrice %></span>
+                                <span class="text-discount" id="discount">-<%=totalRegularprice - cart.totalPrice %></span>
                             </div>
                             <div class="summary-row" hidden>
                                 <span>coupon Discount</span>
@@ -490,16 +490,16 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
 
-      async function palceOrder(paymentMethod,cartTotal,couponId){
+      async function palceOrder(paymentMethod,cartTotal,couponId,totalDiscount){
         
             const selectedAddress = document.querySelector(".address-card.selected");
                 const addressId = selectedAddress.getAttribute("data-id")
-                
+                console.log(totalDiscount)
                 if(addressId){
                     const responce = await fetch('/placeOrder',{
                         method:"POST",
                         headers:{"Content-Type":"application/json"},
-                        body:JSON.stringify({addressId,paymentMethod,cartTotal,couponId})
+                        body:JSON.stringify({addressId,paymentMethod,cartTotal,couponId,totalDiscount})
                     });
 
                     const jsonResponce = await responce.json()
@@ -525,12 +525,17 @@
             const discountInOrder = document.getElementById("coupon-on-calculation")
             const couponRemove = document.getElementById("coupon-remove")
             const couponId = document.getElementById("couponId")
-
+            const discountFromProductOffer = document.getElementById("discount")
+            
             // Show order success modal when place order button is clicked
             document.getElementById('placeOrderBtn').addEventListener('click',async function() {
                 const totalPrice = cartTotal.innerText
                 const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
-                
+                const productOfferDiscount = discountFromProductOffer.innerText === "-" ? 0 : +discountFromProductOffer.innerText;
+                const orderDiscount = discountInOrder.innerText === "-" ? 0 : +discountInOrder.innerText;
+                const totalDiscount = (productOfferDiscount + orderDiscount) * -1;
+                console.log(orderDiscount)
+                console.log(totalDiscount)
                 if(paymentMethod == "Razorpay"){
                     const response = await fetch("/razorpay/create-order",{ 
                         method: "POST",
@@ -548,14 +553,14 @@
                         currency: order.currency,
                         order_id: order.id,
                         handler: function (response) {
-                        palceOrder(paymentMethod,totalPrice,couponId.value)
+                        palceOrder(paymentMethod,totalPrice,couponId.value,totalDiscount)
                         }
                         };
                         var rzp = new Razorpay(options);
                         rzp.open();
                         }
                 }else{
-                    palceOrder(paymentMethod,totalPrice,couponId.value)
+                    palceOrder(paymentMethod,totalPrice,couponId.value,totalDiscount)
                 }
                 
                 
@@ -595,8 +600,10 @@
                 }else{
                     console.log("error")
                     couponError.innerHTML = `<p class="text-danger"><small>${jsonResponse.error}</small></p>`
-
+                    
                 }
+                
+                
             })
         
             // remove coupon

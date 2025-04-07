@@ -21,7 +21,7 @@ const payWithRazorpay = async (req,res)=>{
         currency:"INR"
     }
 
-    console.log("j")
+
     razorpayInstance.orders.create(options,function (err,order){
         if(err){
             console.log(err)
@@ -42,11 +42,10 @@ const validateCoupon = async (req,res)=>{
         return res.status(400).json({error:"invalid Coupon code"})
     }
 
-
     if(coupon.expiryDate <= new Date()){
         return res.status(400).json({error:"coupon expired"})
     }
-
+    
     if(!(coupon.minCartAmount <= +cartTotal)){
         return res.status(400).json({error:`You need to add items worth ${coupon.minCartAmount} to use this coupon.`})
     }
@@ -75,8 +74,8 @@ const addOrder = async (req, res) => {
     try {
         const userId = req.session.userId
         const addressId = req.body.addressId
-        const {paymentMethod,cartTotal,couponId} = req.body
-        
+        const {paymentMethod,cartTotal,couponId,totalDiscount} = req.body
+        console.log('totsl discoeunt'+totalDiscount)
         const cart = await Cart.findOne({ userId }).populate("items.productId");
 
         if (!cart || cart.items.length === 0) {
@@ -100,7 +99,8 @@ const addOrder = async (req, res) => {
             items: orderItems,
             totalPrice:cartTotal, // amount the customer paid 
             addressId:addressId,
-            paymentMethod:paymentMethod
+            paymentMethod:paymentMethod,
+            discountAmount:totalDiscount
 
         });
 
