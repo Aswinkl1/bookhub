@@ -35,7 +35,7 @@ const orderSchema = new Schema({
     totalPrice: { type: Number, required: true },
     status: {
         type: String,
-        enum: ["Pending", "Shipped", "Delivered", "Cancelled","Returned","Return-pending"], 
+        enum: ["Pending", "Shipped", "Delivered", "Cancelled","Returned","Return-pending","Return-cancelled"], 
         default: "Pending"
     },
     orderDate: { type: Date, default: Date.now },

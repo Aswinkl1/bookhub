@@ -360,11 +360,10 @@ const getSalesReportPDF = async (req, res) => {
     }
 };
 
+
 module.exports = {
     salesReportRender,
     getSalesReport,
     getSalesReportPDF,
     getSalesReportExcel,
-
-
 }

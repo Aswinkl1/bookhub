@@ -2,27 +2,49 @@ const category = require('../models/category.schema');
 const Category = require('../models/category.schema')
 const mongoose = require('mongoose')
 
+
+const categoryPageRender =  async (req,res)=>{
+    try {
+        res.render("category")
+    } catch (error) {
+        console.log(error)
+    }
+}
 const CategoryInfo = async (req,res)=>{
     try {
-        const page = parseInt(req.query.page) || 1;
-
-        const limit = 4
-
-        const skip = (page -1 ) * limit;
-
-        const categoryData = await category.find({})
+        let page = parseInt(req.query.page) || 1;
+        const search = req.query.search || ""
+        const limit = 6
+        const filter = {}
+        filter.$or = [
+            {'name':{$regex:search,$options:'i'}},
+            {'description':{$regex:search,$options:'i'}}
+        ]
+       
+        const totalcategories = await Category.countDocuments(filter)
+        // Reset page to 1 if the total number of filtered categories is less than the current limit.
+        // This prevents scenarios where the user is on a higher page (e.g., page 3) but searches for a term
+        // that returns fewer documents (e.g., 1 result). Since that result wouldn't exist on page 3,
+        // we reset to page 1 to ensure the filtered data is visible.
+        if(totalcategories <limit){
+            page =1
+        }
+        const categoryData = await category.find(filter)
         .sort({createdAt:-1})
-        .skip(skip)
+        .skip((page -1 ) * limit)
         .limit(limit)
-
-        const totalcategories = await Category.countDocuments()
+        console.log(categoryData)
         const totalPages = Math.ceil(totalcategories/limit)
-        res.render('category',{
-            cat:categoryData,
-            currentPage:page,
-            totalPages:totalPages,
-            totalcategories:totalcategories
-        })
+        
+        // res.render('category',{
+        //     cat:categoryData,
+        //     currentPage:page,
+        //     totalPages:totalPages,
+        //     totalcategories:totalcategories
+        // })
+        
+        res.status(200).json({categoryData,currentPage:page,totalPages,totalcategories})
+
     } catch (error) {
         console.error(error)
     }
@@ -61,10 +83,11 @@ const getListCategory = async (req,res)=>{
         const a = await Category.updateOne({_id:id},{$set:{isListed:true}})
         console.log(a);
         
-        res.redirect("/admin/category")
+        res.status(200).end()
         
     } catch (error) {
-        
+        console.log(error)
+        res.status(400).end()
     }
 }
 
@@ -73,10 +96,13 @@ const getUnlistCategory = async (req,res)=>{
         const id = req.query.id
         const a= await Category.updateOne({_id:id},{$set:{isListed:false}})
         console.log(a)
-        res.redirect("/admin/category")
+        res.status(200).end()
+
         
     } catch (error) {
-        
+        console.log(error)
+        res.status(400).end()
+
     }
 }
 
@@ -132,7 +158,7 @@ module.exports ={
     getListCategory,
     getUnlistCategory,
     getEditCategory,
-    postEditcategory
-
+    postEditcategory,
+    categoryPageRender,
 
 }

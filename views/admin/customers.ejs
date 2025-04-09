@@ -167,92 +167,43 @@
         </div>
         <div class="col-md-5">
           <div class="input-group">
-            <input type="text" class="form-control custom-search" placeholder="Search by name, email or phone...">
-            <button class="btn custom-search-btn" type="button">
-              <i class="bi bi-search"></i>
+            <input type="text" id="search" class="form-control custom-search" placeholder="Search by name, email or phone...">
+            <button class="btn custom-search-btn" type="button" id="searchClear" onclick="clearInput()">
+              <i class="bi bi-x"></i>
             </button>
           </div>
         </div>
       </div>
       
       <!-- Table -->
-      <div class="table-responsive">
-        <table class="table table-hover mb-0">
-          <tbody>
+      <div class="table-responsive" id="table">
+        <table class="table table-hover mb-0" >
+          <thead>
+
             <tr class="table-header">
               <td>Customer</td>
               <td>Contact Information</td>
               <td>Status</td>
               <td>Action</td>
             </tr>
-            <% for(let i=0;i<data.length;i++) {%>
-
-            
-            <tr>
-              <td>
-                <div class="d-flex align-items-center">
-                  <div class="customer-avatar">JS</div>
-                  <span class="customer-name"><%= data[i].name %></span>
-                </div>
-              </td>
-              <td>
-                <div class="d-flex flex-column">
-                  <span class="customer-email"><%= data[i].email%></span>
-                  <span class="text-muted"><%= data[i].phone%></span>
-                </div>
-              </td>
-              <% if(data[i].isBlocked == false){%>
-              <td>
-                <span class="badge bg-light text-dark">
-                  <span class="status-indicator status-active"></span>Active
-                </span>
-              </td>
-              <% }else {%>
-                <td>
-                  <span class="badge bg-light text-danger">
-                    <span class="status-indicator status-blocked"></span>Blocked
-                  </span>
-                </td>
-
-                <% } %>
-                <% if(data[i].isBlocked == false){%>
-
-              <td>
-                <a href="/admin/blockCustomer?id=<%=data[i]._id%>" class="btn action-btn btn-block" onclick="blockUser('<%=data[i].name%>')">
-                  <i class="bi bi-slash-circle me-1"></i>Block
-                </a>
-              </td>
-            </tr>
-            <% }else {%>
-              <td>
-                <a href="/admin/unBlockCustomer?id=<%=data[i]._id%>"class="btn action-btn btn-unblock" onclick="unblockUser('<%=data[i].name%>')">
-                  <i class="bi bi-check-circle me-1"></i>Unblock
-                </a>
-              </td>
-              <% } %>
-
-            <%}%>
+          </thead>
+          <tbody id="t-body">
+      
           </tbody>
         </table>
       </div>
-      
+      <div id="no-user-label">
+
+      </div>
       <!-- Pagination -->
       <div class="p-3 bg-white border-top">
         <nav aria-label="Customer list pagination">
-          <ul class="pagination custom-pagination justify-content-center mb-0">
-            <!-- <li class="page-item disabled">
-              <a class="page-link" href="#" tabindex="-1"><i class="bi bi-chevron-left"></i></a>
-            </li> -->
+          <ul class="pagination custom-pagination justify-content-center mb-0" id="pagination">
+            
 
-            <% for(let i=1;i<=totalPages;i++){%>
-            <li class="page-item <%= (i===currentPage)?'active':'' %>">
-              <a class="page-link" href="?page=<%=i%>"> <%= i%></a>
-            </li>
-            <%}%>
+            
 
-            <!-- <li class="page-item">
-              <a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a>
-            </li> -->
+            
           </ul>
         </nav>
       </div>
@@ -268,7 +219,7 @@
             </div>
             <div>
               <h6 class="text-muted mb-1">Total Customers</h6>
-              <h3 class="mb-0"><%= count %></h3>
+              <h3 class="mb-0" id="totalCount"></h3>
             </div>
           </div>
         </div>
@@ -281,7 +232,7 @@
             </div>
             <div>
               <h6 class="text-muted mb-1">Active Customers</h6>
-              <h3 class="mb-0">1,187</h3>
+              <h3 class="mb-0" id="activeCount">1,187</h3>
             </div>
           </div>
         </div>
@@ -294,7 +245,7 @@
             </div>
             <div>
               <h6 class="text-muted mb-1">Blocked Customers</h6>
-              <h3 class="mb-0">67</h3>
+              <h3 class="mb-0" id="blockedCount"></h3>
             </div>
           </div>
         </div>
@@ -307,17 +258,213 @@
   
   <!-- JavaScript for the block/unblock functionality -->
   <script>
-    function blockUser(userId) {
-      // In a real application, this would call an API
-      alert(` ${userId} blocked successfully`);
-      // Refresh the table or update the UI
+
+    let search = ""
+    let page = 1
+    function pagination(totalPages,currentPage){
+
+      const parent = document.getElementById("pagination")
+      parent.innerHTML = ""
+      for(let i=1;i<=totalPages;i++ ){
+        const child = document.createElement("li")
+        child.classList.add("page-item")
+        if(currentPage == i){
+          child.classList.add("active")
+        }
+        child.innerHTML = ` <a class="page-link" onclick="changePage(${i})"> ${i}</a>`    
+        parent.appendChild(child)
+      }
+
+    }
+
+    function changePage(Page){
+      page = Page
+      fetchUserData(search,page)
+    }
+
+    async  function fetchUserData(Search="",page=1) {
+      try {
+        const response = await fetch(`/admin/api/users?search=${Search}&page=${page}`,{
+          method:"GET",
+          headers:{"Content-Type":"application/json"}
+        })
+
+        const jsonResponse = await response.json()
+        if(response.ok){
+          loadUsersTable(jsonResponse.users)
+          pagination(jsonResponse.totalPages,jsonResponse.currentPage)
+          document.getElementById("activeCount").innerText = jsonResponse.activeCount
+          document.getElementById("totalCount").innerText = jsonResponse.activeCount + jsonResponse.blockedCount
+          document.getElementById("blockedCount").innerText = jsonResponse.blockedCount
+        }else{
+          console.log("error")
+        }
+      } catch (error) {
+        console.log("error: "+error)
+
+      }
+    }
+
+    async function loadUsersTable(userData) {
+      const parent = document.getElementById("t-body")
+      console.log("heere")
+      parent.innerHTML = ""
+      if(userData.length == 0){
+        document.getElementById("no-user-label").innerHTML = `<p class="text-center">No user found</p>`
+        return
+      }
+      document.getElementById("no-user-label").innerHTML = ""
+      userData.forEach((user)=>{
+        const child = document.createElement("tr")
+        let statusBadge ;
+        let actionButton;
+
+        if(user.isBlocked){
+          statusBadge = `
+                          <span class="badge bg-light text-danger">
+                            <span class="status-indicator status-blocked"></span>Blocked
+                          </span>
+                         `
+          actionButton = `<a class="btn action-btn btn-unblock" onclick="unblockUser('${user.name}','${user._id}')">
+                  <i class="bi bi-check-circle me-1"></i>Unblock
+                </a>
+          `
+        }else{
+          statusBadge = `
+                          
+                            <span class="badge bg-light text-dark">
+                              <span class="status-indicator status-active"></span>Active
+                            </span>
+                          
+          `
+          actionButton = `<a  class="btn action-btn btn-block" onclick="blockUser('${user.name}','${user._id}')">
+                  <i class="bi bi-slash-circle me-1"></i>Block
+                </a>
+                `
+        }
+
+        
+        child.innerHTML = `
+        <tr>
+              <td>
+                <div class="d-flex align-items-center">
+                  <div class="customer-avatar">JS</div>
+                  <span class="customer-name">${user.name}</span>
+                </div>
+              </td>
+              <td>
+                <div class="d-flex flex-column">
+                  <span class="customer-email">${user.email}</span>
+                  <span class="text-muted">${user.phone}</span>
+                </div>
+              </td>
+              <td>
+                ${statusBadge}
+              </td>
+              <td>
+                ${actionButton}
+              </td>
+            </tr>
+          
+        `
+
+            parent.appendChild(child)
+      })
+    }
+
+
+
+    function debounce(func,time){
+      let timeOut
+      return (...args)=>{
+        clearTimeout(timeOut)
+        timeOut = setTimeout(()=>{
+          func.apply(this,args)
+        },time)
+      }
+    }
+
+    const debouncedFetch = debounce(fetchUserData,500)
+
+    function blockUser(userName,userId) {
+
+      Swal.fire({
+        title: "Are you sure?",
+        text: "Do you want to unblock "+userName,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes"
+      }).then(async(result) => {
+        if (result.isConfirmed) {
+
+          const response = await fetch(`/admin/blockCustomer?id=${userId}`,{
+            method:"PATCH",
+            headers:{"Content-Type":"application/json"}
+          })
+
+          if(response.ok){
+            fetchUserData(search,page)
+            Swal.fire({
+              title: "Unblocked!",
+              text: "You have unblocked "+userName,
+              icon: "success"
+            });
+          }
+        }
+      });
     }
     
-    function unblockUser(userId) {
+    function unblockUser(userName,userId) {
+      // href="/admin/unBlockCustomer?id=${user._id}"
+      console.log("yo sjfj")
+      Swal.fire({
+        title: "Are you sure?",
+        text: "Do you want to unblock "+userName,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes"
+      }).then(async(result) => {
+        if (result.isConfirmed) {
+
+          const response = await fetch(`/admin/unBlockCustomer?id=${userId}`,{
+            method:"PATCH",
+            headers:{"Content-Type":"application/json"}
+          })
+
+          if(response.ok){
+            fetchUserData(search,page)
+            Swal.fire({
+              title: "Unblocked!",
+              text: "You have unblocked "+userName,
+              icon: "success"
+            });
+          }
+        }
+      });
+
       // In a real application, this would call an API
-      alert(` ${userId} unblocked successfully`);
+      // alert(` ${userId} unblocked successfully`);
       // Refresh the table or update the UI
     }
+
+
+    function clearInput(e) {
+      document.getElementById("search").value = ""
+      fetchUserData()
+
+    }
+    document.addEventListener("DOMContentLoaded",()=>{
+      fetchUserData()
+
+      document.getElementById("search").addEventListener("input",(e)=>{
+        search = e.target.value.trim()
+        debouncedFetch(search)
+      })
+    })
   </script>
 
 <%-include('../../views/partials/admin/_footer')%>

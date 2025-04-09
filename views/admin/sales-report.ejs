@@ -277,8 +277,8 @@
                         <div class="col-md-3">
                             <label class="form-label">Date Range Type</label>
                             <select class="form-select" id="dateRangeType">
-                                <option value="daily">Daily (1 Day)</option>
-                                <option value="weekly" selected>Weekly</option>
+                                <option value="daily" selected>Daily (1 Day)</option>
+                                <option value="weekly" >Weekly</option>
                                 <option value="monthly">Monthly</option>
                                 <option value="yearly">Yearly</option>
                                 <option value="custom">Custom Date Range</option>
@@ -387,28 +387,19 @@
                     </div>
                     
                     
+                   
                     
-                    <hr class="my-4">
                     
-                    <div class="text-center">
-                        <small class="text-muted">Need help with your report?</small>
-                        <div class="mt-2">
-                            <a href="#" class="btn btn-sm btn-light">View Tutorial</a>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
         
         <!-- Detailed Sales Table -->
-        <div class="col-md-12 mb-12">
+        <div class="col-md-12 mb-12 mt-3">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Detailed Sales Report</h5>
-                    <div class="search-box" style="width: 250px">
-                        <i class="fas fa-search search-icon"></i>
-                        <input type="text" class="form-control form-control-sm" placeholder="Search orders...">
-                    </div>
+                    
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
@@ -620,6 +611,10 @@
     document.getElementById("excelDownload").addEventListener("click",()=>{
         fetchForDownload(SelectedValue.value,start.value,end.value,"excel")
         
+    })
+
+    document.addEventListener("DOMContentLoaded",()=>{
+        fetchdata(SelectedValue.value)
     })
 </script>
 </body>

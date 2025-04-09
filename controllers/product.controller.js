@@ -304,10 +304,11 @@ const fetchAvailableProducts  = async (req,res)=>{
         // sort = JSON.parse(sort)
         console.log(sort)
 
-        const products = await Product.find({isBlocked:false,productTitle:{$regex:search}}).skip(skip).sort(sort).limit(limit)
+        const products = await Product.find({isBlocked:false,productTitle:{$regex:search,$options:'i'}}).skip(skip).sort(sort).limit(limit)
 
         const totalNumberOfProduct = await Product.find({isBlocked:false}).countDocuments()
         const totalPages = Math.ceil(totalNumberOfProduct/limit)
+        
         // console.log(products)
         for(let product of products){
             product.salePrice = await compareOffers(product,product.category)

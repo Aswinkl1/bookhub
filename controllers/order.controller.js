@@ -31,7 +31,6 @@ const payWithRazorpay = async (req,res)=>{
     })
 }
 
-
 const validateCoupon = async (req,res)=>{
     const {couponCode,cartTotal} = req.query
     const {userId} = req.session
@@ -45,7 +44,7 @@ const validateCoupon = async (req,res)=>{
     if(coupon.expiryDate <= new Date()){
         return res.status(400).json({error:"coupon expired"})
     }
-    
+
     if(!(coupon.minCartAmount <= +cartTotal)){
         return res.status(400).json({error:`You need to add items worth ${coupon.minCartAmount} to use this coupon.`})
     }
@@ -411,33 +410,46 @@ const getOrderData = async (req,res)=>{
             }
         }
     
-        const order  =await Order.aggregate([
+        const order = await Order.aggregate([
             statusQuery,
             {
-                $lookup:{
-                    from:"users",
-                    localField:"userId",
-                    foreignField:"_id",
-                    as:"user"
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "user"
                 }
             },
-            {$unwind:"$user"},
+            { $unwind: "$user" },
             searchQuery,
             {
-                $project:{
-                    _id:1,
-                    status:1,
-                    orderdate:1,
-                    orderId:1,
-                    totalPrice:1,
-                    "user.name":1,
-                    "user.email":1
+                $addFields: {
+                    returnPendingPriority: {
+                        $cond: [{ $eq: ["$status", "Return-pending"] }, 0, 1]
+                    }
                 }
-            }
-    
-            
-    
-        ]).skip(skip).limit(limit).sort({status:"Return-pending"})
+            },
+            {
+                $sort: {
+                    returnPendingPriority: 1,       // Put "Return-pending" first
+                    orderDate: -1                   // Then sort by newest
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    status: 1,
+                    orderdate: 1,
+                    orderId: 1,
+                    totalPrice: 1,
+                    "user.name": 1,
+                    "user.email": 1
+                }
+            },
+            { $skip: skip },
+            { $limit: limit }
+        ])
+        
     
         return res.status(200).json({data:order})
     } catch (error) {
@@ -506,6 +518,7 @@ const changeStatusForProduct = async (req,res)=>{
             } 
     
         }
+
         await order.save()
         res.status(200).json({message:"product status change successfull"})
     } catch (error) {
@@ -558,6 +571,20 @@ const changeOrderStatus = async (req,res)=>{
 
 }
 
+
+const register = async (req,res)=>{
+    const {email,name} = req.body
+
+    const user = await User.findOne({email})
+
+    if(user){
+       return res.status(400).json({message:"user already exist"})
+    }
+
+    user = new User({email,name})
+    await user.save()
+    
+}
 module.exports = { 
     addOrder,
     getUserOrders,

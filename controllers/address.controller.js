@@ -30,7 +30,7 @@ const getAddAddresses = async (req,res)=>{
     try{
         console.log("dsfkl")
         req.session.redirectTo = req.query.redirectTo 
-       return res.render("add-address");
+        return res.render("add-address");
     }catch (error){
         console.log(error)
     }

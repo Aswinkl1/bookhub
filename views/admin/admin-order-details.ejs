@@ -26,6 +26,7 @@
                         <option value="Cancelled">Cancelled</option>
                         <option value="Returned">Returned</option>
                         <option value="Return-pending">Return-pending</option>
+                        <option value="Return-cancelled">Return-cancelled</option>
                     </select>
                     <a class="btn btn-primary" id="saveOrderStatusBtn">Save</a>
                     <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a>
@@ -285,7 +286,7 @@
         const statusOption = {
             "Pending":["Pending","Shipped","Delivered","Cancelled"],
             "Shipped":["Shipped","Delivered","Cancelled"],
-            "Return-pending":["Returned","Return-pending"],
+            "Return-pending":["Returned","Return-pending","Return-cancelled"],
             "Delivered":["Delivered"],
             "Cancelled":"Cancelled",
             "Returned":["Returned"]
