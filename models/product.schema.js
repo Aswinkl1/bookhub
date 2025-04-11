@@ -24,10 +24,7 @@ const productSchema = new Schema({
         type:Number,
         // required:true
     },
-    productOffer:{
-        type:Number,
-        default:0
-    },
+    
     quantity:{
         type:Number,
 
@@ -65,6 +62,10 @@ const productSchema = new Schema({
             type:String,
             
         }
+    },
+    isListed:{
+        type:Boolean,
+        default:true
     }
 },{timestamps:true});
 

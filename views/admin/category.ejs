@@ -592,7 +592,7 @@
     getDataForTable()
     
     document.getElementById("categorySearch").addEventListener("input",(e)=>{
-      search = e.target.value
+      search = e.target.value.trim()
       debounsedFetch(search)
 
       

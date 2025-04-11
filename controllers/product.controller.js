@@ -257,6 +257,7 @@ const deleteProduct = async (req, res) => {
         console.error("Error deleting product:", error);
         res.status(500).json({ message: "Internal Server Error" });
     }
+    
 };
 
 
