@@ -23,7 +23,7 @@
         }
         
         .order-details-container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
         
@@ -360,18 +360,20 @@
                 </div>
             </div>
             <div class="d-flex">
-                <div class="action-icon me-2">
-                    <i class="bi bi-printer"></i>
-                </div>
+                <% if(order.status == "Delivered"){ %>
+                
                 <div class="action-icon">
-                    <i class="bi bi-download"></i>
+                    
+                    <a href="/download-invoice/<%= order.orderId %>" target="_blank" download> <i class="bi bi-download"></i></a>
+
                 </div>
+                <% } %>
             </div>
         </div>
 
         <div class="row gy-4">
-            <div class="col-lg-8">
-                <!-- Order Status -->
+            <div class="col-lg-9">
+                <!-- Order Status
                 <div class="card mb-4">
                     <div class="card-header">
                         <h5 class="section-title mb-0"><i class="bi bi-truck"></i> Shipment Status</h5>
@@ -437,7 +439,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Order Items -->
                 <div class="card mb-4">
@@ -451,19 +453,26 @@
                             <div class="card-body p-3">
                                 <div class="row align-items-center">
                                     <div class="col-md-2 col-4 mb-3 mb-md-0">
-                                        <img src="/api/placeholder/120/120" alt="Product 1" class="product-img">
+                                        <img src="/uploads/products-images/<%=item.productId.productImage[0]%>" alt="Product 1" class="product-img">
                                     </div>
-                                    <div class="col-md-6 col-8 mb-3 mb-md-0">
+                                    <div class="col-md-3 col-4 mb-3 mb-md-0">
                                         <h5 class="mb-1"><%= item.productId.productTitle %></h5>
-                                        
                                     </div>
                                     <div class="col-md-2 col-6 text-md-center">
                                         <div class="mb-1 text-muted small">Quantity</div>
                                         <span class="fw-semibold"><%= item.quantity %></span>
                                     </div>
-                                    <div class="col-md-2 col-6 text-end">
+                                    <div class="col-md-1 col-6 text-end">
                                         <div class="mb-1 text-muted small">Price</div>
                                         <div class="fw-semibold">₹<%= item.price %></div>
+                                         
+                                    </div>
+                                    <div class="col-md-2 col-6 text-end">
+                                        <div class="mb-1 text-muted small">Total</div>
+                                        <div class="fw-semibold">₹<%= item.price  * item.quantity%></div>
+                                         
+                                    </div>
+                                    <div class="col-md-2 col-6 text-md-center">
                                         <% if(item.status == "Delivered"){ %>
                                             <button class="btn btn-sm btn-outline-primary mt-2 return-product-btn" id="return-product-btn" data-bs-toggle="modal" data-orderId="<%= order._id %>" data-productId="<%= item.productId._id %>" data-bs-target="#returnModal">
                                                 Return Item
@@ -476,8 +485,6 @@
                                             <span class="badge bg-success text-white me-2 badge-status pr-2"><%=item.status%></span>
                                         <% } %>
 
-
-                                        
                                     </div>
                                 </div>
                             </div>
@@ -535,7 +542,7 @@
                 </div>
             </div>
             
-            <div class="col-lg-4">
+            <div class="col-lg-3">
                 <!-- Order Summary -->
                 <div class="card mb-4">
                     <div class="card-header">
@@ -545,15 +552,15 @@
                         <div class="order-summary-box mb-4">
                             <div class="order-summary-item">
                                 <span>Subtotal</span>
-                                <span>₹<%=order.totalPrice - 50%></span>
+                                <span>₹<%=order.totalPrice + order.discountAmount%></span>
                             </div>
                             <div class="order-summary-item">
                                 <span>Shipping</span>
                                 <span>₹00</span>
                             </div>
                             <div class="order-summary-item">
-                                <span>Tax</span>
-                                <span>₹50</span>
+                                <span>Discount</span>
+                                <span>-₹<%=order.discountAmount%></span>
                             </div>
                             <div class="order-summary-item order-total">
                                 <span>Total</span>
@@ -564,19 +571,17 @@
                         <h6 class="text-uppercase text-muted mb-3">Payment Method</h6>
                         <div class="payment-method-card mb-4">
                             <div class="row">
-                                <div class="col-3">
+                                <!-- <div class="col-3">
                                     <i class="bi bi-credit-card fs-1"></i>
-                                </div>
+                                </div> -->
                                 <div class="col-9">
-                                    <h6 class="mb-1">Visa •••• 4567</h6>
-                                    <small>Expiry: 05/27</small>
+                                    <h6 class="mb-1"><%=order.paymentMethod%></h6>
+                                    <!-- <small>Expiry: 05/27</small> -->
                                 </div>
                             </div>
                         </div>
                         
-                        <button class="btn btn-primary w-100 mb-3">
-                            <i class="bi bi-headset me-2"></i> Contact Support
-                        </button>
+                       
                         <% if(order.status == "Pending" || order.status == "Shipped"){ %>
                             <button class="btn btn-outline-primary w-100" id="cancel-order-button" data-bs-toggle="modal" data-bs-target="#cancelModal">
                                 <i class="bi bi-x-circle me-2"></i> Cancel Order
@@ -645,7 +650,7 @@
     </div>
 
     <!-- Return single  Modal -->
-   <div class="modal fade" id="returnModal" tabindex="-1" aria-labelledby="returnModalLabel" aria-hidden="true">
+    <div class="modal fade" id="returnModal" tabindex="-1" aria-labelledby="returnModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -653,13 +658,25 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form >
-                       
+                    <form>
                         <div class="mb-4">
-                            <label for="returnComments" class="form-label">Reason for Return</label>
-                            <textarea class="form-control" id="returnReason" rows="3" placeholder="Please provide details about your return..."></textarea>
+                            <label for="returnReason" class="form-label">Reason for Return</label>
+                            <select class="form-select" id="returnReason" required>
+                                <option value="" selected disabled>Select a reason...</option>
+                                <option value="wrong-item">Received wrong item</option>
+                                <option value="damaged">Item arrived damaged</option>
+                                <option value="defective">Item is defective</option>
+                                <option value="not-as-described">Item not as described</option>
+                                <option value="size-issue">Wrong size/doesn't fit</option>
+                                <option value="changed-mind">Changed my mind</option>
+                                <option value="accidental-purchase">Accidental purchase</option>
+                                <option value="other">Other reason</option>
+                            </select>
                         </div>
-                        
+                        <div class="mb-4" id="otherReasonContainer" style="display: none;">
+                            <label for="otherReason" class="form-label">Please specify</label>
+                            <textarea class="form-control" id="otherReason" rows="2" placeholder="Please provide details about your return..."></textarea>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -678,13 +695,25 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form >
-                       
+                    <form>
                         <div class="mb-4">
-                            <label for="returnComments" class="form-label">Reason for Return</label>
-                            <textarea class="form-control" id="returnOrderReason" rows="3" placeholder="Please provide details about your return..."></textarea>
+                            <label for="returnOrderReason" class="form-label">Reason for Return</label>
+                            <select class="form-select" id="returnOrderReason" required>
+                                <option value="" selected disabled>Select a reason...</option>
+                                <option value="wrong-item">Received wrong item</option>
+                                <option value="damaged">Item arrived damaged</option>
+                                <option value="defective">Item is defective</option>
+                                <option value="not-as-described">Item not as described</option>
+                                <option value="size-issue">Wrong size/doesn't fit</option>
+                                <option value="changed-mind">Changed my mind</option>
+                                <option value="accidental-purchase">Accidental purchase</option>
+                                <option value="other">Other reason</option>
+                            </select>
                         </div>
-                        
+                        <div class="mb-4" id="otherReasonContainer" style="display: none;">
+                            <label for="otherReason" class="form-label">Please specify</label>
+                            <textarea class="form-control" id="otherReason" rows="2" placeholder="Please provide details about your return..."></textarea>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -793,7 +822,7 @@
             // single product return modal fetch request 
             document.getElementById("product-return-submit").addEventListener("click",async (e)=>{
                 const reason = document.getElementById("returnReason").value
-                
+                console.log("hiiii")
                 console.log(reason)
                 const response = await fetch(`/order/return/${productId}/${orderId}`,{
                     method:"PUT",

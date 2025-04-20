@@ -99,7 +99,7 @@
                                         <td>
                                             <a class="itemside" href="#">
                                                 <div class="left">
-                                                    <img src="assets/imgs/items/1.jpg" width="40" height="40" class="img-xs" alt="Item">
+                                                    <img src="/uploads/products-images/<%=order.items[i].productId.productImage[0]%>" width="40" height="40" class="img-xs" alt="Item">
                                                 </div>
                                                 <div class="info">  <%=order.items[i].productId.productTitle %> </div>
                                             </a>
@@ -181,6 +181,8 @@
                                 <option value="Cancelled">Cancelled</option>
                                 <option value="Return-pending">Return Pending</option>
                                 <option value="Returned">Returned</option>
+                                <option value="Return-cancelled">Return-cancelled</option>
+
                             </select>
                         </div>
                         <div class="modal-footer">

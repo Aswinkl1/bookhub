@@ -10,7 +10,7 @@ const checkout = require("../controllers/checkout.controller")
 const order = require("../controllers/order.controller")
 const product = require('../controllers/product.controller')
 const wishlist = require("../controllers/wishlist.contoller")
-
+const wallet = require("../controllers/wallet.controller")
 
 router.get('/',controller.HomePageLoad);
 
@@ -78,6 +78,7 @@ router.put('/cancelProduct/:orderId/:productId',userAuth,order.cancelSingleProdu
 router.put('/returnOrder/:orderId',userAuth,order.returnOrder)
 router.put('/order/return/:productId/:orderId',userAuth,order.productReturn)
 router.post("/razorpay/create-order",userAuth,order.payWithRazorpay)
+router.get("/download-invoice/:id",order.downloadInvoice)
 //product -shop
 router.get('/shop',product.renderShopPage)
 router.get('/api/shop',product.fetchAvailableProducts )
@@ -89,8 +90,10 @@ router.get('/api/wishlist',userAuth,wishlist.loadWishlistDetails)
 router.post('/api/wishlist',userAuth,wishlist.addToWishlist)
 router.delete('/api/wishlist/:productId',userAuth,wishlist.removeFromWishlist)
 
-// w
-
+// wallet 
+router.get("/wallet",wallet.getWallet)
+router.post("/wallet/razorpay/create-order",wallet.creataOrderUsingRazorpay)
+router.post("/wallet/addMoney",wallet.addMoneyToWallet)
 
 
 module.exports = router;

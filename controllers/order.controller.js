@@ -7,6 +7,7 @@ const Transaction = require('../models/transaction.schema')
 const Razorpay = require("razorpay")
 const Coupon = require("../models/coupon.schema")
 const User = require("../models/user.schema")
+const PDFDocument = require("pdfkit")
 
 const razorpayInstance = new Razorpay({
     key_id:process.env.key_id,
@@ -280,7 +281,7 @@ const returnOrder = async (req,res)=>{
             // Restore stock for all items
             for (let item of order.items) {
                 // await Product.findByIdAndUpdate(item.productId._id, { $inc: { stock: item.quantity } });
-                if(item.status != "Cancelled" && item.status != "Returned"){
+                if(item.status != "Cancelled" && item.status != "Returned" && item.status != "Return-cancelled"){
                     item.status = "Return-pending";
                     item.returnRequest = reason;
                 }
@@ -366,7 +367,278 @@ const _returnMoneyToWallet = async (userId,orderId,amount)=>{
     }
 }
 
-
+const downloadInvoice = async (req, res) => {
+    try {
+      const orderId = req.params.id;
+  
+      const order = await Order.findOne({ orderId })
+        .populate('userId')
+        .populate('addressId')
+        .populate('items.productId');
+      console.log(order)
+      if (!order) return res.status(404).send('Order not found');
+  
+      // Create a PDF document with proper margins
+      const doc = new PDFDocument({ 
+        size: 'A4',
+        margins: {
+          top: 50,
+          bottom: 50,
+          left: 55,
+          right: 55
+        }
+      });
+  
+      // Set response headers
+      res.setHeader('Content-Disposition', `attachment; filename=Invoice-${order.orderId}.pdf`);
+      res.setHeader('Content-Type', 'application/pdf');
+      doc.pipe(res);
+  
+      // Define dimensions
+      const pageWidth = 595.28; // A4 width in points
+      const margin = 55;
+      const contentWidth = pageWidth - (margin * 2);
+      
+      // Header - INVOICE title
+      doc.font('Helvetica-Bold').fontSize(26).text('INVOICE', 0, 30, { align: 'center' });
+      
+      // First horizontal line
+      doc.moveDown(1);
+      const firstLineY = 80;
+      doc.strokeColor('#000000').lineWidth(1)
+        .moveTo(margin, firstLineY)
+        .lineTo(pageWidth - margin, firstLineY)
+        .stroke();
+      
+      // Two-column layout - Customer Details and Invoice Details
+      const colWidth = contentWidth / 2;
+      const leftColX = margin;
+      const rightColX = margin + colWidth;
+      const detailsStartY = firstLineY + 20;
+      
+      // Customer Details - Left column
+      doc.font('Helvetica-Bold').fontSize(18)
+        .text('Customer Details', leftColX, detailsStartY);
+      
+      // Customer details with aligned labels
+      const labelWidth = 140;
+      
+      // Name
+      doc.moveDown(0.7);
+      let y = doc.y;
+      doc.font('Helvetica-Bold').fontSize(11)
+        .text('Name:', leftColX, y);
+      doc.font('Helvetica').fontSize(11)
+        .text(order.userId.name, leftColX + labelWidth, y);
+      
+      // Shipping Address
+      doc.moveDown(0.5);
+      y = doc.y;
+      doc.font('Helvetica-Bold').fontSize(11)
+        .text('Shipping Address:', leftColX, y);
+      const address = order.addressId;
+      doc.font('Helvetica').fontSize(11)
+        .text(address?.fullName || 'abhi', leftColX + labelWidth, y);
+      
+      // City on the next line aligned with address field
+      doc.font('Helvetica').fontSize(11)
+        .text(address?.city || 'kochi', leftColX, y + 15);
+      
+      // Invoice Details - Right column
+      doc.font('Helvetica-Bold').fontSize(18)
+        .text('Invoice Details', rightColX, detailsStartY);
+      
+      // Invoice details with aligned labels
+      const invoiceDetailY = detailsStartY + 30;
+      
+      // Helper function to create aligned invoice details
+      const createDetailRow = (label, value, yPosition, color = '#000000') => {
+        doc.font('Helvetica-Bold').fontSize(11)
+          .text(label, rightColX, yPosition);
+        doc.font('Helvetica').fontSize(11)
+          .fillColor(color)
+          .text(value, rightColX + 130, yPosition);
+        doc.fillColor('#000000'); // Reset to black
+      };
+      
+      // Invoice #
+      createDetailRow('Invoice #:', order.orderId, invoiceDetailY);
+      
+      // Date
+      createDetailRow('Date:', new Date(order.orderDate).toLocaleDateString(), invoiceDetailY + 30);
+      
+      // Payment Method
+      createDetailRow('Payment Method:', order.paymentMethod, invoiceDetailY + 60);
+      
+      // Payment Status (with red color for Pending)
+      createDetailRow('Payment Status:', order.paymentStatus, invoiceDetailY + 90, 
+                     order.paymentStatus === 'Pending' ? '#FF0000' : '#000000');
+      
+      // Second horizontal line
+      const secondLineY = invoiceDetailY + 130;
+      doc.strokeColor('#000000').lineWidth(1)
+        .moveTo(margin, secondLineY)
+        .lineTo(pageWidth - margin, secondLineY)
+        .stroke();
+      
+      // Order Items section title
+      doc.font('Helvetica-Bold').fontSize(20)
+        .text('Order Items', 0, secondLineY + 20, { align: 'center' });
+      
+      // Order Items Table
+      const tableTop = secondLineY + 60;
+      const tableColWidths = [contentWidth * 0.38, contentWidth * 0.24, contentWidth * 0.12, contentWidth * 0.26];
+      
+      // Table header row with gray background
+      doc.fillColor('#f0f0f0')
+        .rect(margin, tableTop, contentWidth, 30)
+        .fill();
+      
+      // Add header texts
+      doc.fillColor('#000000').font('Helvetica-Bold').fontSize(11);
+      
+      let colX = margin;
+      doc.text('Product', colX + 10, tableTop + 10);
+      
+      colX += tableColWidths[0];
+      doc.text('Status', colX + 10, tableTop + 10);
+      
+      colX += tableColWidths[1];
+      doc.text('Qty', colX + 10, tableTop + 10, { align: 'center', width: tableColWidths[2] - 20 });
+      
+      colX += tableColWidths[2];
+      doc.text('Price', colX + 10, tableTop + 10, { align: 'right', width: tableColWidths[3] - 20 });
+      
+      // Table rows
+      let rowY = tableTop + 30;
+      let subtotal = 0;
+      
+      for (const item of order.items) {
+        const product = item.productId;
+        const isDelivered = item.status === 'Delivered' || item.status == "Return-cancelled";
+        
+        // Row background (subtle alternating effect)
+        doc.fillColor('#f9f9f9')
+          .rect(margin, rowY, contentWidth, 30)
+          .fill();
+        
+        // Product name
+        colX = margin;
+        doc.fillColor('#000000').font('Helvetica').fontSize(11)
+          .text(product.productTitle, colX + 10, rowY + 10);
+        
+        // Status with color
+        colX += tableColWidths[0];
+        let statusColor = '#000000';
+        if (item.status === 'Cancelled') statusColor = '#FF0000';
+        if (item.status === 'Returned') statusColor = '#FFA500';
+        if (item.status === 'Delivered') statusColor = '#008000';
+        
+        doc.fillColor(statusColor).font('Helvetica').fontSize(11)
+          .text(item.status, colX + 10, rowY + 10);
+        
+        // Quantity centered
+        colX += tableColWidths[1];
+        doc.fillColor('#000000').font('Helvetica').fontSize(11)
+          .text(item.quantity.toString(), colX + 10, rowY + 10, 
+               { align: 'center', width: tableColWidths[2] - 20 });
+        
+        // Price right-aligned with rupee symbol
+        colX += tableColWidths[2];
+        doc.fillColor('#000000').font('Helvetica').fontSize(11)
+          .text(`₹${item.price.toFixed(2)}`, colX + 10, rowY + 10, 
+               { align: 'right', width: tableColWidths[3] - 20 });
+        
+        if (isDelivered) {
+          subtotal += item.price * item.quantity;
+        }
+        
+        // Bottom border for row
+        doc.strokeColor('#e0e0e0').lineWidth(0.5)
+          .moveTo(margin, rowY + 30)
+          .lineTo(margin + contentWidth, rowY + 30)
+          .stroke();
+        
+        rowY += 30;
+      }
+      
+      // Third horizontal line
+      const thirdLineY = rowY + 30;
+      doc.strokeColor('#000000').lineWidth(1)
+        .moveTo(margin, thirdLineY)
+        .lineTo(pageWidth - margin, thirdLineY)
+        .stroke();
+      
+      // Order Summary section - fixed to match the image exactly
+      const summaryWidth = 460;
+      const summaryLeft = margin; // Align with left margin
+      const summaryTop = thirdLineY + 30;
+      
+      // Order Summary Header
+      doc.fillColor('#f0f0f0')
+        .rect(summaryLeft, summaryTop, summaryWidth, 30)
+        .fill();
+      
+      doc.fillColor('#000000').font('Helvetica-Bold').fontSize(12)
+        .text('Order Summary', summaryLeft + 15, summaryTop + 10);
+      
+      // Subtotal row with border
+      doc.fillColor('#ffffff')
+        .rect(summaryLeft, summaryTop + 30, summaryWidth, 30)
+        .fill()
+        .strokeColor('#e0e0e0').lineWidth(0.5)
+        .rect(summaryLeft, summaryTop + 30, summaryWidth, 30)
+        .stroke();
+      
+      doc.fillColor('#000000').font('Helvetica').fontSize(11)
+        .text('Subtotal (Delivered items only):', summaryLeft + 15, summaryTop + 40);
+      
+      // Format currency with proper right alignment
+      const formattedSubtotal = `₹${order.totalPrice.toFixed(2)}`;
+      doc.text(formattedSubtotal, summaryLeft + summaryWidth - 50, summaryTop + 40, { align: 'left' });
+      
+      // discount amount row
+      doc.fillColor('#ffffff')
+        .rect(summaryLeft, summaryTop + 60, summaryWidth, 30)
+        .fill()
+        .strokeColor('#e0e0e0').lineWidth(0.5)
+        .rect(summaryLeft, summaryTop + 60, summaryWidth, 30)
+        .stroke();
+      
+        
+      doc.fillColor('#000000').font('Helvetica-Bold').fontSize(11)
+        .text('Refunted Amount:', summaryLeft + 15, summaryTop + 70);
+      
+      // Format final amount with proper right alignment
+      const discountAmount = Math.max(0,  order.totalPrice - subtotal);
+      const formatteddiscountAmount = `-₹${discountAmount.toFixed(2)}`;
+      doc.text(formatteddiscountAmount, summaryLeft + summaryWidth - 50, summaryTop + 70, { align: 'left' });
+      
+      
+      // Final Amount row with border
+      doc.fillColor('#ffffff')
+        .rect(summaryLeft, summaryTop + 90, summaryWidth, 30)
+        .fill()
+        .strokeColor('#e0e0e0').lineWidth(0.5)
+        .rect(summaryLeft, summaryTop + 90, summaryWidth, 30)
+        .stroke();
+      
+      doc.fillColor('#000000').font('Helvetica-Bold').fontSize(11)
+        .text('Final Amount:', summaryLeft + 15, summaryTop + 100);
+      
+      // Format final amount with proper right alignment
+      const finalAmount = Math.max(0, subtotal);
+      const formattedFinalAmount = `₹${finalAmount.toFixed(2)}`;
+      doc.text(formattedFinalAmount, summaryLeft + summaryWidth - 50, summaryTop + 100, { align: 'left' });
+      
+      // Finalize PDF
+      doc.end();
+      
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Error generating invoice");
+    }
+  };
 
 // order management for admin 
 const renderOrderList  = async (req,res)=>{
@@ -488,11 +760,12 @@ const changeStatusForProduct = async (req,res)=>{
             return res.status(400).json({error:"order not found"})
         }
 
-        // console.log(order)
+
         let quantity = 0
         let amount = 0
         order.items.forEach((value) =>{
             if(value.productId.toString() == productId){
+                
                 value.status = newStatus
                 quantity = value.quantity
                 amount = value.price
@@ -500,7 +773,7 @@ const changeStatusForProduct = async (req,res)=>{
         })
 
         const statusArray = ["Cancelled","Returned"]
-    
+        
         if(statusArray.includes(newStatus)){
             // Reduce stock for each product
             for (const item of order.items) {
@@ -511,8 +784,8 @@ const changeStatusForProduct = async (req,res)=>{
                     );
                 }
             }
-    
-            if(order.paymentMethod != "COD" ||newStatus == "Returned"){
+
+            if(order.paymentMethod != "COD" ||newStatus == "Returned" ){
                 // return the money to the wallet
                 _returnMoneyToWallet(userId,orderId,quantity * amount)
             } 
@@ -542,30 +815,50 @@ const changeOrderStatus = async (req,res)=>{
 
     order.status = newStatus
 
-    // order.items.forEach(item =>{
-        
-    //     item.status = newStatus
-    // })
-    let refundedAmount =0
+    const statusOption = {
+        "Pending":["Pending","Shipped","Delivered","Cancelled"],
+        "Shipped":["Shipped","Delivered","Cancelled"],
+        "Return-pending":["Returned","Return-pending","Return-cancelled"],
+        "Delivered":["Delivered"],
+        "Cancelled":"Cancelled",
+        "Returned":["Returned"],
+        "Return-cancelled":["Return-cancelled"]
+    }
+    
+
+    // let refundedAmount =0
+    let refuntableAmount = 0
     if(newStatus == "Returned" || newStatus == "Cancelled"){
         // for return money to the wallet 
         for(const item of order.items){
             await Product.findOneAndUpdate(item.productId,{
                 $inc: { stock: item.quantity }
             })
-            if(item.status == "Returned" || item.status == "Cancelled"){
-                refundedAmount += item.quantity * item.price
+
+            // if(item.status == "Returned" || item.status == "Cancelled" ){
+            //     refundedAmount += item.quantity * item.price
+            // }
+            if(item.status == "Return-pending"){
+                refuntableAmount += item.quantity * item.price
             }
-            item.status = newStatus;
+            // item.status = newStatus;
             
 
         }
-        console.log(refundedAmount)
+        
         // return money here
-        _returnMoneyToWallet(userId,orderId,order.totalPrice - refundedAmount)
+        _returnMoneyToWallet(userId,orderId,refuntableAmount)
     }
+    
+    order.items.forEach(item =>{
+        if(statusOption[item.status].includes(newStatus)){
+            console.log(item.status , newStatus)
+            item.status =newStatus
+        }
+    })
 
     await order.save()
+    
     res.status(200).json({message:"change status successfully"})
 
 
@@ -599,7 +892,8 @@ module.exports = {
     changeStatusForProduct,
     changeOrderStatus,
     payWithRazorpay,
-    validateCoupon
+    validateCoupon,
+    downloadInvoice,
 
  };
 

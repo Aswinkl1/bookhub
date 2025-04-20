@@ -197,27 +197,44 @@ const getSalesReportPDF = async (req, res) => {
       doc.text(`Total Discount: ${totalDiscount.toLocaleString()}`).moveDown(1);
   
       // Table Header
-      doc.font("Helvetica-Bold").fontSize(11);
-      
-      const headerY = doc.y;
-      doc.text("Order ID", 50, headerY);
-      doc.text("Customer", 200, headerY);
-      doc.text("Amount", 350, headerY);
-      doc.text("Date", 450, headerY);
-      doc.moveTo(50, headerY + 15).lineTo(550, headerY + 15).stroke();
-      doc.moveDown();
+      doc.font("Helvetica-Bold").fontSize(8);
+
+const headerY = doc.y;
+
+doc.text("Date", 50, headerY, { width: 60 });
+doc.text("Order ID", 110, headerY, { width: 140 });
+doc.text("Customer", 260, headerY, { width: 80 });
+doc.text("Items", 310, headerY, { width: 40 });
+doc.text("Subtotal", 350, headerY, { width: 60 });
+doc.text("Discount", 410, headerY, { width: 60 });
+doc.text("Status", 470, headerY, { width: 60 });
+doc.text("Total", 530, headerY, { width: 60 });
+
+doc.moveTo(50, headerY + 15).lineTo(590, headerY + 15).stroke(); // line now ends at x = 590
+doc.moveDown()
+
+// Table Rows
+doc.font("Helvetica").fontSize(10);
+
+orders.forEach((order) => {
+  const y = doc.y;
+  const discount = order.discountAmount || 0;
+  const subtotal = order.totalPrice || 0;
+  const total = subtotal - discount;
+
   
-      // Rows
-      doc.font("Helvetica").fontSize(10);
-      orders.forEach((order) => {
-        const y = doc.y;
-        doc.text(order._id.toString(), 50, y, { width: 140 });
-        doc.text(order.userId?.name || "-", 200, y, { width: 120 });
-        doc.text(`${order.totalPrice.toLocaleString()}`, 350, y, { width: 80 });
-        doc.text(moment(order.createdAt).format("DD/MM/YYYY"), 450, y, { width: 100 });
-        doc.moveTo(50, y + 15).lineTo(550, y + 15).stroke();
-        doc.moveDown();
-      });
+  doc.text(moment(order.createdAt).format("DD/MM/YYYY"), 50, y, { width: 60 });
+  doc.text(order._id.toString(), 110, y, { width: 140 });
+  doc.text(order.userId?.name || "-", 260, y, { width: 80 });
+  doc.text(`${order.items.length}`, 310, y, { width: 40 });
+  doc.text(`${subtotal.toLocaleString()}`, 350, y, { width: 60 });
+  doc.fillColor("red").text(`-${discount.toLocaleString()}`, 410, y, { width: 60 });
+  doc.fillColor("black").text(`${order.status}`, 470, y, { width: 60 });
+  doc.font("Helvetica-Bold").text(`${total.toLocaleString()}`, 530, y, { width: 60 });
+  
+  doc.font("Helvetica").moveTo(50, y + 22).lineTo(650, y + 22).stroke();
+  doc.moveDown();
+});
   
       doc.end();
   
@@ -312,33 +329,30 @@ const getSalesReportPDF = async (req, res) => {
       worksheet.addRow([]);
   
       // Table header
-      worksheet.addRow(["Order ID", "Customer", "Amount", "Date"]);
-      const headerRow = worksheet.getRow(7);
-      headerRow.font = { bold: true };
-      headerRow.alignment = { horizontal: "center" };
-  
-      // Table data
-      orders.forEach((order) => {
-        worksheet.addRow([
-          order._id.toString(),
-          order.userId?.name || "-",
-          `₹${order.totalPrice.toLocaleString()}`,
-          moment(order.createdAt).format("DD/MM/YYYY"),
-        ]);
-      });
-  
-      // Adjust column width
-      worksheet.columns.forEach((col) => {
-        let maxLength = 0;
-        col.eachCell({ includeEmpty: true }, (cell) => {
-          const cellLength = cell.value ? cell.value.toString().length : 10;
-          if (cellLength > maxLength) {
-            maxLength = cellLength;
-          }
-        });
-        col.width = maxLength + 5;
-      });
-  
+      // === Table Header ===
+worksheet.addRow(["Order ID", "Customer", "Status", "Date", "Subtotal", "Discount", "Total"]);
+const headerRow = worksheet.getRow(worksheet.lastRow.number);
+headerRow.font = { bold: true };
+headerRow.alignment = { horizontal: "center" };
+
+// === Table Data ===
+orders.forEach((order) => {
+  const subtotal = order.totalPrice || 0;
+  const discount = order.discountAmount || 0;
+  const total = subtotal - discount;
+
+  worksheet.addRow([
+    order._id.toString(),
+    order.userId?.name || "-",
+    order.status,
+    moment(order.createdAt).format("DD/MM/YYYY"),
+    `₹${subtotal.toLocaleString()}`,
+    `-₹${discount.toLocaleString()}`,
+    `₹${total.toLocaleString()}`,
+    
+  ]);
+});
+
       // Save file to disk
       const excelPath = path.join(__dirname, "../../public/salesReport");
       if (!fs.existsSync(excelPath)) fs.mkdirSync(excelPath, { recursive: true });

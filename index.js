@@ -11,6 +11,8 @@ const  morgan = require('morgan')
 const { url } = require('inspector')
 const mongoStore = require('connect-mongo');
 const User = require('./models/user.schema')
+const Cart = require("./models/cart.schema")
+const Wishlist = require("./models/wishlist.schema")
 db()
 
 
@@ -50,10 +52,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use( async function(req, res, next) {
     if (req.session && req.session.userId) {
-        
+        const userId = req.session.userId
         const user = await User.findById(req.session.userId); // Fetch from DB
-        
+        const cartCount = await Cart.findOne({userId:userId})
+
+        const wishlistCount = await Wishlist.findOne({userId:userId})
         res.locals.user = user || null;
+        res.locals.cartCount = cartCount?.items.length || 0
+        res.locals.wishlistCount = wishlistCount.items.length || 0
         
     }
     next();

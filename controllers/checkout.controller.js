@@ -2,6 +2,7 @@ const express = require("express")
 const router = express.Router()
 const Address = require("../models/address.schema")
 const Cart = require("../models/cart.schema")
+const Coupon = require("../models/coupon.schema")
 
 
 
@@ -12,7 +13,8 @@ const loadCheckout = async (req,res)=>{
     console.log(userId)
     const address =await Address.find({userId})
     const cart = await Cart.findOne({userId}).populate('items.productId','productTitle productImage status isBlocked regularPrice')
-    // console.log(address)
+    const availableCoupon = await Coupon.find({minCartAmount:{$lte:cart.totalPrice},expiryDate:{$gte: new Date()}})
+    
     if(!cart){
       // return res.status(400).json({message:"cart is empty",redirect:"/cart"})
       return res.redirect('/cart')
@@ -29,7 +31,7 @@ const loadCheckout = async (req,res)=>{
     }
     
    //  console.log(cart.items)
-   return res.render("checkout",{address,cart,totalRegularprice})
+   return res.render("checkout",{address,cart,totalRegularprice,availableCoupon})
 
 }
 

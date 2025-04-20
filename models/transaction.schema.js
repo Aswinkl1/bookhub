@@ -23,7 +23,6 @@ const transactionSchema = new Schema({
     },
     orderId: {
         type:String,
-        required:true
     },
     createdAt: {
         type: Date, 

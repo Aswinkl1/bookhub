@@ -5,6 +5,8 @@ const bcrypt = require('bcrypt')
 const { json } = require('express')
 const Product = require("../models/product.schema")
 const Category = require('../models/category.schema')
+const Cart = require("../models/cart.schema")
+const Wishlist = require("../models/wishlist.schema")
 
 async function compareOffers(product,categoryId){
 
@@ -37,6 +39,7 @@ const HomePageLoad = async (req,res)=>{
 
         if(userId){
             const userData = await User.findOne({_id:userId});
+            
             res.render('home',{user:userData,product:products});
         }else{
             

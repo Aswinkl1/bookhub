@@ -363,13 +363,13 @@
                             </label>
                             <p class="text-muted small ms-4 mb-0 mt-1"></p>
                         </div>
-                        <div class="form-check mb-3 p-3 bg-light rounded">
+                        <!-- <div class="form-check mb-3 p-3 bg-light rounded">
                             <input class="form-check-input" type="radio" name="paymentMethod" value="Wallet" id="wallet" >
                             <label class="form-check-label fw-medium" for="cashOnDelivery">
                                 <i class="bi bi-cash me-2 text-success"></i> Wallet
                             </label>
                             <p class="text-muted small ms-4 mb-0 mt-1">Pay with cash when your order is delivered to your doorstep.</p>
-                        </div>
+                        </div> -->
                         <!-- Other payment methods would go here -->
                     </div>
                 </div>
@@ -407,24 +407,52 @@
                             </div>
                         <% } %>     
                             
-                            
-                            
                         </div>
                         <hr>
                         <!-- Coupon Code -->
-<div class="coupon-section mb-4">
-    <h6 class="mb-2"><i class="bi bi-tag me-2"></i>Apply Coupon</h6>
-    <div class="input-group">
-        <input type="text" class="form-control" placeholder="Enter coupon code" id="coupon-code" aria-label="Coupon code">
-        <button class="btn btn-primary" type="button" id="coupon-submit" >Apply</button>
-        <button class="btn btn-outline-secondary " hidden type="button" id="coupon-remove">
-            <i class="bi bi-x"></i>
-        </button>
-        <input type="text" name="couponId" id="couponId" value="" hidden>
-    </div>
-    <div id="coupon-error"></div>
-    <div id="coupon-success" class="text-success small mt-1 d-none">Coupon applied successfully!</div>
-</div>
+                        <div class="coupon-section mb-4">
+                            <h6 class="mb-2"><i class="bi bi-tag me-2"></i>Apply Coupon</h6>
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Enter coupon code" id="coupon-code" aria-label="Coupon code">
+                                <button class="btn btn-primary" type="button" id="coupon-submit" >Apply</button>
+                                <button class="btn btn-outline-secondary " hidden type="button" id="coupon-remove">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                                <input type="text" name="couponId" id="couponId" value="" hidden>
+                            </div>
+                            <div id="coupon-error"></div>
+                            <div id="coupon-success" class="text-success small mt-1 d-none">Coupon applied successfully!</div>
+                            
+                            <!-- Show Available Coupons -->
+                            <div class="mt-2">
+                                <button class="btn btn-link btn-sm p-0 text-decoration-none" type="button" data-bs-toggle="collapse" data-bs-target="#availableCoupons" aria-expanded="false" aria-controls="availableCoupons">
+                                    <i class="bi bi-ticket-perforated me-1"></i>Show Available Coupons
+                                </button>
+                                <div class="collapse mt-2" id="availableCoupons">
+                                    <div class="card card-body p-3 bg-light">
+                                        <!-- Dummy Coupon Data -->
+                                        <div class="available-coupons-list">
+                                            <!-- Coupon 1 -->
+                                             <% availableCoupon.forEach(coupon =>{ %>
+
+                                                 <div class="coupon-item mb-2 border-bottom pb-2">
+                                                     <div class="d-flex justify-content-between align-items-center">
+                                                         <span class="badge bg-primary me-2"><%= coupon.code %></span>
+                                                         <button class="btn btn-sm btn-outline-primary py-0 px-2 copy-coupon" data-coupon="<%= coupon.code %>">
+                                                             Copy
+                                                         </button>
+                                                     </div>
+                                                     <p class="small mb-1 mt-1"><%= coupon.discountPercentage %>% off on <%= coupon.minCartAmount %> min Cart value upto <%= coupon.maxDiscountAmount %></p>
+                                                     <small class="text-muted">Expires: <%= coupon.expiryDate?.toISOString().split("T")[0].split("-").reverse().join("-") %></small>
+                                                 </div>
+                                            <% }) %>
+                                            
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         
                         <!-- Order Calculations -->
                         <div class="mb-4">
@@ -453,7 +481,7 @@
                                 <span id="cart-total"><%= cart.totalPrice %></span>
                             </div>
                         </div>
-
+            
                         <!-- Place Order Button -->
                         <button class="btn btn-primary w-100 py-3 mb-3" id="placeOrderBtn">
                             <i class="bi bi-bag-check me-2"></i> Place Order
@@ -617,6 +645,30 @@
                 
             })
 
+        
+            const copyButtons = document.querySelectorAll('.copy-coupon');
+    
+    // Add click event listener to each button
+    copyButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Get the coupon code from the data attribute
+            const couponCode = this.getAttribute('data-coupon');
+            
+            // Fill the coupon input field
+            document.getElementById('coupon-code').value = couponCode;
+            
+            // Change button text temporarily
+            const originalText = this.textContent;
+            this.textContent = 'Copied!';
+            
+            // Collapse the coupons section (optional)
+            bootstrap.Collapse.getInstance(document.getElementById('availableCoupons')).hide();
+            
+            setTimeout(() => {
+                this.textContent = originalText;
+            }, 1500);
+        });
+    });
         
         });
     </script>

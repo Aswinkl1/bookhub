@@ -75,6 +75,8 @@
 
 
 <script>
+
+
     async function removeCart(productId) {
         Swal.fire({
         title: "Are you sure?",
@@ -99,6 +101,8 @@
             if(responce.ok){
                 sweetAlert(jsonResponce.message,"")
                 document.getElementById("mainId"+productId).remove()
+            document.getElementById("cartCount").innerText = parseInt(document.getElementById("cartCount").innerText) -1
+
             }else{
                 sweetAlert(jsonResponce.message,"")
             }

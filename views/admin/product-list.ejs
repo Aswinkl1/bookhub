@@ -4,23 +4,26 @@
     <div class="content-header">
         <div>
             <h2 class="content-title card-title">Products List</h2>
-
         </div>
         <div>
-            <a href="#" class="btn btn-light rounded font-md">Export</a>
-            <a href="#" class="btn btn-light rounded  font-md">Import</a>
-            <a href="#" class="btn btn-primary btn-sm rounded">Create new</a>
+            
+            <a href="/admin/addProducts" class="btn btn-primary btn-sm rounded">Create new</a>
         </div>
     </div>
     <div class="card mb-4">
         <header class="card-header">
             <div class="row align-items-center">
-                <div class="col col-check flex-grow-0">
-                    <div class="form-check ms-2">
-                        <input class="form-check-input" type="checkbox" value="">
-                    </div>
+                <div class="col-md-6 col-12 mb-md-0 mb-3">
+                    <form action="" method="GET">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="search" placeholder="Search products..."   id="search" ">
+                            <button class="btn btn-light bg-white" type="submit" onclick="clearInput()">
+                                <i class="material-icons md-close"></i>
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
+                <!-- <div class="col-md-2 col-6">
                     <select class="form-select">
                         <option selected>All category</option>
                         <option>Electronics</option>
@@ -28,9 +31,7 @@
                         <option>Automobile</option>
                     </select>
                 </div>
-                <div class="col-md-2 col-6">
-                    <input type="date" value="02.05.2022" class="form-control">
-                </div>
+               
                 <div class="col-md-2 col-6">
                     <select class="form-select">
                         <option selected>Status</option>
@@ -38,92 +39,56 @@
                         <option>Disabled</option>
                         <option>Show all</option>
                     </select>
-                </div>
+                </div> -->
             </div>
         </header> <!-- card-header end// -->
+        
+        <!-- Table header start -->
+        <div class="card-body border-bottom">
+            <div class="row align-items-center">
+                
+                <div class="col-3">
+                    <strong>Name</strong>
+                </div>
+                <div class="col-1">
+                    <strong>Category</strong>
+                </div>
+                <div class="col-1">
+                    <strong>Sales Price</strong>
+                </div>
+                <div class="col-1">
+                    <strong>Offer</strong>
+                </div>
+                <div class="col-1">
+                    <strong>Quantity</strong>
+                </div>
+                <div class="col-1">
+                    <strong>Status</strong>
+                </div>
+                <div class="col-3 text-end">
+                    <strong>Actions</strong>
+                </div>
+            </div>
+        </div>
+        <!-- Table header end -->
+        <div id="no-user-label"></div>
+        <div id="t-body">
 
-        <% for(let i =0;i<locals.data.length;i++){%>
-        <div class="card-body" id="<%=data[i]._id%>">
-            <article class="itemlist">
-                <div class="row align-items-center">
-                    <div class="col col-check flex-grow-0">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox">
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-sm-4 col-8 flex-grow-1 col-name">
-                        <a class="itemside" href="#">
-                            <div class="left">
-                                <img src="/uploads/products-images/<%=locals.data[i].productImage[0]%>" class="img-sm img-thumbnail" alt="Item">
-                            </div>
-                            <div class="info">
-                                <h6 class="mb-0"><%=data[i].productTitle%></h6>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="col-lg-2 col-sm-2 col-4 col-price"> <span><%= data[i].salePrice %></span> </div>
-                    <div class="col-lg-2 col-sm-2 col-4 col-status">
-                        <% if(data[i].status == "Available"){ %>
-                        <span class="badge rounded-pill alert-success"><%= data[i].status %></span>
-                        <% } else{ %>
-                        <span class="badge rounded-pill alert-danger"><%= data[i].status %></span>
-                        <% } %>
-
-                    </div>
-                    <div class="col-lg-1 col-sm-2 col-4 col-date">
-                        <% if(data[i].productOffer?.offerName){ %>
-
-                            <a href="/admin/edit-offer/<%=data[i]._id%>" class="btn btn-sm font-sm rounded btn-brand">
-                                <i class="material-icons md-edit"></i> Edit Offer
-                            </a>
-                        
-                        <% } else{ %>
-                        <a href="/admin/product-offer/<%=data[i]._id%>" class="btn btn-sm font-sm rounded btn-brand">
-                            <i class="material-icons md-edit"></i> Add Offer
-                        </a>
-                        <% } %>
-
-                    </div>
-                    
-                    <div class="col-lg-2 col-sm-2 col-4 col-action text-end">
-                        <a href="/admin/editProduct/?id=<%= data[i]._id %>" class="btn btn-sm font-sm rounded btn-brand">
-                            <i class="material-icons md-edit"></i> Edit
-                        </a>
-                        <a onclick="deleteProduct('<%= data[i]._id %>')" class="btn btn-sm font-sm btn-light rounded">
-                            <i class="material-icons md-delete_forever"></i> Delete
-                        </a>
-
-                    </div>
-                </div> <!-- row .// -->
-               
             
-            
-        </div> <!-- card-body end// -->
-        <%}%>
-    </div> <!-- card end// -->
-   
+        </div>
+        
+        
+    </div>
    
     <!-- Pagination -->
     <div class="p-3 bg-white border-top">
         <nav aria-label="Customer list pagination">
-          <ul class="pagination custom-pagination justify-content-center mb-0">
-            <!-- <li class="page-item disabled">
-              <a class="page-link" href="#" tabindex="-1"><i class="bi bi-chevron-left"></i></a>
-            </li> -->
-
-            <% for(let i=1;i<=totalPages;i++){%>
-            <li class="page-item <%= (i===currentPage)?'active':'' %>">
-              <a class="page-link" href="?page=<%=i%>"> <%= i%></a>
-            </li>
-            <%}%>
-
-            <!-- <li class="page-item">
-              <a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a>
-            </li> -->
+          <ul class="pagination custom-pagination justify-content-center mb-0" id="pagination">
+            
           </ul>
         </nav>
     </div>
-</section> 
+</section>
 <script>
 
 function sweetAlert(message,title,icon){
@@ -167,5 +132,176 @@ function sweetAlert(message,title,icon){
     });
     
     }
+
+
+
+
+    //dskjfhjkdshgj
+    let search = ""
+    let page = 1
+    function pagination(totalPages,currentPage){
+
+      const parent = document.getElementById("pagination")
+      parent.innerHTML = ""
+      for(let i=1;i<=totalPages;i++ ){
+        const child = document.createElement("li")
+        child.classList.add("page-item")
+        if(currentPage == i){
+          child.classList.add("active")
+        }
+        child.innerHTML = ` <a class="page-link" onclick="changePage(${i})"> ${i}</a>`    
+        parent.appendChild(child)
+      }
+
+    }
+
+    function changePage(Page){
+      page = Page
+      fetchUserData(search,page)
+    }
+
+    async  function fetchUserData(Search="",page=1) {
+      try {
+        const response = await fetch(`/admin/api/products?search=${Search}&page=${page}`,{
+          method:"GET",
+          headers:{"Content-Type":"application/json"}
+        })
+
+        const jsonResponse = await response.json()
+        if(response.ok){
+          loadUsersTable(jsonResponse.productData)
+          pagination(jsonResponse.totalPages,jsonResponse.currentPage)
+          
+        }else{
+          console.log("error")
+        }
+      } catch (error) {
+        console.log("error: "+error)
+
+      }
+    }
+
+    async function loadUsersTable(products) {
+      const parent = document.getElementById("t-body")
+      console.log("heere")
+      parent.innerHTML = ""
+      if(products.length == 0){
+        document.getElementById("no-user-label").innerHTML = `<p class="text-center">No product found</p>`
+        return
+      }
+      document.getElementById("no-user-label").innerHTML = ""
+      products.forEach((product)=>{
+        const child = document.createElement("div")
+        let forImage;
+        let productOffer;
+        let status ;
+        let offerManagement;
+
+        if(product.productImage && product.productImage.length > 0) {
+            forImage = ` <img src="/uploads/products-images/${product.productImage[0]}" class="img-sm img-thumbnail me-2" alt="Product">`
+        } else { 
+          forImage =  `<div class="img-sm bg-light me-2 d-flex align-items-center justify-content-center">
+                <i class="material-icons md-image text-muted"></i>
+            </div>`
+        } 
+
+        if(product.productOffer && product.productOffer.offerName) { 
+          productOffer = `  ${product.productOffer.discountPercentage} <span >%</span>`
+        } else { 
+          productOffer = `  <span class="text-muted">None</span>`
+        } 
+
+        if(product.status === "Available") {
+          status = `  <span class="badge rounded-pill bg-success">Available</span> `
+        } else { 
+          status = `  <span class="badge rounded-pill bg-danger"> ${product.status || 'Unavailable' }</span> `
+        } 
+
+        if(product.productOffer && product.productOffer.offerName) {
+          offerManagement = `  <a href="/admin/edit-offer/${ product._id} " class="btn btn-sm btn-outline-success">
+                <i class="material-icons md-edit"></i> Manage Offer
+            </a>`
+        } else {
+          offerManagement = `  <a href="/admin/product-offer/${ product._id}" class="btn btn-sm btn-outline-success">
+                <i class="material-icons md-add"></i> Add Offer
+            </a>`
+          }
+
+  
+
+
+        
+        child.innerHTML = `
+        <div class="card-body py-3">
+                <div class="row align-items-center">
+                    <div class="col-3">
+                        <a class="d-flex align-items-center" href="#">
+                            ${forImage}
+                            <span>${ product.productTitle ||  'Unnamed Product' }</span>
+                        </a>
+                    </div>
+                    <div class="col-1">
+                        ${product.category.name || "General"}
+                    </div>
+                    <div class="col-1">
+                        ${product.salePrice}
+                    </div>
+                    <div class="col-1">
+                       ${productOffer}
+                    </div>
+                    <div class="col-1">
+                       ${product.quantity || '0'}
+                    </div>
+                    <div class="col-1">
+                        ${status}
+                    </div>
+                    <div class="col-4 text-center">
+                        <a href="/admin/editProduct/?id=${ product._id }" class="btn btn-sm btn-outline-primary">
+                            <i class="material-icons md-edit"></i> Edit
+                        </a>
+                        ${offerManagement}
+                        <button onclick="deleteProduct('${product._id}')" class="btn btn-sm btn-outline-danger">
+                            <i class="material-icons md-delete"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+          
+        `
+
+            parent.appendChild(child)
+      })
+    }
+
+
+
+    function debounce(func,time){
+      let timeOut
+      return (...args)=>{
+        clearTimeout(timeOut)
+        timeOut = setTimeout(()=>{
+          func.apply(this,args)
+        },time)
+      }
+    }
+
+    const debouncedFetch = debounce(fetchUserData,500)
+
+   
+   
+    function clearInput(e) {
+      document.getElementById("search").value = ""
+      search = ""
+      fetchUserData()
+
+    }
+    document.addEventListener("DOMContentLoaded",()=>{
+      fetchUserData()
+
+      document.getElementById("search").addEventListener("input",(e)=>{
+        search = e.target.value.trim()
+        debouncedFetch(search)
+      })
+    })
 </script>
 <%-include('../../views/partials/admin/_footer')%>

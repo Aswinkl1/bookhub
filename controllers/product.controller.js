@@ -78,6 +78,13 @@ const addproducts = async (req,res)=>{
     }
 }
 
+const productListPageRender = async (req,res)=>{
+    try {
+        res.render("product-list")
+    } catch (error) {
+        console.log(error)
+    }
+}
 const getAllProducts = async (req,res)=>{
     try {
         const search = req.query.search || ""
@@ -98,14 +105,18 @@ const getAllProducts = async (req,res)=>{
                 productTitle:{$regex:new RegExp(".*"+search+".*","i")}
             
         }).countDocuments()
+
         const category = await Category.find({isListed:true})
-        // console.log(productData)
-        res.render("product-list",{
-            data:productData,
-            currentPage:page,
-            totalPages:Math.ceil(count/limit),
-            category:category
-        })
+
+
+        // res.render("product-list",{
+        //     data:productData,
+        //     currentPage:page,
+        //     totalPages:Math.ceil(count/limit),
+        //     category:category
+        // })
+
+        res.status(200).json({productData,currentPage:page,totalPages:Math.ceil(count/limit),category:category})
     } catch (error) {
         console.log(error)
         res.status(400).send("server error")
@@ -115,7 +126,7 @@ const getAllProducts = async (req,res)=>{
 const getEditProducts = async (req,res)=>{
     try {
         const id = req.query.id;
-        const product = await Product.findOne({_id:id})
+        const product = await Product.findOne({_id:id}).populate("category")
         const category = await Category.find({})
         console.log(product._id)
         res.render("edit-product",{
@@ -409,6 +420,7 @@ module.exports = {
     getProductOffer,
     addProductOffer,
     getEditProductOffer,
-    putEditProduct
+    putEditProduct,
+    productListPageRender
 
 }

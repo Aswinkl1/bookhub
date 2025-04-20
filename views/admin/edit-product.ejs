@@ -120,7 +120,7 @@
                                           <select class="form-select border" style="width: 150px;" name="category">
                                             <% if (locals.category) { %>
                                               <% for (let i = 0; i < locals.category.length; i++) { %>
-                                                <option value="<%= locals.category[i].name %>" <%= product.category === locals.category[i].name ? 'selected' : '' %>>
+                                                <option value="<%= locals.category[i].name %>" <%= product.category.name == locals.category[i].name ? 'selected' : '' %>>
                                                   <%= locals.category[i].name %>
                                                 </option>
                                               <% } %>

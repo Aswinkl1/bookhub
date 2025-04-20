@@ -207,6 +207,8 @@
 
         if(response.ok){
             showAlert("success",jsonResponce.message,"")
+        
+            document.getElementById("wishlist").innerText = parseInt(document.getElementById("wishlist").innerText) +1
         }else{
             showAlert("error",jsonResponce.error,"")
 
@@ -238,6 +240,8 @@
             text: jsonResponce.message,
             icon: "success"
             });
+            document.getElementById("cartCount").innerText = parseInt(document.getElementById("cartCount").innerText) +1
+
         }else{
             Swal.fire({
             title: "Error",

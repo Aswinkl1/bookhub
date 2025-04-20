@@ -95,12 +95,39 @@
     </nav>
   </div>
     <script>
+        async function addToWishlist(productId) {
+        console.log("evide unde")
+        const response = await fetch('/api/wishlist',{
+            method:"POST",
+            headers:{'Content-Type':"application/json"},
+            body:JSON.stringify({productId})
+        })
+
+        const jsonResponce = await response.json()
+
+        if(response.ok){
+            showAlert("success",jsonResponce.message,"")
+        
+            document.getElementById("wishlist").innerText = parseInt(document.getElementById("wishlist").innerText) +1
+        }else{
+            showAlert("error",jsonResponce.error,"")
+
+        }
+        
+    }
+
         const searchBar = document.querySelector('#search-bar')
         const filter = document.querySelector('#filter')
         let sort = "{}"
         let search;
         let category;
-        
+        function showAlert(icon,title,text) {
+        Swal.fire({
+        title: title,
+        text: text,
+        icon: icon
+        });
+    }
         function pagination(currentpage,totalPage) {
             const parent = document.getElementById("pagination")
             parent.innerHTML = ""
@@ -135,7 +162,7 @@
                                         </div>
                                         <div class="product-action-1">
 
-                                            <a aria-label="Add To Wishlist" class="action-btn hover-up" href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>
+                                                <a aria-label="Add To Wishlist" class="action-btn hover-up" onclick="addToWishlist('${product._id}')"><i class="fi-rs-heart"></i></a>
                                         </div>
                                         <div class="product-badges product-badges-position product-badges-mrg">
                                             <span class="hot">Hot</span>
@@ -246,6 +273,8 @@
                 text: jsonResponce.message,
                 icon: "success"
                 });
+            document.getElementById("cartCount").innerText = parseInt(document.getElementById("cartCount").innerText) +1
+
             }else{
                 Swal.fire({
                 title: "Error",

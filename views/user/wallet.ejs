@@ -1,0 +1,281 @@
+<%-include('../../views/partials/user/_header')%>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .balance-card {
+            background: linear-gradient(45deg, #6a11cb, #2575fc);
+            color: white;
+            border-radius: 15px;
+        }
+        .transaction-container {
+            max-height: 500px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+        .transaction-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .transaction-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .transaction-container::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        .transaction-item {
+            border-left: 4px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .transaction-item:hover {
+            background-color: #f8f9fa;
+        }
+        .purchase {
+            border-left-color: #dc3545;
+        }
+        .return {
+            border-left-color: #28a745;
+        }
+        .refund-pending {
+            border-left-color: #ffc107;
+        }
+        .book-thumbnail {
+            width: 40px;
+            height: 55px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+    </style>
+
+    <div class="container py-4">
+        <!-- Header -->
+        <header class="mb-4">
+            <h1 class="text-center">BookStore Wallet</h1>
+            <p class="text-center text-muted">Manage your purchases and returns</p>
+        </header>
+        
+        <!-- Main Content -->
+        <div class="row g-4">
+            <!-- Wallet Balance Section -->
+            <div class="col-lg-4 mb-4">
+                <div class="card balance-card shadow h-100">
+                    <div class="card-body text-center p-4">
+                        <h5 class="card-title">Wallet Balance</h5>
+                        <h2 class="display-4 fw-bold mb-4">$<%= wallet.balance %></h2>
+                        <!-- <div class="d-flex justify-content-around mb-4">
+                            <div>
+                                <p class="mb-0"><i class="fas fa-shopping-cart"></i> Purchases</p>
+                                <h5>$268.50</h5>
+                            </div>
+                            <div>
+                                <p class="mb-0"><i class="fas fa-undo-alt"></i> Returns</p>
+                                <h5>$125.65</h5>
+                            </div>
+                        </div> -->
+                        <div class="mt-3">
+                            <button class="btn btn-light me-2" data-bs-toggle="modal" data-bs-target="#numberModal"><i class="fas fa-credit-card"></i> Add Funds</button>
+                            <!-- <button class="btn btn-outline-light"><i class="fas fa-gift"></i> Redeem Gift Card</button> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaction History Section -->
+            <div class="col-lg-8">
+                <div class="card shadow h-100">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                        <h5 class="mb-0">Transaction History</h5>
+                         <!-- <div class="d-flex">
+                            <div class="input-group me-2">
+                                <input type="text" class="form-control form-control-sm" placeholder="Search transactions">
+                                <button class="btn btn-outline-secondary btn-sm" type="button">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div> 
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Filter
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="filterDropdown">
+                                    <li><a class="dropdown-item" href="#">All Transactions</a></li>
+                                    <li><a class="dropdown-item" href="#">Purchases</a></li>
+                                    <li><a class="dropdown-item" href="#">Returns</a></li>
+                                    <li><a class="dropdown-item" href="#">Pending Refunds</a></li>
+                                </ul>
+                            </div>
+                        </div>  -->
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="transaction-container">
+                            <div class="list-group list-group-flush" id="parent">
+                                <!-- Transaction items start -->
+                                <% transactions.forEach((transaction)=>{ %>
+
+                               <% if(transaction.status == "Pending"){ %>
+                                <div class="list-group-item transaction-item 
+                                -pending">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center">
+                                            <!-- <img src="/api/placeholder/40/55" alt="Book cover" class="book-thumbnail me-3"> -->
+                                            <div>
+                                                <h6 class="mb-0">The Hobbit (E-book)</h6>
+                                                <small class="text-muted">March 26, 2025 • Return #1094 (Pending)</small>
+                                            </div>
+                                        </div>
+                                        <span class="text-warning fw-bold">+$9.99 (Pending)</span>
+                                    </div>
+                                </div>
+                              <% } else if(transaction.status == "Debit"){ %>
+                                
+                                <div class="list-group-item transaction-item purchase">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center">
+                                            <!-- <img src="/api/placeholder/40/55" alt="Book cover" class="book-thumbnail me-3"> -->
+                                            <div>
+                                                <h6 class="mb-0">To Kill a Mockingbird (Hardcover)</h6>
+                                                <small class="text-muted">March 28, 2025 • Order #24782</small>
+                                            </div>
+                                        </div>
+                                        <span class="text-danger fw-bold">-$18.50</span>
+                                    </div>
+                                </div>
+                             <% } else { %>
+
+                                <div class="list-group-item transaction-item return">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center">
+                                            <!-- <img src="/api/placeholder/40/55" alt="Book cover" class="book-thumbnail me-3"> -->
+                                            <div>
+                                                <h6 class="mb-0"><%= transaction.type %></h6>
+                                                <small class="text-muted"><%= transaction.createdAt?.toISOString().split("T")[0].split("-").reverse().join("-") %> • </small>
+                                            </div>
+                                        </div>
+                                        <span class="text-success fw-bold">+<%= transaction.amount %></span>
+                                    </div>
+                                </div>
+                            <% } %>
+                                
+                                
+                                
+                                
+                                <% }) %>
+                                
+                                
+                                <!-- Transaction items end -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white d-flex justify-content-between align-items-center py-3">
+                        <!-- <span class="text-muted">Showing 12 of 68 transactions</span>
+                        <button class="btn btn-sm btn-primary">Load More</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- modal -->
+    <div class="modal fade" id="numberModal" tabindex="-1" aria-labelledby="numberModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+              <h5 class="modal-title" id="numberModalLabel">Enter a Positive Number</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <!-- Modal Body -->
+            <div class="modal-body">
+              <form id="numberForm">
+                <div class="mb-3">
+                  <label for="numberInput" class="form-label">Number Input</label>
+                  <input type="number" class="form-control" id="numberInput" 
+                         placeholder="Enter a positive number" min="0" step="1">
+                  <div class="form-text">Please enter a positive number (0 or greater).</div>
+                </div>
+              </form>
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary" id="saveBtn">Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Bootstrap and Popper JS from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.8/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+    const numberInput = document.getElementById('numberInput');
+    
+    // Prevent negative numbers by validating input
+    numberInput.addEventListener('input', function() {
+      if (this.value < 0) {
+        this.value = 0;
+      }
+    });
+    
+    // Handle the save button click
+    document.getElementById('saveBtn').addEventListener('click', function() {
+      const inputValue = numberInput.value;
+      if (inputValue !== "") {
+        payWitheRazorPay(inputValue)
+        // You can add your own logic here to process the number
+      } else {
+        alert('Please enter a positive number');
+      }
+    });
+
+    async function addMoney(amount) {
+        const response = await fetch("/wallet/addMoney",{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({amount})
+        })
+
+        if(response.ok){
+            location.reload()
+        }
+        
+    }
+    async function payWitheRazorPay(amount){
+        const response = await fetch("/wallet/razorpay/create-order",{ 
+                        method: "POST",
+                        body: JSON.stringify({ amount , currency: "INR" }),
+                        headers: { "Content-Type": "application/json" } 
+                    })
+                    
+                    const jsonResponce = await response.json()
+                    const order = jsonResponce.order
+                    
+                    if(response.ok){
+                        var options = {
+                        key: "rzp_test_IFU1iLAOCO0wM0",
+                        amount: order.amount,
+                        currency: order.currency,
+                        order_id: order.id,
+                        handler: function (response) {
+                        addMoney(order.amount/100)
+                        }
+                        };
+                        var rzp = new Razorpay(options);
+                        rzp.open();
+                    }else{
+                        console.log("oo eroor")
+                    }
+
+    }
+
+</script>
+
+
+
+<%-include('../../views/partials/user/_footer')%>
