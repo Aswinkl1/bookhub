@@ -11,7 +11,7 @@ const getWallet = async (req,res)=>{
     try {
         const userId = req.session.userId
         const wallet = await Wallet.findOne({userId})
-        const transactions = await Transaction.find({userId}).sort({createdAt:-1})
+        const transactions = await Transaction.find({userId}).sort({createdAt:-1}).limit(10)
         console.log(wallet)
         // console.log(transactions)
         

@@ -11,7 +11,7 @@ const productController = require('../controllers/product.controller')
 const coupon = require("../controllers/coupon.controller")
 const order = require('../controllers/order.controller')
 const sales = require("../controllers/sales.controller")
-
+const dashboard = require("../controllers/dashboard")
 
 router.get('/login',controller.loadLogin)
 
@@ -45,31 +45,34 @@ router.get('/editProduct',productController.getEditProducts)
 router.post('/editProduct/:id',uploads.array("images",4),productController.postEditProduct)
 router.put('/products/delete',productController.deleteProduct)
 
-
 // coupon
+
 router.get("/coupon",adminAuth,coupon.loadCouponPage)
 router.post("/coupon/editCoupons",adminAuth,coupon.getEditCoupon)
 router.put("/coupon/editCoupons",adminAuth,coupon.postEditCoupon)
 router.delete("/coupon/deleteCoupon/:id",adminAuth,coupon.deleteCoupon)
 
 // Order
-router.get("/order",order.renderOrderList)
-router.get("/api/order",order.getOrderData)
-router.get("/order/:id",order.getOrderDetail)
-router.patch('/api/order/change-status/:orderId/:productId',order.changeStatusForProduct)
-router.patch('/api/order/change-status/:orderId',order.changeOrderStatus)
+router.get("/order",adminAuth,order.renderOrderList)
+router.get("/api/order",adminAuth,order.getOrderData)
+router.get("/order/:id",adminAuth,order.getOrderDetail)
+router.patch('/api/order/change-status/:orderId/:productId',adminAuth,order.changeStatusForProduct)
+router.patch('/api/order/change-status/:orderId',adminAuth,order.changeOrderStatus)
 
 // Product offer
-router.get("/product-offer/:id",productController.getProductOffer)
-router.post("/product/addOffer",productController.addProductOffer)
-router.get("/edit-offer/:id",productController.getEditProductOffer)
-router.put("/product/edit-offer",productController.putEditProduct)
+router.get("/product-offer/:id",adminAuth,productController.getProductOffer)
+router.post("/product/addOffer",adminAuth,productController.addProductOffer)
+router.get("/edit-offer/:id",adminAuth,productController.getEditProductOffer)
+router.put("/product/edit-offer",adminAuth,productController.putEditProduct)
 
 //sales report
-router.get("/sales-report",sales.salesReportRender)
-router.get('/api/sales-report',sales.getSalesReport)
-router.get('/api/sales-report/download/pdf',sales.getSalesReportPDF)
-router.get('/api/sales-report/download/excel',sales.getSalesReportExcel)
+router.get("/sales-report",adminAuth,sales.salesReportRender)
+router.get('/api/sales-report',adminAuth,sales.getSalesReport)
+router.get('/api/sales-report/download/pdf',adminAuth,sales.getSalesReportPDF)
+router.get('/api/sales-report/download/excel',adminAuth,sales.getSalesReportExcel)
 
 
+//Dashboard
+router.get("/dashboard",dashboard.renderAdminDashboard)
+router.get("/api/dashboard",dashboard.loadDashboardChart)
 module.exports = router

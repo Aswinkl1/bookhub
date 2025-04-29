@@ -13,15 +13,14 @@ const loadCheckout = async (req,res)=>{
     console.log(userId)
     const address =await Address.find({userId})
     const cart = await Cart.findOne({userId}).populate('items.productId','productTitle productImage status isBlocked regularPrice')
-    const availableCoupon = await Coupon.find({minCartAmount:{$lte:cart.totalPrice},expiryDate:{$gte: new Date()}})
     
     if(!cart){
-      // return res.status(400).json({message:"cart is empty",redirect:"/cart"})
-      return res.redirect('/cart')
-   }
-    const totalRegularprice = cart.items.reduce((acc,curr)=>{
+       // return res.status(400).json({message:"cart is empty",redirect:"/cart"})
+       return res.redirect('/cart')
+      }
+      const availableCoupon = await Coupon.find({minCartAmount:{$lte:cart.totalPrice},expiryDate:{$gte: new Date()}})
+      const totalRegularprice = cart.items.reduce((acc,curr)=>{
       
-
        acc += parseInt(curr.productId.regularPrice * curr.quantity)
        return acc
     },0)

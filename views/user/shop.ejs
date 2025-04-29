@@ -102,7 +102,9 @@
             headers:{'Content-Type':"application/json"},
             body:JSON.stringify({productId})
         })
-
+        if(response.redirected){
+                window.location = response.url
+        }
         const jsonResponce = await response.json()
 
         if(response.ok){
@@ -121,7 +123,7 @@
         let sort = "{}"
         let search;
         let category;
-        
+
         function showAlert(icon,title,text) {
         Swal.fire({
         title: title,
@@ -156,7 +158,7 @@
                                 <div class="product-cart-wrap mb-30">
                                     <div class="product-img-action-wrap">
                                         <div class="product-img product-img-zoom">
-                                            <a href="/product/${product._id}">
+                                            <a href="/product/${product._id}" >
                                                 <img class="default-img" src="/uploads/products-images/${product.productImage[0]}" alt="">
                                                 <img class="hover-img" src="/uploads/products-images/${product.productImage[1]}" alt="">
                                             </a>
@@ -171,12 +173,12 @@
                                     </div>
                                     <div class="product-content-wrap">
                                         <div class="product-category">
-                                            <a href="/product/${product._id}">${product.category}</a>
+                                            <a href="/product/${product._id}">${product.category.name}</a>
                                         </div>
                                         <h2><a href="/product/${product._id}">${product.productTitle}</a></h2>
                                         <div class="rating-result" title="90%">
                                             <span>
-                                                <span>90%</span>
+                                                <!--<span>90%</span>-->
                                             </span>
                                         </div>
                                         <div class="product-price">

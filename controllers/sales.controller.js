@@ -22,6 +22,7 @@ const salesReportRender = async (req,res)=>{
 const getSalesReport = async (req, res) => {
 
     try {
+
     const page = parseInt(req.query.page) || 1;
     const limit = 10;
     const skip = (page - 1) * limit;
@@ -29,8 +30,8 @@ const getSalesReport = async (req, res) => {
     const { filterBy, fromDate, toDate } = req.query;
     console.log(filterBy,fromDate,toDate)
     console.log(typeof fromDate)
-    // let filter = { status: { $in: ['Delivered','Return Rejected'] } };
-    let filter = {}
+    let filter = { status: { $in: ['Delivered','Return-cancelled'] } };
+    // let filter = {}
     
 
     if (fromDate && toDate) {
@@ -70,7 +71,7 @@ const getSalesReport = async (req, res) => {
     }
     }
 
-
+    console.log(filter)
     const totalOrders = await Order.countDocuments(filter);
     const totals = await Order.aggregate([
     { $match: filter },
@@ -79,11 +80,11 @@ const getSalesReport = async (req, res) => {
         _id: null,
         totalRevenue: { $sum: "$totalPrice" },
         totalDiscount: { $sum: "$discountAmount" },
-        
+      
         },
     },
     ]);
-    // console.log(totals)
+
     const totalRevenue = totals.length > 0 ? totals[0].totalRevenue : 0;
     const totalDiscount = totals.length > 0 ? totals[0].totalDiscount : 0;
     // const totalProductDiscount = totals.length > 0 ? totals[0].totalProductDiscount : 0;
@@ -219,14 +220,14 @@ doc.font("Helvetica").fontSize(10);
 orders.forEach((order) => {
   const y = doc.y;
   const discount = order.discountAmount || 0;
-  const subtotal = order.totalPrice || 0;
-  const total = subtotal - discount;
-
-  
+  const subtotal = order.totalPrice +discount|| 0;
+  const total = subtotal -discount;
+  const quantity = order.items.filter(item=>item.status ==="Delivered").length
+  console.log(order.items)
   doc.text(moment(order.createdAt).format("DD/MM/YYYY"), 50, y, { width: 60 });
   doc.text(order._id.toString(), 110, y, { width: 140 });
   doc.text(order.userId?.name || "-", 260, y, { width: 80 });
-  doc.text(`${order.items.length}`, 310, y, { width: 40 });
+  doc.text(`${quantity}`, 310, y, { width: 40 });
   doc.text(`${subtotal.toLocaleString()}`, 350, y, { width: 60 });
   doc.fillColor("red").text(`-${discount.toLocaleString()}`, 410, y, { width: 60 });
   doc.fillColor("black").text(`${order.status}`, 470, y, { width: 60 });
@@ -337,9 +338,9 @@ headerRow.alignment = { horizontal: "center" };
 
 // === Table Data ===
 orders.forEach((order) => {
-  const subtotal = order.totalPrice || 0;
   const discount = order.discountAmount || 0;
-  const total = subtotal - discount;
+  const subtotal = order.totalPrice + discount|| 0;
+  const total = subtotal -discount;
 
   worksheet.addRow([
     order._id.toString(),

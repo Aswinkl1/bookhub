@@ -105,8 +105,12 @@ const removeFromCart = async (req,res)=>{
   if(existingProductIndex <= -1){
     return res.status(400).json({message:"product not found"})
   }
-
-   cart.items.pull({productId:productId})
+  const removedItemPrice = cart.items[existingProductIndex].price 
+  console.log(removedItemPrice)
+   cart.items.splice(existingProductIndex,1)
+   
+   console.log(cart.items)
+  //  cart.totalPrice -= removedItemPrice
    await cart.save()
   console.log(productId)
 
@@ -115,17 +119,6 @@ const removeFromCart = async (req,res)=>{
 
 }
 
-// exports.clearCart = async (req, res) => {
-//   try {
-//     const userId = req.user.id;
-
-//     await Cart.findOneAndUpdate({ user: userId }, { items: [] });
-
-//     res.json({ success: true, message: "Cart cleared successfully." });
-//   } catch (error) {
-//     res.status(500).json({ success: false, message: "Internal server error.", error: error.message });
-//   }
-// };
 
 module.exports = { 
   addTocart,

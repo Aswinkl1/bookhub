@@ -372,75 +372,8 @@
         </div>
 
         <div class="row gy-4">
-            <div class="col-lg-9">
-                <!-- Order Status
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="section-title mb-0"><i class="bi bi-truck"></i> Shipment Status</h5>
-                    </div>
-                    <div class="order-progress">
-                        <div class="position-relative mb-5">
-                            <div class="row position-relative">
-                                <div class="col-3 step-container">
-                                    <div class="step-active text-center">
-                                        <div class="step-icon">
-                                            <i class="bi bi-check-lg"></i>
-                                        </div>
-                                        <span class="d-block fw-medium">Ordered</span>
-                                        <small class="text-muted">Mar 15</small>
-                                    </div>
-                                </div>
-                                <div class="col-3 step-container">
-                                    <div class="step-active text-center">
-                                        <div class="step-icon">
-                                            <i class="bi bi-check-lg"></i>
-                                        </div>
-                                        <span class="d-block fw-medium">Processing</span>
-                                        <small class="text-muted">Mar 16</small>
-                                    </div>
-                                </div>
-                                <div class="col-3 step-container">
-                                    <div class="step-pending text-center">
-                                        <div class="step-icon">
-                                            <i class="bi bi-box-seam"></i>
-                                        </div>
-                                        <span class="d-block fw-medium">Shipped</span>
-                                        <small class="text-muted">Mar 18</small>
-                                    </div>
-                                </div>
-                                <div class="col-3 step-container">
-                                    <div class="step-pending text-center">
-                                        <div class="step-icon">
-                                            <i class="bi bi-house-door"></i>
-                                        </div>
-                                        <span class="d-block fw-medium">Delivered</span>
-                                        <small class="text-muted">Expected: Mar 26</small>
-                                    </div>
-                                </div>
-                                <div class="step-line"></div>
-                            </div>
-                        </div>
-                        <div class="progress mb-4">
-                            <div class="progress-bar" role="progressbar" style="width: 50%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                        
-                        <div class="alert alert-shipping d-flex p-3">
-                            <div class="me-3 fs-4 text-info">
-                                <i class="bi bi-info-circle"></i>
-                            </div>
-                            <div>
-                                <h6 class="mb-1">Package in Transit</h6>
-                                <p class="mb-0">Your package is on its way! Expected delivery: March 26, 2025.</p>
-                                <div class="mt-2">
-                                    <a href="#" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-box-arrow-up-right me-1"></i> Track Package
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
-
+            <div class="col-lg-12">
+            
                 <!-- Order Items -->
                 <div class="card mb-4">
                     <div class="card-header d-flex justify-content-between align-items-center">
@@ -458,7 +391,7 @@
                                     <div class="col-md-3 col-4 mb-3 mb-md-0">
                                         <h5 class="mb-1"><%= item.productId.productTitle %></h5>
                                     </div>
-                                    <div class="col-md-2 col-6 text-md-center">
+                                    <div class="col-md-1 col-6 text-md-center">
                                         <div class="mb-1 text-muted small">Quantity</div>
                                         <span class="fw-semibold"><%= item.quantity %></span>
                                     </div>
@@ -467,12 +400,19 @@
                                         <div class="fw-semibold">₹<%= item.price %></div>
                                          
                                     </div>
-                                    <div class="col-md-2 col-6 text-end">
+                                    <div class="col-md-1 col-6 text-end">
                                         <div class="mb-1 text-muted small">Total</div>
                                         <div class="fw-semibold">₹<%= item.price  * item.quantity%></div>
                                          
                                     </div>
+                                    <div class="col-md-2 col-6 text-end">
+                                        <div class="mb-1 text-muted small">Status</div>
+                                        <div class="fw-semibold"><%= item.status%></div>
+                                         
+                                    </div>
                                     <div class="col-md-2 col-6 text-md-center">
+                                        <div class="mb-1 text-muted small">Action</div>
+                                        
                                         <% if(item.status == "Delivered"){ %>
                                             <button class="btn btn-sm btn-outline-primary mt-2 return-product-btn" id="return-product-btn" data-bs-toggle="modal" data-orderId="<%= order._id %>" data-productId="<%= item.productId._id %>" data-bs-target="#returnModal">
                                                 Return Item
@@ -493,6 +433,17 @@
                         
                     </div>
                 </div>
+                
+                
+            </div>
+            
+            
+        </div>
+        
+        <div class="row gy-4">
+            <div class="col-lg-9">
+            
+               
                 
                 <!-- Shipping Details -->
                 <div class="card mb-4">
@@ -598,44 +549,9 @@
                     </div>
                 </div>
                 
-                <!-- Customer Support -->
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="section-title mb-0"><i class="bi bi-question-circle"></i> Need Help?</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="me-3 fs-3 text-primary">
-                                <i class="bi bi-chat-dots"></i>
-                            </div>
-                            <div>
-                                <h6 class="mb-1">Live Chat</h6>
-                                <p class="mb-0 text-muted small">Available 24/7</p>
-                            </div>
-                        </div>
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="me-3 fs-3 text-primary">
-                                <i class="bi bi-telephone"></i>
-                            </div>
-                            <div>
-                                <h6 class="mb-1">Call Us</h6>
-                                <p class="mb-0 text-muted small">1-800-123-4567</p>
-                            </div>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <div class="me-3 fs-3 text-primary">
-                                <i class="bi bi-envelope"></i>
-                            </div>
-                            <div>
-                                <h6 class="mb-1">Email Support</h6>
-                                <p class="mb-0 text-muted small">support@example.com</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                
             </div>
         </div>
-        
         <!-- Action Buttons -->
         <div class="mt-4 pt-3 border-top">
             <div class="d-flex justify-content-between">

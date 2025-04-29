@@ -14,7 +14,7 @@ async function compareOffers(product,categoryId){
     // console.log(category)
     // console.log(category.name)
     if(!category.categoryOffer?.isActive){
-        console.log("dh")
+       
         return product.salePrice
 
     }

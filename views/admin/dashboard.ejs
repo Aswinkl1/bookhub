@@ -2,7 +2,621 @@
 <%-include('../../views/partials/admin/_header')%>
 
 
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .card {
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+      height: 100%;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    .summary-card {
+      border-left: 4px solid;
+    }
+    .summary-orders {
+      border-color: #4e73df;
+    }
+    .summary-users {
+      border-color: #1cc88a;
+    }
+    .summary-revenue {
+      border-color: #f6c23e;
+    }
+    .summary-categories {
+      border-color: #e74a3b;
+    }
+    .summary-icon {
+      font-size: 2rem;
+      opacity: 0.3;
+    }
+    .chart-container {
+      position: relative;
+      height: 300px;
+      width: 100%;
+    }
+    .table-responsive {
+      max-height: 350px;
+      overflow-y: auto;
+    }
+    .badge-trend-up {
+      background-color: #1cc88a;
+    }
+    .badge-trend-down {
+      background-color: #e74a3b;
+    }
+    .badge-trend-neutral {
+      background-color: #f6c23e;
+    }
+    .product-image {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+    .progress {
+      height: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      
 
-<h1>dash board</h1>
+      <!-- Main content -->
+      <main class="col-md-12 ms-sm-auto col-lg-12 ">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+          <h1 class="h2">Dashboard Overview</h1>
+          <div class="btn-toolbar mb-2 mb-md-0">
+            
+            <div class="dropdown">
+              <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="timeFilterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-calendar"></i> Time Period
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="timeFilterDropdown">
+                <!-- <li><a class="dropdown-item period-filter" href="#" data-period="daily">Daily</a></li> -->
+                <li><a class="dropdown-item period-filter" href="#" data-period="weekly">Weekly</a></li>
+                <li><a class="dropdown-item period-filter active" href="#" data-period="monthly">Monthly</a></li>
+                <li><a class="dropdown-item period-filter" href="#" data-period="yearly">Yearly</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="row mb-4">
+          <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card summary-card summary-orders border-0">
+              <div class="card-body">
+                <div class="row align-items-center">
+                  <div class="col">
+                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Orders</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">2,489</div>
+                    <div class="text-success small mt-1">
+                      <!-- <i class="bi bi-arrow-up"></i> 12.8% since last month -->
+                    </div>
+                  </div>
+                  <div class="col-auto">
+                    <i class="bi bi-cart summary-icon text-primary"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card summary-card summary-users border-0">
+              <div class="card-body">
+                <div class="row align-items-center">
+                  <div class="col">
+                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Users</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">1,852</div>
+                    <div class="text-success small mt-1">
+                      <!-- <i class="bi bi-arrow-up"></i> 8.3% since last month -->
+                    </div>
+                  </div>
+                  <div class="col-auto">
+                    <i class="bi bi-people summary-icon text-success"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card summary-card summary-revenue border-0">
+              <div class="card-body">
+                <div class="row align-items-center">
+                  <div class="col">
+                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Revenue</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">$253,482</div>
+                    <div class="text-success small mt-1">
+                      <!-- <i class="bi bi-arrow-up"></i> 5.4% since last month -->
+                    </div>
+                  </div>
+                  <div class="col-auto">
+                    <i class="bi bi-currency-dollar summary-icon text-warning"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card summary-card summary-categories border-0">
+              <div class="card-body">
+                <div class="row align-items-center">
+                  <div class="col">
+                    <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Categories</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">28</div>
+                    <div class="text-success small mt-1">
+                      <!-- <i class="bi bi-arrow-up"></i> 2 new since last month -->
+                    </div>
+                  </div>
+                  <div class="col-auto">
+                    <i class="bi bi-tag summary-icon text-danger"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Row 1 -->
+        <div class="row mb-4">
+          <div class="col-lg-8 mb-4">
+            <div class="card">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold">Sales  Overview</h6>
+                
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="salesChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 mb-4">
+            <div class="card">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold">User Growth</h6>
+                
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="userChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Row 2 -->
+        <div class="row mb-4">
+            <div class="col-lg-8 mb-4">
+                <div class="card">
+                  <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold">Orders Overview</h6>
+                    
+                  </div>
+                  <div class="card-body">
+                    <div class="chart-container">
+                      <canvas id="orderChart"></canvas>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+          <div class="col-lg-4 mb-4">
+            <div class="card">
+              <div class="card-header">
+                <h6 class="m-0 font-weight-bold">Category Performance</h6>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="categoryChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-4">
+          <div class="col-lg-6 mb-4">
+            <div class="card">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold">Top 10 Best Selling Products</h6>
+                
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-hover" id="productsTable">
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Product</th>
+                        <th scope="col">Units Sold</th>
+                        <th scope="col">Revenue</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% for(let i = 0; i < topProducts.length; i++) { %>
+                        <tr>
+                          <th scope="row"><%= i + 1 %></th>
+                          <td>
+                            <div class="d-flex align-items-center">
+                              <img src="/uploads/products-images/<%= topProducts[i].images[0] %>" alt="<%= topProducts[i].productName %>" class="product-image me-3">
+                              <span><%= topProducts[i].productName %></span>
+                            </div>
+                          </td>
+                          <td><%= topProducts[i].totalSold %></td>
+                          <td>₹<%= topProducts[i].totalRevenue.toLocaleString() %></td>
+                        </tr>
+                        <% } %>
+                        
+                      
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6 mb-4">
+            <div class="card">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold">Top 10 Best Selling Categories</h6>
+                
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-hover" id="categoriesTable">
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Units Sold</th>
+                        <th scope="col">Revenue</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% for(let i = 0; i < topCategories.length; i++) { %>
+                        <tr>
+                          <th scope="row"><%= i + 1 %></th>
+                          <td>
+                            <div class="d-flex align-items-center">
+                              <i class="fas fa-mobile-alt me-3 text-primary"></i>
+                              <span><%= topCategories[i].category %></span> <!-- Use real category -->
+                            </div>
+                          </td>
+                          <td><%= topCategories[i].totalSold %></td> <!-- Sold quantity -->
+                          <td>₹<%= topCategories[i].totalRevenue.toLocaleString() %></td> <!-- Same revenue with $ sign -->
+                          <td>
+                           
+                          </td>
+                        </tr>
+                        <% } %>
+                        
+                      
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+       
+      </main>
+    </div>
+  </div>
+
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <script>
+    // Sample data
+    const monthlyLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const weeklyLabels = ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5'];
+    const dailyLabels = Array.from({ length: 30 }, (_, i) => `Day ${i + 1}`);
+    const yearlyLabels = ['2020', '2021', '2022', '2023', '2024'];
+
+    // Charts configuration
+
+    function lineChartConfig(id,data,label){
+      const chart = Chart.getChart(id); // id = canvas id
+      if (chart) {
+        chart.destroy();
+      }
+      const userChart = new Chart(
+        document.getElementById(id),
+      {
+        type: 'line',
+        data: {
+          labels: data.label,
+          datasets: [
+            {
+              label: label,
+              data: data.value,
+              borderColor: '#4e73df',
+              backgroundColor: 'rgba(78, 115, 223, 0.05)',
+              fill: true,
+              tension: 0.4
+            },
+            
+          ]
+        },
+        options: {
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top'
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      }
+
+      )
+    }
+
+
+    let salesChartConfig = {
+      type: 'line',
+      data: {
+        labels: monthlyLabels,
+        datasets: [
+          {
+            label: 'Sales',
+            data: [25000, 30000, 27500, 32500, 35000, 40000, 42500, 45000, 48000, 51000, 55000, 60000],
+            borderColor: '#4e73df',
+            backgroundColor: 'rgba(78, 115, 223, 0.05)',
+            fill: true,
+            tension: 0.4
+          },
+          
+        ]
+      },
+      options: {
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    };
+
+    let userChartConfig = {
+      type: 'line',
+      data: {
+        labels: monthlyLabels,
+        datasets: [{
+          label: 'New Users',
+          data: [50, 80, 75, 90, 110, 125, 130, 140, 150, 170, 190, 210],
+          borderColor: '#1cc88a',
+          backgroundColor: 'rgba(28, 200, 138, 0.1)',
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    };
+
+   function categoryChartConfig(id, data) {
+  const chart = Chart.getChart(id); // get existing chart by canvas id
+  if (chart) {
+    chart.destroy();
+  }
+
+  const ctx = document.getElementById(id);
+
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: data.label, // dynamic labels
+      datasets: [{
+        data: data.value,   // dynamic values
+        backgroundColor: [
+          'rgba(78, 115, 223, 0.8)',
+          'rgba(28, 200, 138, 0.8)',
+          'rgba(246, 194, 62, 0.8)',
+          'rgba(231, 74, 59, 0.8)',
+          'rgba(54, 185, 204, 0.8)',
+          'rgba(133, 135, 150, 0.8)'
+        ],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom'
+        }
+      }
+    }
+  });
+}
+
+   
+    
+    // Initialize charts
+    window.addEventListener('DOMContentLoaded', (event) => {
+      // Create charts
+      getChartData("weekly")
+
+      // const salesChart = new Chart(
+      //   document.getElementById('salesChart'),
+      //   salesChartConfig
+      // );
+
+      // const userChart = new Chart(
+      //   document.getElementById('userChart'),
+      //   userChartConfig
+      // );
+
+      // const productsChart = new Chart(
+      //   document.getElementById('orderChart'),
+      //   productsChartConfig
+      // );
+
+      // const categoryChart = new Chart(
+      //   document.getElementById('categoryChart'),
+      //   categoryChartConfig
+      // );
+
+      // Handle chart filters
+      document.querySelectorAll('.chart-filter').forEach(item => {
+        item.addEventListener('click', event => {
+          event.preventDefault();
+          
+          // Make this filter active
+          const parentUl = event.target.closest('ul');
+          parentUl.querySelectorAll('.chart-filter').forEach(filter => {
+            filter.classList.remove('active');
+          });
+          event.target.classList.add('active');
+          
+          // Update dropdown button text
+          const dropdownButton = parentUl.previousElementSibling;
+          dropdownButton.textContent = event.target.textContent;
+          
+          // Get the chart and period
+          const chartId = event.target.getAttribute('data-chart');
+          const period = event.target.getAttribute('data-period');
+          console.log(chartId)
+          console.log(period)
+          // Update chart data based on period
+          if (chartId === 'salesChart') {
+            let labels, salesData, ordersData;
+            
+            switch (period) {
+              case 'daily':
+                labels = dailyLabels;
+                salesData = generateRandomData(30, 20000, 60000);
+                ordersData = generateRandomData(30, 100, 500);
+                break;
+              case 'weekly':
+                labels = weeklyLabels;
+                salesData = generateRandomData(5, 25000, 55000);
+                ordersData = generateRandomData(5, 150, 450);
+                break;
+              case 'yearly':
+                labels = yearlyLabels;
+                salesData = [230000, 320000, 410000, 520000, 630000];
+                ordersData = [1800, 2400, 3200, 4100, 4800];
+                break;
+              default: // monthly
+                labels = monthlyLabels;
+                salesData = [25000, 30000, 27500, 32500, 35000, 40000, 42500, 45000, 48000, 51000, 55000, 60000];
+                ordersData = [150, 210, 180, 250, 270, 300, 320, 350, 370, 400, 450, 480];
+            }
+            
+            salesChart.data.labels = labels;
+            salesChart.data.datasets[0].data = salesData;
+            salesChart.data.datasets[1].data = ordersData;
+            salesChart.update();
+          } else if (chartId === 'userChart') {
+            let labels, userData;
+            
+            switch (period) {
+              case 'daily':
+                labels = dailyLabels;
+                userData = generateRandomData(30, 30, 100);
+                break;
+              case 'weekly':
+                labels = weeklyLabels;
+                userData = generateRandomData(5, 50, 170);
+                break;
+              case 'yearly':
+                labels = yearlyLabels;
+                userData = [450, 780, 1100, 1500, 1850];
+                break;
+              default: // monthly
+                labels = monthlyLabels;
+                userData = [50, 80, 75, 90, 110, 125, 130, 140, 150, 170, 190, 210];
+            }
+            
+            userChart.data.labels = labels;
+            userChart.data.datasets[0].data = userData;
+            userChart.update();
+          }
+        });
+      });
+
+      // Handle period filters
+      document.querySelectorAll('.period-filter').forEach(item => {
+        item.addEventListener('click', event => {
+          event.preventDefault();
+          console.log("fghfgdjkfdghk")
+          // Make this filter active
+          const parentUl = event.target.closest('ul');
+          parentUl.querySelectorAll('.period-filter').forEach(filter => {
+            filter.classList.remove('active');
+          });
+          event.target.classList.add('active');
+          
+          // Update dropdown button text
+          const dropdownButton = parentUl.previousElementSibling;
+          dropdownButton.textContent = event.target.textContent;
+          
+          // Update all charts
+          const period = event.target.getAttribute('data-period');
+          console.log(period)
+
+          getChartData(period)
+          
+        });
+      });
+    });
+
+    // Helper function to generate random data
+    function generateRandomData(count, min, max) {
+      return Array.from({ length: count }, () => Math.floor(Math.random() * (max - min + 1)) + min);
+    }
+
+
+  async  function getChartData(filter){
+        const response = await fetch(`/admin/api/dashboard?timeFilter=${filter}`)
+
+        const jsonResponse = await response.json()
+
+        if(response.ok){
+          lineChartConfig("userChart",jsonResponse.userData,"user")
+          lineChartConfig("orderChart",jsonResponse.orderData,"order")
+          lineChartConfig("salesChart",jsonResponse.salesData,"sales")
+          categoryChartConfig("categoryChart",jsonResponse.categoryData)
+        }else{
+          console.log("error")
+        }
+      }
+  </script>
+
+
 
 <%-include('../../views/partials/admin/_footer')%>

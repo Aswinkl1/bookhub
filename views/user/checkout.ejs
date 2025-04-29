@@ -518,7 +518,7 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
 
-      async function palceOrder(paymentMethod,cartTotal,couponId,totalDiscount){
+      async function palceOrder(paymentMethod,cartTotal,couponId,totalDiscount,couponDiscount){
         
             const selectedAddress = document.querySelector(".address-card.selected");
                 const addressId = selectedAddress.getAttribute("data-id")
@@ -527,9 +527,9 @@
                     const responce = await fetch('/placeOrder',{
                         method:"POST",
                         headers:{"Content-Type":"application/json"},
-                        body:JSON.stringify({addressId,paymentMethod,cartTotal,couponId,totalDiscount})
+                        body:JSON.stringify({addressId,paymentMethod,cartTotal,couponId,totalDiscount,couponDiscount})
                     });
-
+                    
                     const jsonResponce = await responce.json()
 
                     if(responce.ok){
@@ -560,11 +560,12 @@
                 const totalPrice = cartTotal.innerText
                 const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
                 const productOfferDiscount = discountFromProductOffer.innerText === "-" ? 0 : +discountFromProductOffer.innerText;
-                const orderDiscount = discountInOrder.innerText === "-" ? 0 : +discountInOrder.innerText;
-                const totalDiscount = (productOfferDiscount + orderDiscount) * -1;
-                console.log(orderDiscount)
+                const couponDiscount = discountInOrder.innerText === "-" ? 0 : +discountInOrder.innerText;
+                const totalDiscount = (productOfferDiscount + couponDiscount) * -1;
+                console.log(couponDiscount)
                 console.log(totalDiscount)
                 if(paymentMethod == "Razorpay"){
+                    
                     const response = await fetch("/razorpay/create-order",{ 
                         method: "POST",
                         body: JSON.stringify({ amount:totalPrice , currency: "INR" }),
@@ -581,14 +582,22 @@
                         currency: order.currency,
                         order_id: order.id,
                         handler: function (response) {
-                        palceOrder(paymentMethod,totalPrice,couponId.value,totalDiscount)
+                        palceOrder(paymentMethod,totalPrice,couponId.value,totalDiscount,couponDiscount)
                         }
                         };
                         var rzp = new Razorpay(options);
                         rzp.open();
                         }
                 }else{
-                    palceOrder(paymentMethod,totalPrice,couponId.value,totalDiscount)
+                    if(+totalPrice >= 1000){
+                        Swal.fire({
+                        title: "error",
+                        text: "amount above 5000 cannot be done using COD",
+                        icon: "error"
+                        });
+                        return
+                    }
+                    palceOrder(paymentMethod,totalPrice,couponId.value,totalDiscount,couponDiscount)
                 }
                 
                 

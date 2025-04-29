@@ -28,6 +28,14 @@ const orderSchema = new Schema({
                 enum: ["Pending", "Shipped", "Delivered", "Cancelled", "Returned","Return-pending","Return-cancelled"], 
                 default: "Pending"
             },
+            totalItemPrice: {
+                type:Number,
+                required:true
+            },
+            totalItemDiscount:{
+                type:Number,
+                required:true
+            },
             cancelRequest: { type: String, default: null },
             returnRequest: { type: String, default: null }
         }
@@ -51,6 +59,10 @@ const orderSchema = new Schema({
     discountAmount:{
         type:Number,
         default:0
+    },
+    refundedAmount:{
+        type:Number,
+        default:0,
     }
 }, { timestamps: true });
 

@@ -71,26 +71,40 @@ const validateCoupon = async (req,res)=>{
 
 
 const addOrder = async (req, res) => {
+    function itemPriceAfterDiscount(itemPrice,couponDiscount,cartTotal,quantity){
+        console.log(arguments)
+        
+        const totalPrice = itemPrice * quantity
+        return totalPrice + (Math.round(couponDiscount * (totalPrice/ +cartTotal)))
+
+    }
     try {
+
         const userId = req.session.userId
         const addressId = req.body.addressId
-        const {paymentMethod,cartTotal,couponId,totalDiscount} = req.body
-        console.log('totsl discoeunt'+totalDiscount)
+        const {paymentMethod,cartTotal,couponId,totalDiscount,couponDiscount} = req.body
+        console.log('coupon discount'+couponDiscount)
         const cart = await Cart.findOne({ userId }).populate("items.productId");
 
         if (!cart || cart.items.length === 0) {
             return res.status(400).json({ message: "Your cart is empty." });
         }
-
-
+        console.log(cart.items.length)
         // Calculate total price
         const orderItems = cart.items.map(item => {
+            const totalItemPrice = itemPriceAfterDiscount(item.price,couponDiscount,cart.totalPrice,item.quantity)
             return {
                 productId: item.productId._id,
                 quantity: item.quantity,
-                price: item.price
+                price: item.price,
+                totalItemPrice:totalItemPrice,
+                totalItemDiscount:(item.productId.regularPrice *item.quantity)- totalItemPrice
             };
         });
+        console.log(orderItems)
+
+        
+
 
         // Create new order
         const newOrder = new Order({
@@ -103,13 +117,13 @@ const addOrder = async (req, res) => {
             discountAmount:totalDiscount
 
         });
-
+        console.log(newOrder)
         await newOrder.save();
         if(couponId){
 
             const user = await User.findOne({_id:userId})
             user.usedCoupons.push(couponId)
-            user.save()
+            // user.save()
         }
 
         // Reduce stock for each product
@@ -199,16 +213,18 @@ const cancelOrder = async (req,res)=>{
         order.items.forEach(item =>{
 
             if((item.status == "Cancelled" || item.status == "Returned") && order.paymentMethod != "COD"){
-                refundedAmount += item.quantity * item.price
+                refundedAmount += item.totalItemPrice
             }
+            
              item.status = "Cancelled"
             });
         order.cancelRequest = reason || null;
         if(order.paymentMethod != "COD"){
             // return the money to the wallet
-            _returnMoneyToWallet(userId,orderId,order.totalPrice - refundedAmount)
-        }
 
+            _returnMoneyToWallet(userId,orderId,order.totalPrice)
+        }
+        order.paymentStatus = "Refunded"
         await order.save();
 
         res.json({ message: "Order cancelled successfully", order });
@@ -244,14 +260,20 @@ const cancelSingleProduct = async (req,res)=>{
             item.cancelRequest = reason || null;
             
             if(order.paymentMethod != "COD"){
-                _returnMoneyToWallet(userId,orderId,item.price * item.quantity)
+
+                _returnMoneyToWallet(userId,orderId,item.totalItemPrice)
             }
+            order.totalPrice -= item.totalItemPrice
+            order.refundedAmount += item.totalItemPrice
+            order.discountAmount -= item.totalItemDiscount
+
             console.log(item.price * item.quantity)
             // If all items are cancelled, update order status
             if (order.items.every(item => item.status === "Cancelled")) {
                 order.status = "Cancelled";
+                order.paymentStatus = "Refunded"
             }
-    
+            
             await order.save();
     
             res.json({ message: "Product cancelled successfully", order });
@@ -471,8 +493,8 @@ const downloadInvoice = async (req, res) => {
       createDetailRow('Payment Method:', order.paymentMethod, invoiceDetailY + 60);
       
       // Payment Status (with red color for Pending)
-      createDetailRow('Payment Status:', order.paymentStatus, invoiceDetailY + 90, 
-                     order.paymentStatus === 'Pending' ? '#FF0000' : '#000000');
+    //   createDetailRow('Payment Status:', order.paymentStatus, invoiceDetailY + 90, 
+    //                  order.paymentStatus === 'Pending' ? '#FF0000' : '#000000');
       
       // Second horizontal line
       const secondLineY = invoiceDetailY + 130;
@@ -509,58 +531,60 @@ const downloadInvoice = async (req, res) => {
       colX += tableColWidths[2];
       doc.text('Price', colX + 10, tableTop + 10, { align: 'right', width: tableColWidths[3] - 20 });
       
+      
       // Table rows
       let rowY = tableTop + 30;
       let subtotal = 0;
       
       for (const item of order.items) {
         const product = item.productId;
-        const isDelivered = item.status === 'Delivered' || item.status == "Return-cancelled";
-        
-        // Row background (subtle alternating effect)
-        doc.fillColor('#f9f9f9')
-          .rect(margin, rowY, contentWidth, 30)
-          .fill();
-        
-        // Product name
-        colX = margin;
-        doc.fillColor('#000000').font('Helvetica').fontSize(11)
-          .text(product.productTitle, colX + 10, rowY + 10);
-        
-        // Status with color
-        colX += tableColWidths[0];
-        let statusColor = '#000000';
-        if (item.status === 'Cancelled') statusColor = '#FF0000';
-        if (item.status === 'Returned') statusColor = '#FFA500';
-        if (item.status === 'Delivered') statusColor = '#008000';
-        
-        doc.fillColor(statusColor).font('Helvetica').fontSize(11)
-          .text(item.status, colX + 10, rowY + 10);
-        
-        // Quantity centered
-        colX += tableColWidths[1];
-        doc.fillColor('#000000').font('Helvetica').fontSize(11)
-          .text(item.quantity.toString(), colX + 10, rowY + 10, 
-               { align: 'center', width: tableColWidths[2] - 20 });
-        
-        // Price right-aligned with rupee symbol
-        colX += tableColWidths[2];
-        doc.fillColor('#000000').font('Helvetica').fontSize(11)
-          .text(`₹${item.price.toFixed(2)}`, colX + 10, rowY + 10, 
-               { align: 'right', width: tableColWidths[3] - 20 });
-        
-        if (isDelivered) {
-          subtotal += item.price * item.quantity;
-        }
-        
-        // Bottom border for row
-        doc.strokeColor('#e0e0e0').lineWidth(0.5)
-          .moveTo(margin, rowY + 30)
-          .lineTo(margin + contentWidth, rowY + 30)
-          .stroke();
-        
-        rowY += 30;
-      }
+        const isDelivered = item.status === 'Delivered' || item.status == "Return-cancelled" ;
+        if(isDelivered){
+            // Row background (subtle alternating effect)
+            doc.fillColor('#f9f9f9')
+            .rect(margin, rowY, contentWidth, 30)
+            .fill();
+            
+            // Product name
+            colX = margin;
+            doc.fillColor('#000000').font('Helvetica').fontSize(11)
+            .text(product.productTitle, colX + 10, rowY + 10);
+            
+            // Status with color
+            colX += tableColWidths[0];
+            let statusColor = '#000000';
+            if (item.status === 'Cancelled') statusColor = '#FF0000';
+            if (item.status === 'Returned') statusColor = '#FFA500';
+            if (item.status === 'Delivered') statusColor = '#008000';
+            
+            doc.fillColor(statusColor).font('Helvetica').fontSize(11)
+            .text(item.status, colX + 10, rowY + 10);
+            
+            // Quantity centered
+            colX += tableColWidths[1];
+            doc.fillColor('#000000').font('Helvetica').fontSize(11)
+            .text(item.quantity.toString(), colX + 10, rowY + 10, 
+                { align: 'center', width: tableColWidths[2] - 20 });
+            
+            // Price right-aligned with rupee symbol
+            colX += tableColWidths[2];
+            doc.fillColor('#000000').font('Helvetica').fontSize(11)
+            .text(`₹${item.price.toFixed(2)}`, colX + 10, rowY + 10, 
+                { align: 'right', width: tableColWidths[3] - 20 });
+            
+            
+            if (isDelivered) {
+            subtotal += item.totalItemPrice;
+            }
+            
+            // Bottom border for row
+            doc.strokeColor('#e0e0e0').lineWidth(0.5)
+            .moveTo(margin, rowY + 30)
+            .lineTo(margin + contentWidth, rowY + 30)
+            .stroke();
+            
+            rowY += 30;
+      }}
       
       // Third horizontal line
       const thirdLineY = rowY + 30;
@@ -611,7 +635,7 @@ const downloadInvoice = async (req, res) => {
       
       // Format final amount with proper right alignment
       const discountAmount = Math.max(0,  order.totalPrice - subtotal);
-      const formatteddiscountAmount = `-₹${discountAmount.toFixed(2)}`;
+      const formatteddiscountAmount = `-${discountAmount.toFixed(2)}`;
       doc.text(formatteddiscountAmount, summaryLeft + summaryWidth - 50, summaryTop + 70, { align: 'left' });
       
       
@@ -628,7 +652,7 @@ const downloadInvoice = async (req, res) => {
       
       // Format final amount with proper right alignment
       const finalAmount = Math.max(0, subtotal);
-      const formattedFinalAmount = `₹${finalAmount.toFixed(2)}`;
+      const formattedFinalAmount = `${finalAmount.toFixed(2)}`;
       doc.text(formattedFinalAmount, summaryLeft + summaryWidth - 50, summaryTop + 100, { align: 'left' });
       
       // Finalize PDF
@@ -761,15 +785,17 @@ const changeStatusForProduct = async (req,res)=>{
         }
 
 
-        let quantity = 0
         let amount = 0
+        let itemDiscount = 0
         order.items.forEach((value) =>{
             if(value.productId.toString() == productId){
                 
                 value.status = newStatus
-                quantity = value.quantity
-                amount = value.price
+                itemDiscount = value.totalItemDiscount
+                amount = value.totalItemPrice
             }
+            
+
         })
 
         const statusArray = ["Cancelled","Returned"]
@@ -784,13 +810,19 @@ const changeStatusForProduct = async (req,res)=>{
                     );
                 }
             }
-
+            
             if(order.paymentMethod != "COD" ||newStatus == "Returned" ){
                 // return the money to the wallet
-                _returnMoneyToWallet(userId,orderId,quantity * amount)
+                _returnMoneyToWallet(userId,orderId,amount)
             } 
+        order.totalPrice -= amount
+        console.log(order.refundedAmount)
+        order.refundedAmount += amount
+        order.discountAmount -= itemDiscount
     
         }
+
+        order.status = _determineOrderStatusFromItem(order.items)
 
         await order.save()
         res.status(200).json({message:"product status change successfull"})
@@ -839,15 +871,17 @@ const changeOrderStatus = async (req,res)=>{
             //     refundedAmount += item.quantity * item.price
             // }
             if(item.status == "Return-pending"){
-                refuntableAmount += item.quantity * item.price
+                refuntableAmount += item.totalItemPrice
             }
             // item.status = newStatus;
             
-
         }
-        
+        order.refundedAmount += refuntableAmount
+        order.totalPrice -= refuntableAmount
+        order.paymentStatus = "Refunded"
         // return money here
         _returnMoneyToWallet(userId,orderId,refuntableAmount)
+        
     }
     
     order.items.forEach(item =>{
@@ -864,20 +898,45 @@ const changeOrderStatus = async (req,res)=>{
 
 }
 
+function _determineOrderStatusFromItem(items){
+    const statuses = items.map(item => item.status)
+    console.log(statuses)
+    const allCancelled = statuses.every(status => status == "Cancelled")
+    const allShipped = statuses.every(status => status == "Shipped")
+    const allDelivered = statuses.every(status => status == "Delivered")
+    const allReturned = statuses.every(status => status == "Returned")
+    const allReturnPending = statuses.every(status => status == "Return-pending")
+    const allReturnCancelled = statuses.every(status => status == "Return-cancelled")
 
-const register = async (req,res)=>{
-    const {email,name} = req.body
-
-    const user = await User.findOne({email})
-
-    if(user){
-       return res.status(400).json({message:"user already exist"})
+    const anydeliverd = statuses.includes("Delivered")
+    const anyReturned = statuses.includes("Returned")
+    const anyPendingOrShipped = statuses.some(status =>["Pending","Shipped"].includes(status))
+    
+    if(allCancelled){
+        return "Cancelled"
+    }
+    else if(allShipped){
+        return "Shipped"
+    }
+    else if(allDelivered || (anydeliverd && !anyPendingOrShipped)){
+        return "Delivered"
+    }
+    else if(allReturned || (anyReturned && !anyPendingOrShipped)){
+        return "Returned"
+    }
+    else if(allReturnPending){
+        return "Return-pending"
+    }
+    else if(allReturnCancelled){
+        return "Return-cancelled"
+    }else{
+        return "Pending"
     }
 
-    user = new User({email,name})
-    await user.save()
     
+
 }
+
 module.exports = { 
     addOrder,
     getUserOrders,

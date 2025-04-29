@@ -1,290 +1,588 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookStore Wallet Dashboard</title>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .balance-card {
-            background: linear-gradient(45deg, #6a11cb, #2575fc);
-            color: white;
-            border-radius: 15px;
-        }
-        .transaction-container {
-            max-height: 500px;
-            overflow-y: auto;
-            scrollbar-width: thin;
-        }
-        .transaction-container::-webkit-scrollbar {
-            width: 6px;
-        }
-        .transaction-container::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        .transaction-container::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 10px;
-        }
-        .transaction-item {
-            border-left: 4px solid transparent;
-            transition: all 0.2s ease;
-        }
-        .transaction-item:hover {
-            background-color: #f8f9fa;
-        }
-        .purchase {
-            border-left-color: #dc3545;
-        }
-        .return {
-            border-left-color: #28a745;
-        }
-        .refund-pending {
-            border-left-color: #ffc107;
-        }
-        .book-thumbnail {
-            width: 40px;
-            height: 55px;
-            object-fit: cover;
-            border-radius: 4px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coupon Management</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3f37c9;
+      --success-color: #4cc9f0;
+      --danger-color: #f72585;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --border-radius: 0.5rem;
+    }
+    
+    body {
+      background-color: #f5f7ff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .page-container {
+      padding: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    .dashboard-card {
+      background-color: white;
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      padding: 2rem;
+      border: none;
+      margin-bottom: 1.5rem;
+    }
+    
+    .header-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .page-title {
+      color: var(--dark-color);
+      font-weight: 600;
+      margin-bottom: 0;
+    }
+    
+    .search-container {
+      position: relative;
+      margin-right: 16px;
+    }
+    
+    .search-input {
+      padding-left: 40px;
+      height: 48px;
+      border-radius: 24px;
+      border: 1px solid #e0e0e0;
+      background-color: white;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      width: 300px;
+    }
+    
+    .search-input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.15);
+    }
+    
+    .search-icon {
+      position: absolute;
+      left: 15px;
+      top: 16px;
+      color: #6c757d;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      border: none;
+      border-radius: 24px;
+      padding: 12px 24px;
+      font-weight: 500;
+      box-shadow: 0 4px 10px rgba(67, 97, 238, 0.2);
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(67, 97, 238, 0.3);
+    }
+    
+    .table-container {
+      border-radius: var(--border-radius);
+      overflow: hidden;
+    }
+    
+    .table {
+      margin-bottom: 0;
+    }
+    
+    .table thead th {
+      background-color: #f8f9fa;
+      border-bottom: none;
+      color: #495057;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+      padding: 16px;
+    }
+    
+    .table tbody td {
+      padding: 16px;
+      vertical-align: middle;
+      border-color: #f0f0f0;
+    }
+    
+    .coupon-code {
+      font-family: 'Courier New', monospace;
+      font-weight: 600;
+      background-color: #f0f2ff;
+      padding: 5px 10px;
+      border-radius: 4px;
+      color: var(--primary-color);
+    }
+    
+    .badge {
+      padding: 8px 12px;
+      font-weight: 500;
+      border-radius: 6px;
+    }
+    
+    .badge-active {
+      background-color: #dbffe7;
+      color: #0c6b2e;
+    }
+    
+    .badge-expired {
+      background-color: #ffe5e5;
+      color: #c70000;
+    }
+    
+    .btn-action {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 8px;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-edit {
+      background-color: #e7f0ff;
+      color: var(--primary-color);
+      border: none;
+    }
+    
+    .btn-edit:hover {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .btn-delete {
+      background-color: #ffe5e5;
+      color: var(--danger-color);
+      border: none;
+    }
+    
+    .btn-delete:hover {
+      background-color: var(--danger-color);
+      color: white;
+    }
+    
+    .pagination .page-item .page-link {
+      border: none;
+      color: #6c757d;
+      margin: 0 3px;
+      border-radius: 4px;
+    }
+    
+    .pagination .page-item.active .page-link {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .modal-content {
+      border-radius: 12px;
+      border: none;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .modal-header {
+      border-bottom: 1px solid #f0f0f0;
+      padding: 1.5rem;
+    }
+    
+    .modal-body {
+      padding: 1.5rem;
+    }
+    
+    .modal-footer {
+      border-top: 1px solid #f0f0f0;
+      padding: 1.5rem;
+    }
+    
+    .form-label {
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: #495057;
+    }
+    
+    .form-control, .form-select {
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+      background-color: #f9fafb;
+    }
+    
+    .form-control:focus, .form-select:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.15);
+    }
+    
+    .stats-row {
+      margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+      background-color: white;
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      height: 100%;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+    }
+    
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+      color: white;
+    }
+    
+    .icon-active {
+      background-color: #4cc9f0;
+    }
+    
+    .icon-expired {
+      background-color: #f72585;
+    }
+    
+    .icon-total {
+      background-color: #4361ee;
+    }
+    
+    .icon-value {
+      background-color: #7209b7;
+    }
+    
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 0.2rem;
+    }
+    
+    .stat-label {
+      color: #6c757d;
+      font-size: 0.85rem;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 992px) {
+      .search-input {
+        width: 100%;
+      }
+      .header-actions {
+        flex-direction: column;
+        width: 100%;
+      }
+      .search-container {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 1rem;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container py-4">
-        <!-- Header -->
-        <header class="mb-4">
-            <h1 class="text-center">BookStore Wallet</h1>
-            <p class="text-center text-muted">Manage your purchases and returns</p>
-        </header>
-        
-        <!-- Main Content -->
-        <div class="row g-4">
-            <!-- Wallet Balance Section -->
-            <div class="col-lg-4 mb-4">
-                <div class="card balance-card shadow h-100">
-                    <div class="card-body text-center p-4">
-                        <h5 class="card-title">Wallet Balance</h5>
-                        <h2 class="display-4 fw-bold mb-4">$142.85</h2>
-                        <div class="d-flex justify-content-around mb-4">
-                            <div>
-                                <p class="mb-0"><i class="fas fa-shopping-cart"></i> Purchases</p>
-                                <h5>$268.50</h5>
-                            </div>
-                            <div>
-                                <p class="mb-0"><i class="fas fa-undo-alt"></i> Returns</p>
-                                <h5>$125.65</h5>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <button class="btn btn-light me-2"><i class="fas fa-credit-card"></i> Add Funds</button>
-                            <button class="btn btn-outline-light"><i class="fas fa-gift"></i> Redeem Gift Card</button>
-                        </div>
-                    </div>
-                </div>
+  <div class="page-container">
+    <div class="dashboard-card">
+      <div class="header-section">
+        <h2 class="page-title">Coupon Management</h2>
+      </div>
+      
+      <div class="row stats-row">
+        <div class="col-md-3 mb-3">
+          <div class="stat-card">
+            <div class="stat-icon icon-active">
+              <i class="fas fa-check-circle"></i>
             </div>
-
-            <!-- Transaction History Section -->
-            <div class="col-lg-8">
-                <div class="card shadow h-100">
-                    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-                        <h5 class="mb-0">Transaction History</h5>
-                        <div class="d-flex">
-                            <div class="input-group me-2">
-                                <input type="text" class="form-control form-control-sm" placeholder="Search transactions">
-                                <button class="btn btn-outline-secondary btn-sm" type="button">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-                            <div class="dropdown">
-                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Filter
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="filterDropdown">
-                                    <li><a class="dropdown-item" href="#">All Transactions</a></li>
-                                    <li><a class="dropdown-item" href="#">Purchases</a></li>
-                                    <li><a class="dropdown-item" href="#">Returns</a></li>
-                                    <li><a class="dropdown-item" href="#">Pending Refunds</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="transaction-container">
-                            <div class="list-group list-group-flush">
-                                <!-- Transaction items start -->
-                                <div class="list-group-item transaction-item purchase">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="d-flex align-items-center">
-                                            <img src="/api/placeholder/40/55" alt="Book cover" class="book-thumbnail me-3">
-                                            <div>
-                                                <h6 class="mb-0">The Great Gatsby (Paperback)</h6>
-                                                <small class="text-muted">March 30, 2025 • Order #24785</small>
-                                            </div>
-                                        </div>
-                                        <span class="text-danger fw-bold">-$12.99</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="list-group-item transaction-item purchase">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="d-flex align-items-center">
-                                            <img src="/api/placeholder/40/55" alt="Book cover" class="book-thumbnail me-3">
-                                            <div>
-                                                <h6 class="mb-0">To Kill a Mockingbird (Hardcover)</h6>
-                                                <small class="text-muted">March 28, 2025 • Order #24782</small>
-                                            </div>
-                                        </div>
-                                        <span class="text-danger fw-bold">-$18.50</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="list-group-item transaction-item return">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="d-flex align-items-center">
-                                            <img src="/api/placeholder/40/55" alt="Book cover" class="book-thumbnail me-3">
-                                            <div>
-                                                <h6 class="mb-0">1984 (Paperback)</h6>
-                                                <small class="text-muted">March 27, 2025 • Return #1095</small>
-                                            </div>
-                                        </div>
-                                        <span class="text-success fw-bold">+$14.99</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="list-group-item transaction-item refund-pending">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="d-flex align-items-center">
-                                            <img src="/api/placeholder/40/55" alt="Book cover" class="book-thumbnail me-3">
-                                            <div>
-                                                <h6 class="mb-0">The Hobbit (E-book)</h6>
-                                                <small class="text-muted">March 26, 2025 • Return #1094 (Pending)</small>
-                                            </div>
-                                        </div>
-                                        <span class="text-warning fw-bold">+$9.99 (Pending)</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="list-group-item transaction-item purchase">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="d-flex align-items-center">
-                                            <img src="/api/placeholder/40/55" alt="Book cover" class="book-thumbnail me-3">
-                                            <div>
-                                                <h6 class="mb-0">Pride and Prejudice (Audiobook)</h6>
-                                                <small class="text-muted">March 25, 2025 • Order #24775</small>
-                                            </div>
-                                        </div>
-                                        <span class="text-danger fw-bold">-$22.95</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="list-group-item transaction-item purchase">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="d-flex align-items-center">
-                                            <img src="/api/placeholder/40/55" alt="Book cover" class="book-thumbnail me-3">
-                                            <div>
-                                                <h6 class="mb-0">The Alchemist (Paperback)</h6>
-                                                <small class="text-muted">March 23, 2025 • Order #24771</small>
-                                            </div>
-                                        </div>
-                                        <span class="text-danger fw-bold">-$11.99</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="list-group-item transaction-item return">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="d-flex align-items-center">
-                                            <img src="/api/placeholder/40/55" alt="Book cover" class="book-thumbnail me-3">
-                                            <div>
-                                                <h6 class="mb-0">Brave New World (Hardcover)</h6>
-                                                <small class="text-muted">March 22, 2025 • Return #1092</small>
-                                            </div>
-                                        </div>
-                                        <span class="text-success fw-bold">+$19.95</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="list-group-item transaction-item purchase">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="d-flex align-items-center">
-                                            <img src="/api/placeholder/40/55" alt="Book cover" class="book-thumbnail me-3">
-                                            <div>
-                                                <h6 class="mb-0">Harry Potter and the Philosopher's Stone</h6>
-                                                <small class="text-muted">March 20, 2025 • Order #24765</small>
-                                            </div>
-                                        </div>
-                                        <span class="text-danger fw-bold">-$15.99</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="list-group-item transaction-item purchase">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="d-flex align-items-center">
-                                            <img src="/api/placeholder/40/55" alt="Book cover" class="book-thumbnail me-3">
-                                            <div>
-                                                <h6 class="mb-0">Lord of the Rings: Fellowship of the Ring</h6>
-                                                <small class="text-muted">March 18, 2025 • Order #24761</small>
-                                            </div>
-                                        </div>
-                                        <span class="text-danger fw-bold">-$24.99</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="list-group-item transaction-item purchase">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="d-flex align-items-center">
-                                            <img src="/api/placeholder/40/55" alt="Book cover" class="book-thumbnail me-3">
-                                            <div>
-                                                <h6 class="mb-0">The Catcher in the Rye (Paperback)</h6>
-                                                <small class="text-muted">March 15, 2025 • Order #24754</small>
-                                            </div>
-                                        </div>
-                                        <span class="text-danger fw-bold">-$10.99</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="list-group-item transaction-item purchase">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="d-flex align-items-center">
-                                            <img src="/api/placeholder/40/55" alt="Book cover" class="book-thumbnail me-3">
-                                            <div>
-                                                <h6 class="mb-0">The Art of War (Deluxe Edition)</h6>
-                                                <small class="text-muted">March 12, 2025 • Order #24748</small>
-                                            </div>
-                                        </div>
-                                        <span class="text-danger fw-bold">-$29.99</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="list-group-item transaction-item return">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="d-flex align-items-center">
-                                            <img src="/api/placeholder/40/55" alt="Book cover" class="book-thumbnail me-3">
-                                            <div>
-                                                <h6 class="mb-0">Jane Eyre (E-book)</h6>
-                                                <small class="text-muted">March 10, 2025 • Return #1087</small>
-                                            </div>
-                                        </div>
-                                        <span class="text-success fw-bold">+$8.99</span>
-                                    </div>
-                                </div>
-                                <!-- Transaction items end -->
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-footer bg-white d-flex justify-content-between align-items-center py-3">
-                        <span class="text-muted">Showing 12 of 68 transactions</span>
-                        <button class="btn btn-sm btn-primary">Load More</button>
-                    </div>
-                </div>
-            </div>
+            <div class="stat-value">42</div>
+            <div class="stat-label">Active Coupons</div>
+          </div>
         </div>
+        <div class="col-md-3 mb-3">
+          <div class="stat-card">
+            <div class="stat-icon icon-expired">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-value">8</div>
+            <div class="stat-label">Expired Coupons</div>
+          </div>
+        </div>
+        <div class="col-md-3 mb-3">
+          <div class="stat-card">
+            <div class="stat-icon icon-total">
+              <i class="fas fa-ticket-alt"></i>
+            </div>
+            <div class="stat-value">50</div>
+            <div class="stat-label">Total Coupons</div>
+          </div>
+        </div>
+        <div class="col-md-3 mb-3">
+          <div class="stat-card">
+            <div class="stat-icon icon-value">
+              <i class="fas fa-dollar-sign"></i>
+            </div>
+            <div class="stat-value">$12,500</div>
+            <div class="stat-label">Total Discount Value</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
+        <div class="header-actions d-flex align-items-center">
+          <div class="search-container">
+            <input type="text" class="form-control search-input" placeholder="Search coupons..." id="searchInput">
+            <span class="search-icon"><i class="fas fa-search"></i></span>
+          </div>
+        </div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCouponModal">
+          <i class="fas fa-plus me-2"></i>Add New Coupon
+        </button>
+      </div>
+      
+      <div class="table-container">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Code</th>
+              <th>Discount</th>
+              <th>Min Amount</th>
+              <th>Max Discount</th>
+              <th>Expiry Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>New Year Sale</td>
+              <td><span class="coupon-code">NEWYEAR25</span></td>
+              <td>25%</td>
+              <td>$50.00</td>
+              <td>$100.00</td>
+              <td>31-12-2025</td>
+              <td><span class="badge badge-active">Active</span></td>
+              <td>
+                <button class="btn btn-action btn-edit"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-action btn-delete"><i class="fas fa-trash"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>Summer Special</td>
+              <td><span class="coupon-code">SUMMER15</span></td>
+              <td>15%</td>
+              <td>$30.00</td>
+              <td>$75.00</td>
+              <td>30-08-2025</td>
+              <td><span class="badge badge-active">Active</span></td>
+              <td>
+                <button class="btn btn-action btn-edit"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-action btn-delete"><i class="fas fa-trash"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>Welcome Discount</td>
+              <td><span class="coupon-code">WELCOME10</span></td>
+              <td>10%</td>
+              <td>$0.00</td>
+              <td>$50.00</td>
+              <td>31-05-2025</td>
+              <td><span class="badge badge-active">Active</span></td>
+              <td>
+                <button class="btn btn-action btn-edit"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-action btn-delete"><i class="fas fa-trash"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>Flash Sale</td>
+              <td><span class="coupon-code">FLASH50</span></td>
+              <td>50%</td>
+              <td>$100.00</td>
+              <td>$200.00</td>
+              <td>15-05-2025</td>
+              <td><span class="badge badge-active">Active</span></td>
+              <td>
+                <button class="btn btn-action btn-edit"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-action btn-delete"><i class="fas fa-trash"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>Birthday Special</td>
+              <td><span class="coupon-code">BDAY30</span></td>
+              <td>30%</td>
+              <td>$75.00</td>
+              <td>$150.00</td>
+              <td>01-01-2025</td>
+              <td><span class="badge badge-expired">Expired</span></td>
+              <td>
+                <button class="btn btn-action btn-edit"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-action btn-delete"><i class="fas fa-trash"></i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="d-flex justify-content-between align-items-center mt-4">
+        <div>
+          <p class="text-muted">Showing 1 to 5 of 50 entries</p>
+        </div>
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+            <li class="page-item disabled">
+              <a class="page-link" href="#" tabindex="-1"><i class="fas fa-chevron-left"></i></a>
+            </li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item"><a class="page-link" href="#">4</a></li>
+            <li class="page-item"><a class="page-link" href="#">5</a></li>
+            <li class="page-item">
+              <a class="page-link" href="#"><i class="fas fa-chevron-right"></i></a>
+            </li>
+          </ul>
+        </nav>
+      </div>
     </div>
+  </div>
+  
+  <!-- Add Coupon Modal -->
+  <div class="modal fade" id="addCouponModal" tabindex="-1" aria-labelledby="addCouponModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addCouponModalLabel"><i class="fas fa-ticket-alt me-2"></i>Add New Coupon</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="description" class="form-label">Description</label>
+                <input type="text" class="form-control" id="description" placeholder="Enter coupon description" required>
+              </div>
+              <div class="col-md-6">
+                <label for="code" class="form-label">Coupon Code</label>
+                <div class="input-group">
+                  <input type="text" class="form-control" id="code" placeholder="e.g. SUMMER25" required>
+                  <button class="btn btn-outline-secondary" type="button" id="generateCode">Generate</button>
+                </div>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="discountType" class="form-label">Discount Type</label>
+                <select class="form-select" id="discountType">
+                  <option value="percentage">Percentage (%)</option>
+                  <option value="fixed">Fixed Amount ($)</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="discount" class="form-label">Discount Value</label>
+                <div class="input-group">
+                  <input type="number" class="form-control" id="discount" min="0" placeholder="Enter discount value" required>
+                  <span class="input-group-text">%</span>
+                </div>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="minAmount" class="form-label">Minimum Purchase Amount ($)</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input type="number" class="form-control" id="minAmount" min="0" step="0.01" placeholder="0.00" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label for="maxDiscount" class="form-label">Maximum Discount ($)</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input type="number" class="form-control" id="maxDiscount" min="0" step="0.01" placeholder="0.00" required>
+                </div>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="expiryDate" class="form-label">Expiry Date</label>
+                <input type="date" class="form-control" id="expiryDate" required>
+              </div>
+              <div class="col-md-6">
+                <label for="status" class="form-label">Status</label>
+                <select class="form-select" id="status" required>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-12">
+                <label for="additionalNotes" class="form-label">Additional Notes</label>
+                <textarea class="form-control" id="additionalNotes" rows="3" placeholder="Any additional information about this coupon"></textarea>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary">Save Coupon</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Simple search functionality
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+      const input = this.value.toLowerCase();
+      const rows = document.querySelectorAll('tbody tr');
+      
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(input) ? '' : 'none';
+      });
+    });
+    
+    // Generate random coupon code
+    document.getElementById('generateCode').addEventListener('click', function() {
+      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let code = '';
+      for (let i = 0; i < 8; i++) {
+        code += characters.charAt(Math.floor(Math.random() * characters.length));
+      }
+      document.getElementById('code').value = code;
+    });
+    
+    // Change discount input type
+    document.getElementById('discountType').addEventListener('change', function() {
+      const inputGroup = document.getElementById('discount').nextElementSibling;
+      if (this.value === 'percentage') {
+        inputGroup.textContent = '%';
+      } else {
+        inputGroup.textContent = '$';
+      }
+    });
+  </script>
 </body>
 </html>

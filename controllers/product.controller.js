@@ -99,7 +99,7 @@ const getAllProducts = async (req,res)=>{
         .limit(limit)
         .populate("category")
         .exec()
-
+        
         const count = await Product.find({
             
                 productTitle:{$regex:new RegExp(".*"+search+".*","i")}
@@ -127,6 +127,7 @@ const getEditProducts = async (req,res)=>{
     try {
         const id = req.query.id;
         const product = await Product.findOne({_id:id}).populate("category")
+        console.log(product)
         const category = await Category.find({})
         console.log(product._id)
         res.render("edit-product",{
@@ -316,7 +317,7 @@ const fetchAvailableProducts  = async (req,res)=>{
         // sort = JSON.parse(sort)
         console.log(sort)
 
-        const products = await Product.find({isBlocked:false,productTitle:{$regex:search,$options:'i'}}).skip(skip).sort(sort).limit(limit)
+        const products = await Product.find({isBlocked:false,productTitle:{$regex:search,$options:'i'}}).skip(skip).sort(sort).limit(limit).populate("category")
 
         const totalNumberOfProduct = await Product.find({isBlocked:false}).countDocuments()
         const totalPages = Math.ceil(totalNumberOfProduct/limit)

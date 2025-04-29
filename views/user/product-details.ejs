@@ -41,7 +41,7 @@ figure img {
                                         <% for(let i=0;i<product.productImage.length;i++){%>
 
                                             <figure class="border-radius-10">
-                                                <img src="/uploads/products-images/<%=product.productImage[i]%>" alt="product image">
+                                                <img  src="/uploads/products-images/<%=product.productImage[i]%>" alt="product image">
                                             </figure>
                                             <%}%>
                                         
@@ -50,7 +50,7 @@ figure img {
                                     <!-- THUMBNAILS -->
                                     <div class="slider-nav-thumbnails pl-15 pr-15">
                                         <% for(let i=0;i<product.productImage.length;i++){%>
-                                        <div><img src="/uploads/products-images/<%=product.productImage[i]%>" alt="product image"></div>
+                                        <div><img id="zoom-image" src="/uploads/products-images/<%=product.productImage[i]%>" alt="product image"></div>
                                         <%}%>
                                     </div>
                                 </div>
@@ -108,8 +108,10 @@ figure img {
                                         </div> -->
                                         <div class="product-extra-link2">
                                             <button type="submit" class="button button-add-to-cart" onclick="addToCart('<%=product._id%>')">Add to cart</button>
-                                            <a aria-label="Add To Wishlist" class="action-btn hover-up" href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>
-                                            <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a>
+                                            <!-- <a aria-label="Add To Wishlist" class="action-btn hover-up" ><i class="fi-rs-heart"></i></a> -->
+                                            <a aria-label="Add To Wishlist" class="action-btn hover-up" onclick="addToWishlist('<%=product._id%>')"><i class="fi-rs-heart"></i></a>
+
+                                            <!-- <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a> -->
                                         </div>
                                     </div>
                                     <ul class="product-meta font-xs color-grey mt-50">
@@ -549,8 +551,52 @@ figure img {
         </div>
     </section>
 </main>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- ElevateZoom -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/elevatezoom/3.0.8/jquery.elevatezoom.min.js"></script>
 
 <script>
+
+     $(document).ready(function() {
+    $("#zoom-image").elevateZoom({
+      zoomType: "lens",
+      lensShape: "round",
+      lensSize: 200
+    });
+  });
+
+    function showAlert(icon,title,text) {
+        Swal.fire({
+        title: title,
+        text: text,
+        icon: icon
+        });
+    }
+    async function addToWishlist(productId) {
+        console.log("evide unde")
+        const response = await fetch('/api/wishlist',{
+            method:"POST",
+            headers:{'Content-Type':"application/json"},
+            body:JSON.stringify({productId})
+        })
+        if(response.redirected){
+                window.location = response.url
+        }
+        const jsonResponce = await response.json()
+
+        if(response.ok){
+            showAlert("success",jsonResponce.message,"")
+        
+            document.getElementById("wishlist").innerText = parseInt(document.getElementById("wishlist").innerText) +1
+        }else{
+            showAlert("error",jsonResponce.error,"")
+
+        }
+        
+    }
+
     async function addToCart(productId){
          const responce =await fetch('/cart/addToCart',{
              method:'POST',
@@ -560,7 +606,9 @@ figure img {
                  quantity:1
              })
          })
- 
+         if(responce.redirected){
+                window.location = responce.url
+        }
          const jsonResponce = await responce.json()
          if(responce.ok){
              Swal.fire({

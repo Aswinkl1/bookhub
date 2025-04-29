@@ -41,7 +41,6 @@ app.use(session({
     
 }));
 
-
 // app level middleware
 
 app.use(passport.initialize())

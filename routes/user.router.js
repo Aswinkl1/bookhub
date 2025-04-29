@@ -91,9 +91,9 @@ router.post('/api/wishlist',userAuth,wishlist.addToWishlist)
 router.delete('/api/wishlist/:productId',userAuth,wishlist.removeFromWishlist)
 
 // wallet 
-router.get("/wallet",wallet.getWallet)
-router.post("/wallet/razorpay/create-order",wallet.creataOrderUsingRazorpay)
-router.post("/wallet/addMoney",wallet.addMoneyToWallet)
+router.get("/wallet",userAuth,wallet.getWallet)
+router.post("/wallet/razorpay/create-order",userAuth,wallet.creataOrderUsingRazorpay)
+router.post("/wallet/addMoney",userAuth,wallet.addMoneyToWallet)
 
 
 module.exports = router;
