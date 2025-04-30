@@ -46,8 +46,10 @@ router.post('/editProduct/:id',uploads.array("images",4),productController.postE
 router.put('/products/delete',productController.deleteProduct)
 
 // coupon
+router.route("/coupon")
+.get(adminAuth,coupon.renderCouponPage)
 
-router.get("/coupon",adminAuth,coupon.loadCouponPage)
+router.get("/api/coupon",adminAuth,coupon.loadCouponPage)
 router.post("/coupon/editCoupons",adminAuth,coupon.getEditCoupon)
 router.put("/coupon/editCoupons",adminAuth,coupon.postEditCoupon)
 router.delete("/coupon/deleteCoupon/:id",adminAuth,coupon.deleteCoupon)

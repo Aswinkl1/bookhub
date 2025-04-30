@@ -32,9 +32,13 @@ const couponSchema = new Schema({
       type:String,
       required:true,
       
+     },
+     isDeleted:{
+      type:Boolean,
+      default:false
      }
 
-});
+},{timestamps:true});
 
 const coupon = mongoose.model("coupon",couponSchema);
 module.exports = coupon;

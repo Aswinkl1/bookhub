@@ -4,10 +4,10 @@ const User = require("../models/user.schema")
 // admin
 const addCoupons = async (req,res)=>{
     try{
-
+        console.log(req.body)
     const {name,code,discountPercentage,maxDiscountAmount,minCartAmount,expiryDate,status} = req.body
     if(!name || !code || !discountPercentage || !maxDiscountAmount || !minCartAmount || !expiryDate || !status){
-        res.status(400).json({message:"please input necesory details"})
+        return res.status(400).json({message:"please input necesory details"})
     }
 
      // Check if coupon code already exists (to prevent duplicates)
@@ -36,13 +36,21 @@ const addCoupons = async (req,res)=>{
 
 }
 
+const renderCouponPage = async (req,res)=>{
+    try {
+        res.render("coupons2")
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 
 const loadCouponPage = async (req,res)=>{
     console.log("khd")
 // 📌 Get Coupons with Search, Sort, Filter & Pagination
     try {
         let page = req.query.page 
-        let { search, sort, status,  limit = 5 } = req.query;
+        let { search, limit = 5 } = req.query;
         let filter = {};
 
         // Convert page & limit to numbers
@@ -58,39 +66,27 @@ const loadCouponPage = async (req,res)=>{
             ];
         }
 
-        // 🔄 Filter by Status (active / non-active)
-        if (status) {
-            filter.status = status;
-        }
 
-        // 🗂 Sorting Options (Newest or Expiry Date)
-        let sortOption = {};
-        if (sort === "newest") {
-            sortOption.createdAt = -1; // Newest first
-        } else if (sort === "expiry") {
-            sortOption.expiryDate = 1; // Expiry date ascending
-        }
-
+        
         // 📌 Fetch Coupons with Filters, Sorting & Pagination
         const totalCoupons = await Coupon.countDocuments(filter);
         const coupons = await Coupon.find(filter)
-            .sort(sortOption)
+            .sort({updatedAt:-1})
             .skip(skip)
             .limit(limit);
 
-        // res.status(200).json({
-        //     totalCoupons,
-        //     currentPage: page,
-        //     totalPages: Math.ceil(totalCoupons / limit),
-        //     coupons
-        // });
-        res.render("coupons",{
+        res.status(200).json({
             totalCoupons,
-            currentPage:page,
+            currentPage: page,
             totalPages: Math.ceil(totalCoupons / limit),
             coupons
-
-        })
+        });
+        // res.render("coupons",{
+        //     totalCoupons,
+        //     currentPage:page,
+        //     totalPages: Math.ceil(totalCoupons / limit),
+        //     coupons
+        // })
 
         console.log(coupons)
 
@@ -206,6 +202,7 @@ const deleteCoupon = async (req,res)=>{
     }
 }
 module.exports={
+    renderCouponPage,
     loadCouponPage,
     addCoupons,
     getEditCoupon,

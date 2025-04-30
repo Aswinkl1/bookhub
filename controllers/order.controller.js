@@ -22,7 +22,7 @@ const payWithRazorpay = async (req,res)=>{
         currency:"INR"
     }
 
-
+    
     razorpayInstance.orders.create(options,function (err,order){
         if(err){
             console.log(err)

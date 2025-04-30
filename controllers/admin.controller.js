@@ -21,7 +21,7 @@ const postLogin = async (req,res)=>{
         console.log(passwordMatch)
         if(passwordMatch){
             req.session.admin = true
-            res.redirect('/admin')
+            res.redirect('/admin/dashboard')
         }else{
             console.log("password miss");
             

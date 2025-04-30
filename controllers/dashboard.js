@@ -85,15 +85,28 @@ const renderAdminDashboard = async (req,res) =>{
 }
 
 function _chartFilter(filterData){
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 0 (Sunday) to 6 (Saturday)
+
+    // Find the previous Sunday
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - dayOfWeek);
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    // End of today
+    const endOfToday = new Date(today);
+    endOfToday.setHours(23, 59, 59, 999);
     let filter = {}
     if(filterData == "weekly"){
         filter.order = [
             {
                 $match: {
-                  createdAt: {
-                    $gte: new Date(new Date().setDate(new Date().getDate() - 7)) // Last 7 days
+                    createdAt: {
+                      $gte: startOfWeek,
+                      $lte: endOfToday
+                    },
+
                   },
-                }
             },
             {
             $group:{
@@ -109,11 +122,13 @@ function _chartFilter(filterData){
         filter.sales = [
             {
                 $match: {
-                  createdAt: {
-                    $gte: new Date(new Date().setDate(new Date().getDate() - 7)) // Last 7 days
+                    createdAt: {
+                      $gte: startOfWeek,
+                      $lte: endOfToday
+                    },
+                    status: { $in: ['Delivered', 'Return-cancelled'] }
+
                   },
-                  status: { $in: ['Delivered', 'Return-cancelled'] }
-                }
             },
             {
                 $group:{
@@ -129,10 +144,12 @@ function _chartFilter(filterData){
         filter.user = [
             {
                 $match: {
-                  createdAt: {
-                    $gte: new Date(new Date().setDate(new Date().getDate() - 7)) // Last 7 days
+                    createdAt: {
+                      $gte: startOfWeek,
+                      $lte: endOfToday
+                    },
+
                   },
-                }
             },
             {
                 $group:{
@@ -149,11 +166,13 @@ function _chartFilter(filterData){
         filter.category = [
             {
                 $match: {
-                  createdAt: {
-                    $gte: new Date(new Date().setDate(new Date().getDate() - 7)) // Last 7 days
+                    createdAt: {
+                      $gte: startOfWeek,
+                      $lte: endOfToday
+                    },
+                    status: { $in: ['Delivered', 'Return-cancelled'] }
+
                   },
-                  status: { $in: ['Delivered', 'Return-cancelled'] }
-                }
             },
             {$unwind:"$items"},
             {$lookup:{
@@ -432,7 +451,7 @@ const loadDashboardChart = async (req,res) =>{
                 return data.reduce((acc, cur) => {
                     if (timeFilter === "weekly") acc.label.push(label[cur._id - 1] ?? cur.categoryName ?? "wed");
                     else if (timeFilter === "yearly") acc.label.push(cur._id?.toString() ?? cur.categoryName ?? "wed");
-                    else acc.label.push(label[cur._id - 1]);
+                    else acc.label.push(label[cur._id - 1] ??  cur.categoryName );
                     acc.value.push(cur.totalOrders || cur.totalRevenue||cur.totalrevenue || cur.totalUsers || cur.totalQuantity); 
                     return acc;
                 }, { label: [], value: [] });
@@ -446,14 +465,15 @@ const loadDashboardChart = async (req,res) =>{
 
         let categoryData = await Order.aggregate(filter.category)
         
-        console.log(salesData)
         orderData = _formatChartData(orderData,timeFilter)
         // console.log(orderData)
         salesData = _formatChartData(salesData,timeFilter)
+        
+        // console.log(salesData)
         userData = _formatChartData(userData,timeFilter)
         // console.log(userData)
         categoryData = _formatChartData(categoryData,timeFilter)
-        
+        console.log(categoryData)
         orderData = fillLabels(orderData,label)
         userData = fillLabels(userData,label)
         salesData = fillLabels(salesData,label)
@@ -472,11 +492,16 @@ function fillLabels(data, fullLabels) {
   for (let i = 0; i < data.label.length; i++) {
     labelToValue[data.label[i]] = data.value[i];
   }
-
+  if(data.label.length == 0){
+    return { label: fullLabels, value: [0] }
+  }
   // Create full label and value arrays
   const newLabels = [];
   const newValues = [];
-
+  const index = fullLabels.indexOf(data.label[data.label.length -1])
+//   console.log(index)
+  fullLabels = fullLabels.slice(0,index +1)
+//   console.log(fullLabels)
   for (let label of fullLabels) {
     newLabels.push(label);
     newValues.push(labelToValue[label] !== undefined ? labelToValue[label] : 0);

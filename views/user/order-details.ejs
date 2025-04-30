@@ -709,7 +709,7 @@
         </div>
     </div>
     <!-- Bootstrap JS Bundle with Popper -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script> -->
 
 
     <script>
@@ -849,14 +849,22 @@
 
 
 
-        function closeModal(params) {
-            $('.modal').modal('hide');
-            setTimeout(() => {
-                $('.modal-backdrop').remove();
-                $('body').removeClass('modal-open');
-            }, 300); // Wait for animation to complete
+        // function closeModal(params) {
+        //     $('.modal').modal('hide');
+        //     setTimeout(() => {
+        //         $('.modal-backdrop').remove();
+        //         $('body').removeClass('modal-open');
+        //     }, 300); // Wait for animation to complete
 
+        // }
+        function closeModal(params) {
+            const modal = $('.modal');
+            modal.on('hidden.bs.modal', () => {
+                $('body').removeClass('modal-open').removeAttr('style');
+            });
+            modal.modal('hide');
         }
+
 
         function showAlert(icon,title,message){
             Swal.fire({
