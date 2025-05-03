@@ -18,7 +18,7 @@ const loadCheckout = async (req,res)=>{
        // return res.status(400).json({message:"cart is empty",redirect:"/cart"})
        return res.redirect('/cart')
       }
-      const availableCoupon = await Coupon.find({minCartAmount:{$lte:cart.totalPrice},expiryDate:{$gte: new Date()}})
+      const availableCoupon = await Coupon.find({minCartAmount:{$lte:cart.totalPrice},expiryDate:{$gte: new Date()},status:"1",isDeleted:false})
       const totalRegularprice = cart.items.reduce((acc,curr)=>{
       
        acc += parseInt(curr.productId.regularPrice * curr.quantity)

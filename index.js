@@ -13,8 +13,28 @@ const mongoStore = require('connect-mongo');
 const User = require('./models/user.schema')
 const Cart = require("./models/cart.schema")
 const Wishlist = require("./models/wishlist.schema")
+const Coupon = require("./models/coupon.schema")
 db()
+const cron = require('node-cron');
 
+// Runs every 8 hours at minute 0 (00:00, 08:00, 16:00)
+//always make sure db is fully connected before running cron
+cron.schedule("0 */8 * * *", async () => {
+    try {
+      const result = await Coupon.updateMany(
+        {
+          expiryDate: { $lt: new Date() },
+          status: "1",
+        },
+        { $set: { status: "0" } }
+      );
+  
+      console.log(`⏰ Cron ran: ${result.modifiedCount} coupons marked as expired.`);
+    } catch (err) {
+      console.error("❌ Cron job failed:", err);
+    }
+  });
+  
 
 // app.use(morgan('dev'))
 app.set('view engine','ejs')

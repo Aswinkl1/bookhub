@@ -680,7 +680,7 @@ const getOrderData = async (req,res)=>{
         let {search,status,page=1,} = req.query
         // status= "Pending"
         // search = "sanjay"
-        let limit = 10
+        let limit = 5
         const skip = (page -1) * limit
         let searchQuery = {$match:{}}
     
@@ -706,7 +706,7 @@ const getOrderData = async (req,res)=>{
             }
         }
     
-        const order = await Order.aggregate([
+        const result = await Order.aggregate([
             statusQuery,
             {
                 $lookup: {
@@ -727,27 +727,36 @@ const getOrderData = async (req,res)=>{
             },
             {
                 $sort: {
-                    returnPendingPriority: 1,       // Put "Return-pending" first
-                    orderDate: -1                   // Then sort by newest
+                    returnPendingPriority: 1,
+                    orderDate: -1
                 }
             },
             {
-                $project: {
-                    _id: 1,
-                    status: 1,
-                    orderdate: 1,
-                    orderId: 1,
-                    totalPrice: 1,
-                    "user.name": 1,
-                    "user.email": 1
+                $facet: {
+                    metadata: [{ $count: "total" }],
+                    data: [
+                        { 
+                            $project: {
+                                _id: 1,
+                                status: 1,
+                                orderDate: 1,
+                                orderId: 1,
+                                totalPrice: 1,
+                                "user.name": 1,
+                                "user.email": 1
+                            }
+                        },
+                        { $skip: skip },
+                        { $limit: limit }
+                    ]
                 }
             },
-            { $skip: skip },
-            { $limit: limit }
-        ])
+            
+        ]);
         
-    
-        return res.status(200).json({data:order})
+        
+        console.log(result[0]?.metadata[0]?.total)
+        return res.status(200).json({data:result[0].data,currentPage:+page,totalPages:Math.ceil(result[0]?.metadata[0]?.total/limit)})
     } catch (error) {
         console.log(error)
         return res.status(400).json({error:"internal server error"})

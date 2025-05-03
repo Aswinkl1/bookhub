@@ -18,7 +18,7 @@ const addCoupons = async (req,res)=>{
 
     const coupon = new Coupon({
         name:name,
-        code:code,
+        code:code.trim(),
         discountPercentage:discountPercentage,
         maxDiscountAmount:maxDiscountAmount,
         minCartAmount:minCartAmount,
@@ -60,16 +60,36 @@ const loadCouponPage = async (req,res)=>{
 
         // 🔍 Search by Name or Code
         if (search) {
-            filter.$or = [
-                { name: { $regex: search, $options: "i" } },
-                { code: { $regex: search, $options: "i" } }
-            ];
+            filter.$and = [
+                { isDeleted: false },
+                {
+                  $or: [
+                    { name: { $regex: search, $options: "i" } },
+                    { code: { $regex: search, $options: "i" } }
+                  ]
+                }
+              ];
+        }else{
+            filter.isDeleted = false
         }
 
-
+        console.log(filter)
         
         // 📌 Fetch Coupons with Filters, Sorting & Pagination
         const totalCoupons = await Coupon.countDocuments(filter);
+        const stats = await Coupon.aggregate([
+            {
+                $facet:{
+                    total:[{$match:{isDeleted:false}},{$count:"count"}],
+                    active:[{$match:{isDeleted:false,status:"1"}},{$count:"count"}],
+                    inActive:[{$match:{isDeleted:false,status:"0"}},{$count:"count"}]
+                }
+            }
+        ])
+        const total = stats[0]?.total[0]?.count || 0
+        const active = stats[0]?.active[0]?.count || 0
+        const inActive = stats[0]?.inActive[0]?.count || 0
+        
         const coupons = await Coupon.find(filter)
             .sort({updatedAt:-1})
             .skip(skip)
@@ -79,7 +99,10 @@ const loadCouponPage = async (req,res)=>{
             totalCoupons,
             currentPage: page,
             totalPages: Math.ceil(totalCoupons / limit),
-            coupons
+            coupons,
+            totalCoupons:total,
+            activeCoupon:active,
+            inActiveCoupon:inActive
         });
         // res.render("coupons",{
         //     totalCoupons,
@@ -88,7 +111,7 @@ const loadCouponPage = async (req,res)=>{
         //     coupons
         // })
 
-        console.log(coupons)
+        
 
     } catch (error) {
         res.status(500).json({ message: "Internal server error", error });
@@ -193,7 +216,8 @@ const deleteCoupon = async (req,res)=>{
         }
 
         // Delete the coupon
-        await Coupon.findByIdAndDelete(couponId);
+        coupon.isDeleted = true
+        await coupon.save()
 
         return res.json({ success: true, message: "Coupon deleted successfully" });
     } catch (error) {

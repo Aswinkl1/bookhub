@@ -305,43 +305,35 @@
         <h2 class="page-title">Coupon Management</h2>
       </div>
       
-      <div class="row stats-row">
-        <div class="col-md-3 mb-3">
-          <div class="stat-card">
+      <div class="row stats-row d-flex justify-content-between">
+        <div class="col-md-4 mb-3 text-center  align-item-center ">
+          <div class="stat-card d-flex align-items-center flex-column">
             <div class="stat-icon icon-active">
               <i class="fas fa-check-circle"></i>
             </div>
-            <div class="stat-value">42</div>
+            <div class="stat-value" id="active">42</div>
             <div class="stat-label">Active Coupons</div>
           </div>
         </div>
-        <div class="col-md-3 mb-3">
-          <div class="stat-card">
+        <div class="col-md-4 mb-3">
+          <div class="stat-card d-flex align-items-center flex-column">
             <div class="stat-icon icon-expired">
               <i class="fas fa-clock"></i>
             </div>
-            <div class="stat-value">8</div>
-            <div class="stat-label">Expired Coupons</div>
+            <div class="stat-value" id="inActive">8</div>
+            <div class="stat-label">InActive Coupons</div>
           </div>
         </div>
-        <div class="col-md-3 mb-3">
-          <div class="stat-card">
+        <div class="col-md-4 mb-3">
+          <div class="stat-card d-flex align-items-center flex-column">
             <div class="stat-icon icon-total">
               <i class="fas fa-ticket-alt"></i>
             </div>
-            <div class="stat-value">50</div>
+            <div class="stat-value" id="total">50</div>
             <div class="stat-label">Total Coupons</div>
           </div>
         </div>
-        <div class="col-md-3 mb-3">
-          <div class="stat-card">
-            <div class="stat-icon icon-value">
-              <i class="fas fa-dollar-sign"></i>
-            </div>
-            <div class="stat-value">$12,500</div>
-            <div class="stat-label">Total Discount Value</div>
-          </div>
-        </div>
+        
       </div>
       
       <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
@@ -401,24 +393,16 @@
           </tbody>
         </table>
       </div>
-      
+      <div id="no-user-label"></div>
       <div class="d-flex justify-content-between align-items-center mt-4">
         <div>
-          <p class="text-muted">Showing 1 to 5 of 50 entries</p>
+          <p class="text-muted" hidden>Showing 1 to 5 of 50 entries</p>
         </div>
         <nav aria-label="Page navigation">
-          <ul class="pagination">
-            <li class="page-item disabled">
-              <a class="page-link" href="#" tabindex="-1"><i class="fas fa-chevron-left"></i></a>
-            </li>
+          <ul class="pagination" id="pagination">
+            
             <li class="page-item active"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item"><a class="page-link" href="#">4</a></li>
-            <li class="page-item"><a class="page-link" href="#">5</a></li>
-            <li class="page-item">
-              <a class="page-link" href="#"><i class="fas fa-chevron-right"></i></a>
-            </li>
+            
           </ul>
         </nav>
       </div>
@@ -445,7 +429,7 @@
               <div class="col-md-6">
                 <label for="code" class="form-label">Coupon Code</label>
                 <div class="input-group">
-                  <input type="text" class="form-control" onblur="isEmpty(event)" name="code" id="code" placeholder="e.g. SUMMER25" required>
+                  <input type="text" class="form-control" onblur="isEmpty(event)" value=" " name="code" id="code" placeholder="e.g. SUMMER25" required>
                   <button class="btn btn-outline-secondary" type="button" id="generateCode">Generate</button>
                 </div>
                 <div id="errorForCouponCode"></div>
@@ -506,7 +490,7 @@
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" id="cancel">Cancel</button>
           <button type="button" class="btn btn-primary" id="saveCoupon">Save Coupon</button>
         </div>
       </div>
@@ -514,29 +498,30 @@
   </div>
 
   <!-- Edit Coupon Modal -->
-  <div class="modal fade" id="addCouponModal" tabindex="-1" aria-labelledby="addCouponModalLabel" aria-hidden="true">
+  <div class="modal fade" id="editCouponModal" tabindex="-1" aria-labelledby="editCouponModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="addCouponModalLabel"><i class="fas fa-ticket-alt me-2"></i>Add New Coupon</h5>
+          <h5 class="modal-title" id="editCouponModalLabel"><i class="fas fa-ticket-alt me-2"></i>Edit New Coupon</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form id="couponForm">
+          <form id="editCouponForm">
+            <input type="text" hidden id="id" name="id">
             <div class="row mb-3">
               <div class="col-md-6">
                 <label for="description" class="form-label">Description</label>
-                <input type="text" class="form-control" id="name" name="name" onblur="isOnlyletters(event)" placeholder="Enter coupon description" required>
-                <div id="errorForName"></div>
+                <input type="text" class="form-control" id="editName" name="name" onblur="isOnlyletters(event,'Edit')" placeholder="Enter coupon description" required>
+                <div id="errorForNameEdit"></div>
               </div>
 
               <div class="col-md-6">
                 <label for="code" class="form-label">Coupon Code</label>
                 <div class="input-group">
-                  <input type="text" class="form-control" onblur="isEmpty(event)" name="code" id="code" placeholder="e.g. SUMMER25" required>
-                  <button class="btn btn-outline-secondary" type="button" id="generateCode">Generate</button>
+                  <input type="text" class="form-control" onblur="isEmpty(event,'Edit')" name="code" id="editCode" placeholder="e.g. SUMMER25" required>
+                  <button class="btn btn-outline-secondary" type="button" id="generateCodeEdit">Generate</button>
                 </div>
-                <div id="errorForCouponCode"></div>
+                <div id="errorForCouponCodeEdit"></div>
 
               </div>
             </div>
@@ -551,10 +536,10 @@
               <div class="col-md-6">
                 <label for="discount" class="form-label">Discount Percentage</label>
                 <div class="input-group">
-                  <input type="number" class="form-control" name="discountPercentage" id="percentage" min="0" onblur="validationForPercentage(event)" placeholder="Enter discount value" required>
+                  <input type="number" class="form-control" name="discountPercentage" id="editPercentage" min="0" onblur="validationForPercentage(event,'Edit')" placeholder="Enter discount value" required>
                   <span class="input-group-text">%</span>
                 </div>
-                <div id="errorForPercentage"></div>
+                <div id="errorForPercentageEdit"></div>
               </div>
             </div>
             <div class="row mb-3">
@@ -562,40 +547,39 @@
                 <label for="minAmount" class="form-label">Minimum Purchase Amount ($)</label>
                 <div class="input-group">
                   <span class="input-group-text">$</span>
-                  <input type="number" class="form-control" name="minCartAmount" id="minAmount" min="0" step="0.01" placeholder="0.00" onblur="validateMinCartAmount(event)" required>
+                  <input type="number" class="form-control" name="minCartAmount" id="editMinAmount" min="0" step="0.01" placeholder="0.00" onblur="validateMinCartAmount(event,'Edit')" required>
                 </div>
-                <div id="errorForMinCartAmount"></div>
+                <div id="errorForMinCartAmountEdit"></div>
 
               </div>
               <div class="col-md-6">
                 <label for="maxDiscount" class="form-label">Maximum Discount ($)</label>
                 <div class="input-group">
                   <span class="input-group-text">$</span>
-                  <input type="number" class="form-control" name="maxDiscountAmount" id="maxDiscount" min="0" step="0.01" placeholder="0.00" onblur="validateMaxDiscount(event)" required>
+                  <input type="number" class="form-control" name="maxDiscountAmount" id="editMaxDiscount" min="0" step="0.01" placeholder="0.00" onblur="validateMaxDiscount(event,'Edit')" required>
                 </div>
-                <div id="errorForMaxDiscount"></div>
+                <div id="errorForMaxDiscountEdit"></div>
               </div>
             </div>
             <div class="row mb-3">
               <div class="col-md-6">
                 <label for="expiryDate" class="form-label">Expiry Date</label>
-                <input type="date" name="expiryDate" class="form-control" id="expiryDate" required>
-                <div id="errorForExpiryDate"></div>
+                <input type="date" name="expiryDate" class="form-control" id="editExpDate" required>
+                <div id="errorForExpiryDateEdit"></div>
               </div>
               <div class="col-md-6">
                 <label for="status" class="form-label">Status</label>
-                <select class="form-select" name="status" id="status" required>
+                <select class="form-select" name="status" id="EditIsActive" required>
                   <option value="1">Active</option>
                   <option value="0">Inactive</option>
                 </select>
               </div>
             </div>
-            
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-primary" id="saveCoupon">Save Coupon</button>
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"  id="cancelEdit" >Cancel</button>
+          <button type="button" class="btn btn-primary" id="saveEditCoupon">Save Coupon</button>
         </div>
       </div>
     </div>
@@ -603,10 +587,39 @@
 
   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script> -->
   <script>
+    let page;
+    let search;
+    function pagination(totalPages,currentPage){
 
+        const parent = document.getElementById("pagination")
+        parent.innerHTML = ""
+        //<li class="page-item active"><a class="page-link" href="#">1</a></li>
+        //
+        for(let i=1;i<=totalPages;i++ ){
+          const child = document.createElement("li")
+          child.classList.add("page-item")
+          if(currentPage == i){
+            child.classList.add("active")
+          }
+          child.innerHTML = ` <a class="page-link" onclick="changePage(${i})"> ${i}</a>`    
+          parent.appendChild(child)
+        }
+
+    }
+
+    function changePage(Page){
+      page = Page
+      getCoupon(search,page)
+    }
     function renderDataToTable(coupons) {
       const parent =  document.getElementById("t-body")
       parent.innerHTML = ""
+      if(coupons.length == 0){
+        document.getElementById("no-user-label").innerHTML = `<p class="text-center">No coupon found</p>`
+        return
+      }
+        document.getElementById("no-user-label").innerHTML = ""
+      
       console.log(coupons)
       coupons.forEach((coupon)=>{
         let status;
@@ -618,6 +631,7 @@
         }
         const child = document.createElement("tr")
         child.innerHTML = `
+                        <tr class="align-middle" id="${coupon._id}" data-id="${coupon._id}" hidden>
             <td>${coupon.name}</td>
             <td><span class="coupon-code">${coupon.code}</span></td>
             <td>${coupon.discountPercentage}%</td>
@@ -626,8 +640,8 @@
             <td>${coupon.expiryDate.toString().split('T')[0]}</td>
             ${status}
             <td>
-            <button class="btn btn-action btn-edit"><i class="fas fa-edit"></i></button>
-            <button class="btn btn-action btn-delete"><i class="fas fa-trash"></i></button>
+            <button class="btn btn-action btn-edit" onclick="edit('${coupon._id}')"><i class="fas fa-edit" ></i></button>
+            <button class="btn btn-action btn-delete" onclick="deleteCoupon('${coupon._id}')"><i class="fas fa-trash" ></i></button>
             </td>
         `
 
@@ -636,14 +650,19 @@
     }
 
 
+
     
-    async function getCoupon(search ="") {
-      const response = await fetch(`/admin/api/coupon?search=${search}`)
+    async function getCoupon(search ="",page=1) {
+      const response = await fetch(`/admin/api/coupon?search=${search}&page=${page}`)
 
       const jsonResponse = await response.json()
       if(response.ok){
         console.log(jsonResponse)
         renderDataToTable(jsonResponse.coupons)
+        pagination(jsonResponse.totalPages,jsonResponse.currentPage)
+        document.getElementById("active").innerText = jsonResponse.activeCoupon
+        document.getElementById("inActive").innerText = jsonResponse.inActiveCoupon
+        document.getElementById("total").innerText = jsonResponse.totalCoupons
       }else{
         console.log("error",jsonResponse)
       }
@@ -670,6 +689,14 @@
       }
       document.getElementById('code').value = code;
     });
+    document.getElementById('generateCodeEdit').addEventListener('click', function() {
+      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let code = '';
+      for (let i = 0; i < 8; i++) {
+        code += characters.charAt(Math.floor(Math.random() * characters.length));
+      }
+      document.getElementById('editCode').value = code;
+    });
     
     // Change discount input type
     document.getElementById('discountType').addEventListener('change', function() {
@@ -687,34 +714,35 @@
             
     }
 
-    function validateMinCartAmount(num){
+    function validateMinCartAmount(num,option =""){
         num = num?.target?.value || num
         if(!isNegative(num)){
-            document.getElementById("errorForMinCartAmount").innerHTML = '<p class="text-danger"><small> Number should be positive</small></p>'
+            document.getElementById("errorForMinCartAmount"+option).innerHTML = '<p class="text-danger"><small> Number should be positive</small></p>'
         }else{
-            document.getElementById("errorForMinCartAmount").innerHTML =""
+            document.getElementById("errorForMinCartAmount"+option).innerHTML =""
             return true
 
         }
     }
 
-    function validateMaxDiscount(num){
+    function validateMaxDiscount(num,option=""){
         num = num?.target?.value || num
         const minCartValue = document.getElementById("minAmount").value || document.getElementById("editMinAmount")?.value
-        console.log( typeof +minCartValue);
+        console.log(+minCartValue);
         
         if(!isNegative(num)){
-            document.getElementById("errorForMaxDiscount").innerHTML = '<p class="text-danger"><small> Number should be positive</small></p>'
-        }else if(minCartValue < num){
+            document.getElementById("errorForMaxDiscount"+option).innerHTML = '<p class="text-danger"><small> Number should be positive</small></p>'
+        }else if(+minCartValue < num){
             console.log("djhfjk")
-            document.getElementById("errorForMaxDiscount").innerHTML = '<p class="text-danger"><small>Discount should always be less that total amount</small></p>'
+            document.getElementById("errorForMaxDiscount"+option).innerHTML = '<p class="text-danger"><small>Discount should always be less that total amount</small></p>'
  
         }else{
-            document.getElementById("errorForMaxDiscount").innerHTML = ''
+            document.getElementById("errorForMaxDiscount"+option).innerHTML = ''
             return true
 
         }
     }
+    
     
     document.getElementById("expiryDate").addEventListener("change", function() {
     const expDate = this.value;
@@ -725,6 +753,19 @@
         this.value = ""; // Clear input if invalid
     }
 });
+//edit exp
+    document.getElementById("expiryDate").addEventListener("change", function() {
+    const expDate = this.value;
+    document.getElementById("errorForExpiryDateEdit").innerHTML = ""
+    if (!isFutureDate(expDate)) {
+        document.getElementById("errorForExpiryDateEdit").innerHTML = '<p class="text-danger"><small>Expiration date must be in the future!</small></p>'
+ 
+        this.value = ""; // Clear input if invalid
+    }
+});
+  function checkExpiry(){
+
+  }
     function isFutureDate(expDate) {
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Remove time part to compare only dates
@@ -733,37 +774,38 @@
     return inputDate > today; // Check if input date is in the future
 }
 
-    function isOnlyletters(str){
+    function isOnlyletters(str,option=""){
         str = str?.target?.value || str
         if(!(/^[A-Za-z]+$/.test(str) || /\S/.test(str))){
-        document.getElementById("errorForName").innerHTML = '<p class="text-danger"><small>please enter a valid name</small></p>'
+        document.getElementById("errorForName"+option).innerHTML = '<p class="text-danger"><small>please enter a valid name</small></p>'
         }else{
-        document.getElementById("errorForName").innerHTML = ''
+        document.getElementById("errorForName"+option).innerHTML = ''
         return true
 
 
         }
     }
 
-    function validationForPercentage(num){
+    function validationForPercentage(num,option=""){
         num = num?.target?.value || num
         console.log(typeof num)
         console.log(!(num >=0 && num <= 100))
         if(!(num >=0 && num <= 100)){
-        document.getElementById("errorForPercentage").innerHTML = '<p class="text-danger"><small>Enter a valid percentage under 100</small></p>'
+        document.getElementById("errorForPercentage"+option).innerHTML = '<p class="text-danger"><small>Enter a valid percentage under 100</small></p>'
         }else{
-        document.getElementById("errorForPercentage").innerHTML = ''
+        document.getElementById("errorForPercentage"+option).innerHTML = ''
         
         return true
         }
     }
 
-    function isEmpty(value){
-      value = value?.target?.value || value
-      if(value?.trim() == ""){
-        document.getElementById("errorForCouponCode").innerHTML = '<p class="text-danger"><small>Enter a valid coupon</small></p>'
+    function isEmpty(value,option=""){
+      values = value?.target?.value || value
+      console.log(value.target)
+      if(values?.trim() == ""){
+        document.getElementById("errorForCouponCode"+option).innerHTML = '<p class="text-danger"><small>Enter a valid coupon</small></p>'
       }else{
-        document.getElementById("errorForCouponCode").innerHTML = ""
+        document.getElementById("errorForCouponCode"+option).innerHTML = ""
         return true
       }
 
@@ -807,7 +849,7 @@
     const jsonResponce = await responce.json()
 
     if(responce.ok){
-
+        getCoupon()
         Swal.fire({
         icon: "success",
         title: jsonResponce.message,
@@ -896,11 +938,11 @@ async  function edit(id){
     // Validation checks
     console.log("max"+ maxDiscount)
     if (
-        !validateMaxDiscount(maxDiscount) ||
-        !validateMinCartAmount(minCartAmount) ||
-        !validationForPercentage(percentage) ||
-        !isFutureDate(expiryDate) ||
-        !isOnlyletters(name)
+        !validateMaxDiscount(maxDiscount,'Edit') ||
+        !validateMinCartAmount(minCartAmount,'Edit') ||
+        !validationForPercentage(percentage,'Edit') ||
+        !isFutureDate(expiryDate,'Edit') ||
+        !isOnlyletters(name,'Edit')
     ) {
 
         showAlert("error", "Please enter valid values");
@@ -928,10 +970,13 @@ async  function edit(id){
         const jsonResponse = await response.json();
 
         if (response.ok) {
-            updateCouponRow(jsonResponse.data)
+            // updateCouponRow(jsonResponse.data)
+        getCoupon()
+
             showAlert("success", jsonResponse.message);
             
-            // Close modal and reset form
+            // // Close modal and reset form
+            console.log(document.getElementById("cancelEdit"))
             document.getElementById("cancelEdit").click();
             document.getElementById("editCouponForm").reset();
         } else {
@@ -945,6 +990,46 @@ async  function edit(id){
  })
 
 
+ async function deleteCoupon(couponId) {
+    // Show confirmation popup
+    const confirmDelete = await Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to recover this coupon!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!"
+    });
+
+    if (confirmDelete.isConfirmed) {
+        try {
+            const response = await fetch(`coupon/deleteCoupon/${couponId}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                // Show success message
+                Swal.fire("Deleted!", result.message, "success");
+
+                getCoupon()
+                
+            } else {
+                // Show error message
+                Swal.fire("Error!", result.message, "error");
+            }
+        } catch (error) {
+            console.error("Error deleting coupon:", error);
+            Swal.fire("Error!", "Something went wrong!", "error");
+        }
+    }
+}
+
   
 
 
@@ -952,7 +1037,7 @@ async  function edit(id){
 
 
     document.getElementById("searchInput").addEventListener("input",(e)=>{
-      debouncedFetch(e.target.value)
+      debouncedFetch(e.target.value.trim())
     })
 
     document.addEventListener("DOMContentLoaded",()=>{

@@ -39,9 +39,15 @@ const addTocart = async (req,res)=>{
 
   if(existingProductIndex > -1){
     const existingProduct = cart.items[existingProductIndex]
-    existingProduct.quantity = quantity
-    existingProduct.price = price
-    cart.items[existingProductIndex] = existingProduct
+    console.log()
+    if(+existingProduct.quantity -1 == quantity || +existingProduct.quantity +1 == quantity){
+      existingProduct.quantity = quantity
+      existingProduct.price = price
+      cart.items[existingProductIndex] = existingProduct
+      
+    }else{
+      return res.status(200).json({message:"product is already in the cart"});
+    }
     
 
   }else{
@@ -55,7 +61,7 @@ const addTocart = async (req,res)=>{
     {new:true}
   )
   const totalPrice = result.items[existingProductIndex]?.totalPrice || ""
-
+  console.log(quantity)
   res.status(200).json({message:"product added to cart",quantity:quantity,totalPrice:totalPrice});
 }catch (error){
 

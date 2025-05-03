@@ -30,13 +30,7 @@
                         <option value="Return-pending">Return-pending</option>
                     </select>
                 </div>
-                <div class="col-lg-2 col-6 col-md-3">
-                    <select class="form-select">
-                        <option>Show 20</option>
-                        <option>Show 30</option>
-                        <option>Show 40</option>
-                    </select>
-                </div>
+                
             </div>
         </header> <!-- card-header end// -->
         <div class="card-body">
@@ -81,13 +75,47 @@
     </div> <!-- card end// -->
     
 </section> <!-- content-main end// -->
-<!-- Pagination -->
 
+<!-- Pagination -->
+<div class="p-3 bg-white border-top">
+    <nav aria-label="Customer list pagination">
+      <ul class="pagination custom-pagination justify-content-center mb-0" id="pagination">
+        
+
+        
+
+        
+      </ul>
+    </nav>
+  </div>
 
 <script>
-
     let search = ""
     let status = ""
+    let page = 1
+
+    function pagination(totalPages,currentPage){
+        console.log(totalPages)
+        console.log(currentPage)
+        const parent = document.getElementById("pagination")
+        parent.innerHTML = ""
+        for(let i=1;i<=totalPages;i++ ){
+        const child = document.createElement("li")
+        child.classList.add("page-item")
+        if(currentPage == i){
+            child.classList.add("active")
+        }
+        child.innerHTML = ` <a class="page-link" onclick="changePage(${i})"> ${i}</a>`    
+        parent.appendChild(child)
+        }
+
+    }
+    function changePage(Page){
+      page = Page
+      fetchOrderList(search,status,page)
+    }
+
+    
     function insertOrderDetails(orders){
         const parent = document.getElementById("t-body")
 
@@ -101,7 +129,7 @@
                             <td>${order.user.email}</td>
                             <td>₹${order.totalPrice}</td>
                             <td><span class="badge rounded-pill alert-warning">${order.status}</span></td>
-                            <td>19.4.2025</td>
+                            <td>${order.orderDate.toString().split("T")[0]}</td>
                             <td class="text-end">
                                 <a href="/admin/order/${order._id}" class="btn btn-md rounded font-sm">Detail</a>
                             </td> `
@@ -114,8 +142,8 @@
     }
 
     
-    async function fetchOrderList (search="",status =""){
-        const response = await fetch(`/admin/api/order?search=${search}&status=${status}`,{
+    async function fetchOrderList (search="",status ="",page=1){
+        const response = await fetch(`/admin/api/order?search=${search}&status=${status}&page=${page}`,{
             method:"GET",
             headers:{'Content-Type':"application/json"}
         })
@@ -123,10 +151,12 @@
         const jsonResponse = await response.json()
 
         if(response.ok){
+            console.log(jsonResponse)
             insertOrderDetails(jsonResponse.data)
+            pagination(jsonResponse.totalPages,jsonResponse.currentPage)
             
         }else{
-
+            console.log("error")
         }
     }
 

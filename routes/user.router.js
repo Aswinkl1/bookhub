@@ -56,9 +56,9 @@ router.get("/account/editAddress",userAuth,address.getEditAddress)
 router.put("/account/editAddress",userAuth,address.postEditAddress)
 router.delete('/account/deleteAddress',userAuth,address.deleteAddress)
 
-// Cart 
-router.post("/cart/addToCart",userAuth,cart.addTocart)
+// Cart
 router.get('/cart',userAuth,cart.loadcartPage)
+router.post("/cart/addToCart",userAuth,cart.addTocart)
 router.patch("/cart/updatecart",userAuth,cart.addTocart)
 router.delete("/cart/removeCart",userAuth,cart.removeFromCart)
 
@@ -79,6 +79,7 @@ router.put('/returnOrder/:orderId',userAuth,order.returnOrder)
 router.put('/order/return/:productId/:orderId',userAuth,order.productReturn)
 router.post("/razorpay/create-order",userAuth,order.payWithRazorpay)
 router.get("/download-invoice/:id",order.downloadInvoice)
+
 //product -shop
 router.get('/shop',product.renderShopPage)
 router.get('/api/shop',product.fetchAvailableProducts )
