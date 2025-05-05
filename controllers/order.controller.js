@@ -16,13 +16,20 @@ const razorpayInstance = new Razorpay({
 
 
 const payWithRazorpay = async (req,res)=>{
+    const userId = req.session.userId
+
     const amount = parseInt(req.body.amount)
     const options = {
         amount: amount * 100,
         currency:"INR"
     }
 
-    
+    const cart = await Cart.findOne({ userId }).populate("items.productId");
+
+        if (!cart || cart.items.length === 0) {
+            return res.status(400).json({ message: "Your cart is empty." });
+        }
+        
     razorpayInstance.orders.create(options,function (err,order){
         if(err){
             console.log(err)
@@ -85,7 +92,7 @@ const addOrder = async (req, res) => {
         const {paymentMethod,cartTotal,couponId,totalDiscount,couponDiscount} = req.body
         console.log('coupon discount'+couponDiscount)
         const cart = await Cart.findOne({ userId }).populate("items.productId");
-
+        
         if (!cart || cart.items.length === 0) {
             return res.status(400).json({ message: "Your cart is empty." });
         }
@@ -126,11 +133,11 @@ const addOrder = async (req, res) => {
             // user.save()
         }
 
-        // Reduce stock for each product
+        // Reduce quantity for each product
         for (const item of cart.items) {
             await Product.findByIdAndUpdate(
                 item.productId._id,
-                { $inc: { stock: -item.quantity } }
+                { $inc: { quantity: -item.quantity } }
             );
         }
 
@@ -199,12 +206,15 @@ const cancelOrder = async (req,res)=>{
             return res.status(400).json({ message: "Order is already cancelled" });
         }
 
-        // Restore stock for all items
+        // Restore quantity for all items
         for (let item of order.items) {
-            
-            await Product.findByIdAndUpdate(item.productId._id, { 
-                $inc: { stock: item.quantity } 
+            console.log("item quantity",item.quantity)
+            console.log(typeof item.quantity)
+           const re= await Product.findByIdAndUpdate(item.productId._id, { 
+                $inc: { quantity: item.quantity } 
             });
+            console.log(re)
+            console.log("fuck it")
         }
 
         // Update order status
@@ -252,8 +262,8 @@ const cancelSingleProduct = async (req,res)=>{
                 return res.status(400).json({ message: "Product already cancelled" });
             }
     
-            // Restore stock
-            await Product.findByIdAndUpdate(productId, { $inc: { stock: item.quantity } });
+            // Restore quantity
+            await Product.findByIdAndUpdate(productId, { $inc: { quantity: item.quantity } });
     
             // Update product status
             item.status = "Cancelled";
@@ -300,9 +310,9 @@ const returnOrder = async (req,res)=>{
                 return res.status(400).json({ message: "Only delivered orders can be returned" });
             }
             
-            // Restore stock for all items
+            // Restore quantity for all items
             for (let item of order.items) {
-                // await Product.findByIdAndUpdate(item.productId._id, { $inc: { stock: item.quantity } });
+                // await Product.findByIdAndUpdate(item.productId._id, { $inc: { quantity: item.quantity } });
                 if(item.status != "Cancelled" && item.status != "Returned" && item.status != "Return-cancelled"){
                     item.status = "Return-pending";
                     item.returnRequest = reason;
@@ -810,12 +820,12 @@ const changeStatusForProduct = async (req,res)=>{
         const statusArray = ["Cancelled","Returned"]
         
         if(statusArray.includes(newStatus)){
-            // Reduce stock for each product
+            // Reduce quantity for each product
             for (const item of order.items) {
                 if(item.productId.toString() == productId){
                     await Product.findByIdAndUpdate(
                         item.productId,
-                        { $inc: { stock: item.quantity } }
+                        { $inc: { quantity: item.quantity } }
                     );
                 }
             }
@@ -873,7 +883,7 @@ const changeOrderStatus = async (req,res)=>{
         // for return money to the wallet 
         for(const item of order.items){
             await Product.findOneAndUpdate(item.productId,{
-                $inc: { stock: item.quantity }
+                $inc: { quantity: item.quantity }
             })
 
             // if(item.status == "Returned" || item.status == "Cancelled" ){

@@ -317,12 +317,24 @@ const fetchAvailableProducts  = async (req,res)=>{
         // sort = JSON.parse(sort)
         console.log(sort)
 
-        const products = await Product.find({isBlocked:false,productTitle:{$regex:search,$options:'i'}}).skip(skip).sort(sort).limit(limit).populate("category")
+        const listedCategories = await Category.find({ isListed: true }).select('_id');
+        const listedCategoryIds = listedCategories.map(cat => cat._id);
+        console.log(listedCategoryIds)
 
-        const totalNumberOfProduct = await Product.find({isBlocked:false}).countDocuments()
+        // Step 2: Use those IDs in your product query
+        const products = await Product.find({
+        isBlocked: false,
+        productTitle: { $regex: search, $options: 'i' },
+        category: { $in: listedCategoryIds }
+        })        
+        .skip(skip)
+        .sort(sort)
+        .limit(limit)
+        .populate("category")
+        const totalNumberOfProduct = await Product.find({isBlocked:false,productTitle: { $regex: search, $options: 'i' },
+            category: { $in: listedCategoryIds }}).countDocuments()
         const totalPages = Math.ceil(totalNumberOfProduct/limit)
         
-        // console.log(products)
         for(let product of products){
             product.salePrice = await compareOffers(product,product.category)
         }

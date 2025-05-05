@@ -512,11 +512,32 @@
             </div>
         </div>
     </div>
+    <!-- Order failure Modal -->
+    <div class="modal fade" id="orderFailureModal" tabindex="-1" aria-labelledby="orderFailureModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center py-5">
+                    <div class="success-icon">
+                        <i class="bi bi-check-circle-fill"></i>
+                    </div>
+                    <h3 class="mb-3">payment failed</h3>
+                    <!-- <p class="text-muted mb-4">Thank you for your purchase. Your order #ORD123456 has been confirmed and will be delivered soon.</p> -->
+                    <div class="d-flex justify-content-center gap-3">
+                        <a  class="btn btn-outline-primary px-4" onclick="payAgain()">Try Again</a>
+                        <a href="/" class="btn btn-primary px-4">Continue Shopping</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <!-- Bootstrap JS with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
+        function payAgain(){
+            document.getElementById("placeOrderBtn").click()
+        }
 
       async function palceOrder(paymentMethod,cartTotal,couponId,totalDiscount,couponDiscount){
         
@@ -533,6 +554,8 @@
                     const jsonResponce = await responce.json()
 
                     if(responce.ok){
+                        const orderFailureModal = new bootstrap.Modal(document.getElementById('orderFailureModal'));
+                                orderFailureModal.hide();
                         const orderSuccessModal = new bootstrap.Modal(document.getElementById('orderSuccessModal'));
                         orderSuccessModal.show();
                     }else{
@@ -583,7 +606,17 @@
                         order_id: order.id,
                         handler: function (response) {
                         palceOrder(paymentMethod,totalPrice,couponId.value,totalDiscount,couponDiscount)
+                        },
+                        modal: {
+                            ondismiss: function () {
+                                // ✅ This is called on payment cancel or fail
+                                console.log("Payment was cancelled or failed");
+                                const orderFailureModal = new bootstrap.Modal(document.getElementById('orderFailureModal'));
+                                orderFailureModal.show();
+                                
+                            }
                         }
+
                         };
                         var rzp = new Razorpay(options);
                         rzp.open();

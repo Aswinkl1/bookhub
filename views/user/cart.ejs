@@ -31,28 +31,49 @@
                             </thead>
                             <tbody>
                                 
-                                <%for(let i=0;i < cart.items.length;i++){ %>
-                                <tr id="mainId<%= cart.items[i].productId._id %>">
-                                    <td class="image product-thumbnail"><img src="/uploads/products-images/<%= cart.items[i].productId.productImage[0] %>" alt="#"></td>
-                                    <td class="product-des product-name">
-                                        <h5 class="product-name"><a href=""><%=cart.items[i].productId.productTitle%></a></h5>
-                                         
-                                    </td>
-                                    <td class="price" data-title="Price"><span><%=cart.items[i].price%></span></td>
-                                    <td class="text-center" data-title="Stock">
-                                        <div class="detail-qty border radius  m-auto">
-                                            <a class="qty-down" onclick="changeQuantity('<%= cart.items[i].productId._id %>','down')"><i class="fi-rs-angle-small-down"></i></a>
-                                            <span id="qty-val<%= cart.items[i].productId._id %>" class="qty-val"><%=cart.items[i].quantity %></span>
-
-                                            <a  class="qty-up" onclick="changeQuantity('<%= cart.items[i].productId._id %>','up')"><i class="fi-rs-angle-small-up"></i></a>
-                                        </div>
-                                    </td>
-                                    <td class="text-right" data-title="Cart">
-                                        <span id="totalPrice<%= cart.items[i].productId._id %>"><%=cart.items[i].totalPrice%></span>
-                                    </td>
-                                    <td class="action" data-title="Remove"><a  class="text-muted" onclick="removeCart('<%= cart.items[i].productId._id %>')"><i class="fi-rs-trash"></i></a></td>
-                                </tr>
-                                <%}%>
+                                <% for(let i = 0; i < cart.items.length; i++) {
+                                    const item = cart.items[i];
+                                    const product = item.productId;
+                                    const isOutOfStock = item.quantity > product.quantity || product.isBlocked || product.status != "Available" || item?.isCategoryBlocked;
+                               %>
+                               <tr id="mainId<%= product._id %>">
+                                   <td class="image product-thumbnail">
+                                       <img src="/uploads/products-images/<%= product.productImage[0] %>" alt="#">
+                                   </td>
+                                   <td class="product-des product-name">
+                                       <h5 class="product-name"><a href=""><%= product.productTitle %></a></h5>
+                                   </td>
+                                   <td class="price" data-title="Price"><span><%= item.price %></span></td>
+                                   
+                                   <% if (!isOutOfStock) { %>
+                                       <td class="text-center" data-title="Stock">
+                                           <div class="detail-qty border radius m-auto">
+                                               <a class="qty-down" onclick="changeQuantity('<%= product._id %>', 'down')">
+                                                   <i class="fi-rs-angle-small-down"></i>
+                                               </a>
+                                               <span id="qty-val<%= product._id %>" class="qty-val"><%= item.quantity %></span>
+                                               <a class="qty-up" onclick="changeQuantity('<%= product._id %>', 'up')">
+                                                   <i class="fi-rs-angle-small-up"></i>
+                                               </a>
+                                           </div>
+                                       </td>
+                                       <td class="text-right" data-title="Cart">
+                                           <span id="totalPrice<%= product._id %>"><%= item.totalPrice %></span>
+                                       </td>
+                                   <% } else { %>
+                                       <td class="text-center text-danger" colspan="2">
+                                           <strong>Out of Stock</strong>
+                                       </td>
+                                   <% } %>
+                               
+                                   <td class="action" data-title="Remove">
+                                       <a class="text-muted" onclick="removeCart('<%= product._id %>')">
+                                           <i class="fi-rs-trash"></i>
+                                       </a>
+                                   </td>
+                               </tr>
+                               <% } %>
+                               
                             </tbody>
                         </table>
                         

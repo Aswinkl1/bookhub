@@ -27,7 +27,6 @@ const productSchema = new Schema({
     
     quantity:{
         type:Number,
-
     },
     productImage:{
         type:[String],

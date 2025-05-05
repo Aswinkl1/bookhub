@@ -2,7 +2,7 @@ const Cart = require("../models/cart.schema");
 const Product = require("../models/product.schema");
 const Wishlist = require("../models/wishlist.schema");
 const {compareOffers} = require("./user.controler")
- 
+const Category = require("../models/category.schema")
 
 const addTocart = async (req,res)=>{
   try{
@@ -13,13 +13,14 @@ const addTocart = async (req,res)=>{
     return res.status(400).json({message:"Invalid Quantity"})
   }
 
-  const product = await Product.findById(productId);
+  const product = await Product.findById(productId).populate("category");
   
   if(!product){
     return res.status(400).json({message:"product not found"});
   }
 
-  if(product.isBlocked || product.status != "Available"){
+  if(product.isBlocked || product.status != "Available" || product.category.isListed == false){
+    console.log(product.category.name)
     return res.status(400).json({message:"product is blocked"});
   }
 
@@ -77,13 +78,31 @@ const loadcartPage = async (req,res)=>{
     const userId = req.session.userId
 
     console.log("hi")
-    const cart = await Cart.findOne({userId:userId}).populate("items.productId","productTitle productImage status isBlocked")
+    const cart = await Cart.findOne({userId:userId}).populate("items.productId","productTitle productImage status isBlocked quantity category")
+
     if(!cart){
       return res.status(400).render("cart",{cart:[]})
     }
-    console.log("hh")
-    console.log(cart)
     
+  // cart.items.find(async(item,index) => {
+  //     console.log("pundee")
+  //     const product = item.productId;
+  //     const category = await Category.findById(product.category)
+  //     cart.items[index].isCategoryBlocked = !category.isListed   
+
+
+  //   });
+
+
+  for(let item of cart.items){
+    const product = item.productId;
+    const category = await Category.findById(product.category)
+    // console.log(category)
+    item.isCategoryBlocked = !category.isListed
+  }
+  
+  console.log(cart.items[0].isCategoryBlocked)
+
 
    return res.render("cart",{cart:cart})
 

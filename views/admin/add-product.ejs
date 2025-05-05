@@ -202,13 +202,13 @@ function validateForm() {
   const language = document.getElementById("language").value
   const description = document.getElementById('descriptionid').value;
   const price = document.getElementsByName('regularPrice')[0].value;
-  const salePrice = document.getElementsByName('salePrice')[0].value;
+
   const category = document.getElementsByName('category')[0].value;
   const imageInput1 = document.getElementById('input1');
   const quantity = document.getElementsByName('quantity')[0].value;
   let isValid = true;
   console.log(author)
-  // Validate product name
+  // Validate product name3
   if (name.trim() === "") {
     displayErrorMessage('productName-error', 'Please enter a product name.');
     isValid = false;
@@ -251,18 +251,9 @@ function validateForm() {
     isValid = false;
   }
 
-  // Validate sale price if provided
-  if (salePrice.trim() !== "" && (!/^\d+(\.\d{1,2})?$/.test(salePrice) || parseFloat(salePrice) < 0)) {
-    displayErrorMessage('salePrice-error', 'Please enter a valid non-negative sale price.');
-    isValid = false;
-  }
+ 
   
-  // Check price comparison if sale price is provided
-  if (salePrice.trim() !== "" && parseFloat(price) <= parseFloat(salePrice)) {
-    displayErrorMessage('regularPrice-error', 'Regular price must be greater than sale price.');
-    isValid = false;
-  }
-      
+  
   
 
   // Validate image
