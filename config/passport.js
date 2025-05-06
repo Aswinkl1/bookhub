@@ -13,19 +13,28 @@ async (accessToken,refreshToken,profile,done)=>{
     try {
         let user = await User.findOne({googleId:profile.id});
         if(user){
+            
             console.log("inside user");
             console.log(user)
             return done(null,user)
-        }else{
-            console.log("inside selse");
+        }
+        user = await User.findOne({ email: profile.emails[0].value });
+        
+        if (user) {
+            user.googleId = profile.id;
+            user = await user.save();
+            return done(null, user);
+          }
+
+
             user = new User({
                 name:profile.displayName,
                 email:profile.emails[0].value,
                 googleId:profile.id
             });
-            await user.save();
+          user =  await user.save();
             return done(null,user)
-        }
+        
     } catch (error) {
         return done(error,null)
     }

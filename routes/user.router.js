@@ -31,6 +31,12 @@ router.patch("/forgetPassword-passwordChange",controller.changePasswordForForget
 //Google
 router.get('/auth/google',passport.authenticate('google',{scope:['profile','email']}))
 router.get('/auth/google/callback',passport.authenticate('google',{failureRedirect:'/signup'}),(req,res)=>{
+    if(req.user.isBlocked){
+       
+        return res.render('login',{message:"User is blocked by admin"})
+
+    }
+    req.session.userId = req.user._id
     // req.session.user
     res.redirect('/')
 })

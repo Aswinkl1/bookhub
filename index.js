@@ -29,9 +29,9 @@ cron.schedule("0 */8 * * *", async () => {
         { $set: { status: "0" } }
       );
   
-      console.log(`⏰ Cron ran: ${result.modifiedCount} coupons marked as expired.`);
+      console.log(`Cron ran: ${result.modifiedCount} coupons marked as expired.`);
     } catch (err) {
-      console.error("❌ Cron job failed:", err);
+      console.error("Cron job failed:", err);
     }
   });
   
@@ -78,7 +78,7 @@ app.use( async function(req, res, next) {
         const wishlistCount = await Wishlist.findOne({userId:userId})
         res.locals.user = user || null;
         res.locals.cartCount = cartCount?.items.length || 0
-        res.locals.wishlistCount = wishlistCount.items.length || 0
+        res.locals.wishlistCount = wishlistCount?.items.length || 0
         
     }
     next();
