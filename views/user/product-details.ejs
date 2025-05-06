@@ -14,7 +14,12 @@ figure img {
     max-height: 100%;
     object-fit: contain;
 }
-
+.drift-zoom-pane {
+  border-radius: 50% !important;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
 </style>
 
 <main class="main">
@@ -37,22 +42,31 @@ figure img {
                                 <div class="detail-gallery">
                                     <span class="zoom-icon"><i class="fi-rs-search"></i></span>
                                     <!-- MAIN SLIDES -->
-                                    <div class="product-image-slider">
-                                        <% for(let i=0;i<product.productImage.length;i++){%>
-
-                                            <figure class="border-radius-10">
-                                                <img  src="/uploads/products-images/<%=product.productImage[i]%>" alt="product image">
-                                            </figure>
-                                            <%}%>
-                                        
-
-                                    </div>
-                                    <!-- THUMBNAILS -->
-                                    <div class="slider-nav-thumbnails pl-15 pr-15">
-                                        <% for(let i=0;i<product.productImage.length;i++){%>
-                                        <div><img id="zoom-image" src="/uploads/products-images/<%=product.productImage[i]%>" alt="product image"></div>
-                                        <%}%>
-                                    </div>
+ <!-- Zoomable Image Container -->
+<div class="drift-container">
+    <img 
+      id="main-image" 
+      src="/uploads/products-images/<%= product.productImage[0] %>" 
+      data-zoom="/uploads/products-images/<%= product.productImage[0] %>" 
+      class="zoom-target" 
+      width="400" 
+      alt="Zoomable image" />
+  </div>
+  
+  <!-- Thumbnails -->
+  <ul class="thumbnails mt-3 d-flex gap-2">
+    <% for (let i = 0; i < product.productImage.length; i++) { %>
+      <li>
+        <img 
+          class="thumb-img" 
+          src="/uploads/products-images/<%= product.productImage[i] %>" 
+          data-zoom="/uploads/products-images/<%= product.productImage[i] %>" 
+          width="75" />
+      </li>
+    <% } %>
+  </ul>
+  
+  
                                 </div>
                                 <!-- End Gallery -->
                                 <div class="social-icons single-share">
@@ -553,17 +567,36 @@ figure img {
 </main>
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/drift-zoom/dist/drift-basic.min.css">
+<script src="https://cdn.jsdelivr.net/npm/drift-zoom/dist/Drift.min.js"></script>
 
-<!-- ElevateZoom -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/elevatezoom/3.0.8/jquery.elevatezoom.min.js"></script>
 
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
+    const mainImage = document.querySelector('#main-image');
 
-     $(document).ready(function() {
-    $("#zoom-image").elevateZoom({
-      zoomType: "lens",
-      lensShape: "round",
-      lensSize: 200
+    // Init Drift on main image
+    const drift = new Drift(mainImage, {
+      paneContainer: document.querySelector('.drift-container'),
+      inlinePane: false,
+      hoverBoundingBox: true,
+      zoomFactor: 2,
+      inlinePane: true,
+        inlineOffsetY: -85,
+        hoverBoundingBox: true
+    });
+
+    // Thumbnail image switching
+    document.querySelectorAll('.thumb-img').forEach((thumb) => {
+      thumb.addEventListener('click', () => {
+        const newSrc = thumb.getAttribute('src');
+        const newZoom = thumb.getAttribute('data-zoom');
+
+        mainImage.setAttribute('src', newSrc);
+        mainImage.setAttribute('data-zoom', newZoom);
+
+        // Drift automatically rebinds to updated data-zoom
+      });
     });
   });
 
