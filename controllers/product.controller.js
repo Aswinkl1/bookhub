@@ -47,7 +47,7 @@ const addproducts = async (req,res)=>{
             if(!categoryId){
                 return res.status(400).send("invalid category name")
             }
-
+            console.log(images)
             const newProduct = new Product({
                 productTitle:products.productName,
                 description:products.description,
@@ -209,7 +209,9 @@ async function postEditProduct(req, res) {
         // Combine kept images and new images
         const updatedImages = [...imagesToKeep, ...newImages];
         console.log("Final image list:", updatedImages);
-        
+        // if(updatedImages.length  >5){
+        //     return res.status(400).send("only 5 images are allowed");
+        // }
         // Get category ID
         const categoryId = await Category.findOne({ name: productData.category });
         if (!categoryId) {

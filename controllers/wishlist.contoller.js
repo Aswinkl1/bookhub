@@ -15,9 +15,10 @@ const getWishlistRender = async (req,res)=>{
 const loadWishlistDetails = async (req,res)=>{
     try {
         const {userId} = req.session
-        console.log(userId)
+        
         const wishlist = await Wishlist.findOne({userId}).populate('items')
         if(!wishlist){
+            console.log(wishlist)
             return res.status(400).json({eroor:"wishlist is empty"})
         }
 
