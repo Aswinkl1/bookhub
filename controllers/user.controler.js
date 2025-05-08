@@ -30,8 +30,18 @@ async function compareOffers(product,categoryId){
 const HomePageLoad = async (req,res)=>{
     try{
         const userId = req.session.userId
-        const products = await Product.find()
+        // const products = await Product.find()
+        const listedCategories = await Category.find({ isListed: true }).select('_id');
+        const listedCategoryIds = listedCategories.map(cat => cat._id);
+        console.log(listedCategoryIds)
 
+        // Step 2: Use those IDs in your product query
+        const products = await Product.find({
+        isBlocked: false,
+        category: { $in: listedCategoryIds }
+        })        
+        .limit(8)
+        .populate("category")
         for(let product of products){
             product.salePrice = await compareOffers(product,product.category)
         }

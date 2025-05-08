@@ -208,14 +208,41 @@
                                   </div>
                               </div>
                           </div>
-                          <div>
-                              <button class="btn btn-md rounded font-sm hover-up"  type="button" onclick="validateAndSubmit()">
-                                  Update Product
-                              </button>
-                              <a href="/admin/products" class="btn btn-md rounded font-sm btn-secondary ms-2">
-                                  Cancel
-                              </a>
-                          </div>
+                          
+
+                          <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="row gx-2">
+                                    <div class="col-sm-6 mb-3">
+                                        <label class="form-label">Block Product</label>
+                                        <select class="form-select border" style="width: 150px;" name="isBlocked">
+                                          
+                                              
+                                              <option value="1" <%= product.isBlocked ? 'selected' : '' %>>
+                                                Block
+                                              </option>
+                                              
+                                              <option value="0" <%= product.isBlocked ? '' : 'selected' %>>
+                                                UnBlock
+                                              </option>
+                                             
+                                          
+                                        </select>
+                                        
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                          <button class="btn btn-md rounded font-sm hover-up"  type="button" onclick="validateAndSubmit()">
+                              Update Product
+                          </button>
+                          <a href="/admin/products" class="btn btn-md rounded font-sm btn-secondary ms-2">
+                              Cancel
+                          </a>
+                      </div>
                       </form>
                   </div>
               </div>

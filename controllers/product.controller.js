@@ -145,7 +145,7 @@ async function postEditProduct(req, res) {
     try {
         const productId = req.params.id;
         const productData = req.body;
-        
+        console.log(productData)
         // Find the product to update
         const existingProduct = await Product.findById(productId);
         
@@ -230,6 +230,7 @@ async function postEditProduct(req, res) {
             status: productData.status || existingProduct.status,
             authorname: productData.authorName,
             language: productData.language,
+            isBlocked:!!+productData.isBlocked,
             updatedAt: new Date()
         };
         
