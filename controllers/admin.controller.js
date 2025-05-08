@@ -42,10 +42,11 @@ const postLogin = async (req,res)=>{
 const loadHomepage = async (req,res)=>{
     try {
         // if(req.session.admin){
-           return res.render("dashboard")
+      
+           return res.redirect("/admin/dashboard")
         // }
     } catch (error) {
-        
+        console.log(error)
     }
 }
 

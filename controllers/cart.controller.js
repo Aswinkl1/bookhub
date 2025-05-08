@@ -84,14 +84,6 @@ const loadcartPage = async (req,res)=>{
       return res.status(400).render("cart",{cart:[]})
     }
     
-  // cart.items.find(async(item,index) => {
-  //     console.log("pundee")
-  //     const product = item.productId;
-  //     const category = await Category.findById(product.category)
-  //     cart.items[index].isCategoryBlocked = !category.isListed   
-
-
-  //   });
 
 
   for(let item of cart.items){

@@ -120,7 +120,7 @@
                     <div id="otpTimer" class="otp-timer">
                         <span id="timerValue">60</span>
                     </div>
-                    <button type="button" class="btn btn-secondary" onclick="resendOTP()">Resend OTP</button>
+                    <button type="button" class="btn btn-secondary" onclick="resendOTP()" id="resent-otp">Resend OTP</button>
                 </div>
                 <% if (locals.message && message.length > 0) { %>
                 <div class="alert alert-danger"><%= message %></div>
@@ -136,23 +136,53 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.getElementById("otp").focus();
+    document.getElementById("resent-otp").disabled = true
+    const timerDisplay = document.getElementById("timerValue");
+  const otpInput = document.getElementById("otp");
+  const TIMER_DURATION = 60; // seconds
 
-    let timer = 60;
-    let timerInterval;
+  function getRemainingTime() {
+    const storedStart = sessionStorage.getItem("otpTimerStart");
+    if (!storedStart) return TIMER_DURATION;
 
-    function startTimer() {
-        timerInterval = setInterval(() => {
-            timer--;
-            document.getElementById("timerValue").textContent = timer;
-            if (timer <= 0) {
-                clearInterval(timerInterval);
-                document.getElementById("timerValue").classList.add("expired");
-                document.getElementById("timerValue").textContent = "Expired";
-                document.getElementById("otp").disabled = true;
-            }
-        }, 1000);
+    const elapsed = Math.floor((Date.now() - parseInt(storedStart)) / 1000);
+    return Math.max(0, TIMER_DURATION - elapsed);
+  }
+
+  function startTimer() {
+    let remaining = getRemainingTime();
+
+    if (remaining === 0) {
+      handleExpired();
+      return;
     }
-    startTimer();
+    
+    timerDisplay.textContent = remaining;
+    const interval = setInterval(() => {
+      remaining--;
+      timerDisplay.textContent = remaining;
+
+      if (remaining <= 0) {
+        clearInterval(interval);
+        handleExpired();
+      }
+    }, 1000);
+  }
+
+  function handleExpired() {
+    timerDisplay.classList.add("expired");
+    timerDisplay.textContent = "Expired";
+    otpInput.disabled = true;
+    document.getElementById("resent-otp").disabled = false
+    sessionStorage.removeItem("otpTimerStart");
+  }
+
+  // Initialize timer
+  if (!sessionStorage.getItem("otpTimerStart")) {
+    sessionStorage.setItem("otpTimerStart", Date.now().toString());
+  }
+
+  startTimer();
 
     function validateOtpForm(){
         const otpInput = document.getElementById("otp").value 
@@ -197,35 +227,35 @@
 
 
     function resendOTP() {
-        console.log("ghhh");
-        
-        clearInterval(timerInterval)
-        timer = 60
-        document.getElementById('otp').disabled = false
-        document.getElementById('timerValue').classList.remove("expired")
-        startTimer()
-        $.ajax({
-            type:'POST',
-            url:"resend-otp",
-            success:(response)=>{
-                if(response.success){
-                    Swal.fire({
-                    icon:"success",
-                    title:"OTP Resend successfully",
-                    showConfirmButton:false,
-                    timer:1500
-                })
-                }else{
-                    Swal.fire({
-                        icon:"error",
-                        title:"Error",
-                        text:"An error occured while resending OTP, Please try again"
-                    })
-                }
-                
-            }
-        })
-        return false
+  sessionStorage.setItem("otpTimerStart", Date.now().toString()); // reset timer start time
+  document.getElementById("otp").disabled = false;
+  document.getElementById("timerValue").classList.remove("expired");
+
+  startTimer(); // restart timer UI
+
+  $.ajax({
+    type: 'POST',
+    url: "resend-otp",
+    success: (response) => {
+      if (response.success) {
+    document.getElementById("resent-otp").disabled = true
+
+        Swal.fire({
+          icon: "success",
+          title: "OTP resent successfully",
+          showConfirmButton: false,
+          timer: 1500
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Could not resend OTP"
+        });
+      }
     }
+  });
+}
+
 </script>
 <%-include('../../views/partials/user/_footer')%>

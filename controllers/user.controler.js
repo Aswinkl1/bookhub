@@ -65,6 +65,7 @@ const pageNotFound = async (req,res)=>{
 
 const loadSignUp = async (req,res)=>{
     try {
+        req.session.userOtp = null
         res.render('signup')
     } catch (error) {
         console.log("coudnt signup")
@@ -111,16 +112,19 @@ const postSignUp = async (req,res)=>{
     if(findUser){
         return res.render('signup',{message:"User with this email already exists"})
     }
-    const otp = generateOtp()
-    const emailSend = sendVerificationEmail(email,otp);
-    if(!emailSend){
-        return res.json("email-error")
+    if(!req.session.userOtp){
+        const otp = generateOtp()
+        const emailSend = sendVerificationEmail(email,otp);
+        if(!emailSend){
+            return res.json("email-error")
+        }
+        
+        console.log("Otp send",otp);
+        req.session.userOtp = otp;
+        req.session.userData = req.body;
     }
     
-    console.log("Otp send",otp);
-    req.session.userOtp = otp;
-    req.session.userData = req.body;
-    // store thimgs n session before rendering a resonce page
+    // store things n session before rendering a resonce page
     res.render("verify-otp")
 
    } catch (error) {

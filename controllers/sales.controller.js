@@ -22,7 +22,7 @@ const salesReportRender = async (req,res)=>{
 const getSalesReport = async (req, res) => {
 
     try {
-
+    
     const page = parseInt(req.query.page) || 1;
     const limit = 10;
     const skip = (page - 1) * limit;
@@ -55,12 +55,14 @@ const getSalesReport = async (req, res) => {
         $lte: new Date(),
         };
     } else if (filterBy === "monthly") {
-        const lastMonth = new Date();
-        lastMonth.setMonth(lastMonth.getMonth() - 1);
-        filter.createdAt = {
-        $gte: lastMonth,
-        $lte: new Date(),
-        };
+      const startOfMonth = new Date();
+      startOfMonth.setDate(1);           
+      startOfMonth.setHours(0, 0, 0, 0); 
+      
+      filter.createdAt = {
+        $gte: startOfMonth,
+        $lte: new Date()                 
+      };
     } else if (filterBy === "yearly") {
         const lastYear = new Date();
         lastYear.setFullYear(lastYear.getFullYear() - 1);
@@ -97,7 +99,7 @@ const getSalesReport = async (req, res) => {
     .skip(skip)
     .limit(limit);
     console.log(orders)
-    res.status(200).json({orders,totalDiscount,totalRevenue,totalOrders})
+    res.status(200).json({orders,totalDiscount,totalRevenue,totalOrders,totalPages,currentPage:page})
     // res.render("salesReport", {
     // orders,
     // totalRevenue,
