@@ -84,14 +84,14 @@
                                                 <!-- <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a> -->
                                             </div>
                                             <div class="product-badges product-badges-position product-badges-mrg">
-                                                <!-- <span class="hot">Hot</span> -->
+                                                <span class="hot"><%=locals.product[i]?.productOffer?.discountPercentage || 0%> %</span>
                                             </div>
                                         </div>
                                         <div class="product-content-wrap">
                                             <div class="product-category">
-                                                <a href="shop-grid-right.html"><%=locals.product[i].category.name%></a>
+                                                <a href="/product/<%= locals.product[i]._id %>"><%=locals.product[i].category.name%></a>
                                             </div>
-                                            <h2><a href="shop-product-right.html"><%=locals.product[i].productTitle%></a></h2>
+                                            <h2><a href="/product/<%= locals.product[i]._id %>"><%=locals.product[i].productTitle%></a></h2>
                                             <div class="rating-result" title="90%">
                                                 <span>
                                                     <span><%=locals.product[i].productOffer.discountPercentage%> %</span>
