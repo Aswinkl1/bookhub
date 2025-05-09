@@ -6,6 +6,7 @@ const path = require('path')
 const sharp = require('sharp')
 const category = require("../models/category.schema")
 const {compareOffers} = require("./user.controler")
+const product = require("../models/product.schema")
 
 const getProductAddPage = async (req,res)=>{
     try {
@@ -220,6 +221,9 @@ async function postEditProduct(req, res) {
         }
         if(!!+productData.isBlocked){
             status = "Blocked"
+        }else{
+            status = "Available"
+
         }
         // Update the product
         const updatedProduct = {
@@ -287,8 +291,10 @@ const getProductForUser = async (req,res)=>{
     try {
         const productId = req.params.id
         const product = await Product.findById(productId)
-        console.log(product)
-        product.salePrice = await compareOffers(product,product.category)
+
+        product.salePrice = (await compareOffers(product,product.category))[0]
+        console.log(product.salePrice)
+        console.log(await compareOffers(product,product.category))
         if(!product){
           return  res.status(400).json("product not found")
         }
