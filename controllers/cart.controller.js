@@ -28,7 +28,7 @@ const addTocart = async (req,res)=>{
     return res.status(400).json({message:"Not enough stock available"});
   }
 
-  const price = await compareOffers(product,product.category)
+  const price = (await compareOffers(product,product.category))[0]
   
 
   let cart = await Cart.findOne({userId:userId});
