@@ -15,16 +15,16 @@ async function compareOffers(product,categoryId){
     // console.log(category.name)
     if(!category.categoryOffer?.isActive){
        
-        return product.salePrice
+        return [product.salePrice,product.productOffer.discountPercentage]
 
     }
     const offerPriceOfCategory = Math.round(product.regularPrice * (1- (category.categoryOffer.discountPercentage/100)))
     // console.log(offerPriceOfCategory)
     if(offerPriceOfCategory < product.salePrice){
         
-        return offerPriceOfCategory
+        return [offerPriceOfCategory,category.categoryOffer.discountPercentage]
     }
-    return product.salePrice
+    return [product.salePrice,product.productOffer.discountPercentage]
 }
 
 const HomePageLoad = async (req,res)=>{
@@ -43,7 +43,7 @@ const HomePageLoad = async (req,res)=>{
         .limit(8)
         .populate("category")
         for(let product of products){
-            product.salePrice = await compareOffers(product,product.category)
+            [product.salePrice,product.productOffer.discountPercentage] = await compareOffers(product,product.category)
         }
 
 

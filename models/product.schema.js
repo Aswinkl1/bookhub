@@ -38,7 +38,7 @@ const productSchema = new Schema({
     },
     status:{
         type:String,
-        enum:["Available","out of stock"]
+        enum:["Available","out of stock","Blocked"]
     },
     authorname:{
         type:String,

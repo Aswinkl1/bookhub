@@ -143,6 +143,7 @@ async function postEditProduct(req, res) {
     console.log(req.body); 
     console.log("Processing product edit");
     try {
+        let status ;
         const productId = req.params.id;
         const productData = req.body;
         console.log(productData)
@@ -217,7 +218,9 @@ async function postEditProduct(req, res) {
         if (!categoryId) {
             return res.status(400).send("Invalid category name");
         }
-        
+        if(!!+productData.isBlocked){
+            status = "Blocked"
+        }
         // Update the product
         const updatedProduct = {
             productTitle: productData.productName,
@@ -227,7 +230,7 @@ async function postEditProduct(req, res) {
             salePrice: productData.salePrice || existingProduct.salePrice,
             quantity: productData.quantity,
             productImage: updatedImages,
-            status: productData.status || existingProduct.status,
+            status: status || existingProduct.status,
             authorname: productData.authorName,
             language: productData.language,
             isBlocked:!!+productData.isBlocked,
