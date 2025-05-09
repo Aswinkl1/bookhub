@@ -320,7 +320,7 @@ const renderShopPage = async (req,res)=>{
 const fetchAvailableProducts  = async (req,res)=>{
     try {
         const page = req.query.page || 1;
-        const limit = 4
+        const limit = 8
         const search = req.query.search || ""
         const skip = (page - 1) * limit
         // console.log(skip)
