@@ -37,13 +37,13 @@ router.patch('/api/unListCategory',adminAuth,categoryController.getUnlistCategor
 router.get('/editCategory',adminAuth,categoryController.getEditCategory)
 router.post('/editCategory/:id',adminAuth,categoryController.postEditcategory)
 
-router.get("/addProducts",productController.getProductAddPage)
-router.post("/addProducts",uploads.array("images",4),productController.addproducts)
-router.get('/products',productController.productListPageRender)
-router.get('/api/products',productController.getAllProducts)
-router.get('/editProduct',productController.getEditProducts)
-router.post('/editProduct/:id',uploads.array("images",4),productController.postEditProduct)
-router.put('/products/delete',productController.deleteProduct)
+router.get("/addProducts",adminAuth,productController.getProductAddPage)
+router.post("/addProducts",adminAuth,uploads.array("images",4),productController.addproducts)
+router.get('/products',adminAuth,productController.productListPageRender)
+router.get('/api/products',adminAuth,productController.getAllProducts)
+router.get('/editProduct',adminAuth,productController.getEditProducts)
+router.post('/editProduct/:id',adminAuth,uploads.array("images",4),productController.postEditProduct)
+router.put('/products/delete',adminAuth,productController.deleteProduct)
 
 // coupon
 router.route("/coupon")
@@ -75,6 +75,6 @@ router.get('/api/sales-report/download/excel',adminAuth,sales.getSalesReportExce
 
 
 //Dashboard
-router.get("/dashboard",dashboard.renderAdminDashboard)
-router.get("/api/dashboard",dashboard.loadDashboardChart)
+router.get("/dashboard",adminAuth,dashboard.renderAdminDashboard)
+router.get("/api/dashboard",adminAuth,dashboard.loadDashboardChart)
 module.exports = router
