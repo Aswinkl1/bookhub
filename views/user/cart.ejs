@@ -96,7 +96,22 @@
 
 
 <script>
+    let Toast;
+    document.addEventListener("DOMContentLoaded",()=>{
+         Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+        }
+    });
+    })
 
+    
 
     async function removeCart(productId) {
         Swal.fire({
@@ -120,12 +135,17 @@
 
             const jsonResponce = await responce.json()
             if(responce.ok){
-                sweetAlert(jsonResponce.message,"")
+                // showAlert(jsonResponce.message,"")
+                Toast.fire({
+                    icon: "success",
+                    title: jsonResponce.message
+                    });
+                console.log("mainId"+productId)
                 document.getElementById("mainId"+productId).remove()
             document.getElementById("cartCount").innerText = parseInt(document.getElementById("cartCount").innerText) -1
 
             }else{
-                sweetAlert(jsonResponce.message,"")
+                showAlert(jsonResponce.message,"")
             }
         }
         });
@@ -139,7 +159,10 @@
             quantityValue +=1
             console.log(quantityValue)
             if(quantityValue >5){
-                sweetAlert("you can only order upto 5 ","quantity excided")
+                Toast.fire({
+                    icon: "error",
+                    title: "Limit reached: Max 5 per item."
+                    });
                 document.getElementById("qty-val"+productId).innerHTML = 5
             }else{
             const apiResponce = await apiCall(quantityValue)
@@ -172,9 +195,17 @@
         if(responce.ok){
             document.getElementById("qty-val"+productId).innerHTML = jsonResponce.quantity
             document.getElementById("totalPrice"+productId).innerHTML = jsonResponce.totalPrice
-            sweetAlert("cart updated successfully","")
+            
+            Toast.fire({
+                    icon: "success",
+                    title: jsonResponce.message
+                    });
         }else{
-            sweetAlert(jsonResponce.message,"")
+           
+            Toast.fire({
+                icon: "error",
+                title: jsonResponce.message
+            });
         }
 
 
@@ -182,7 +213,7 @@
     }
 
 
-    function sweetAlert(message,title){
+    function showAlert(message,title){
         Swal.fire({
         icon: "success",
         title: message,

@@ -63,7 +63,7 @@ const addTocart = async (req,res)=>{
   )
   const totalPrice = result.items[existingProductIndex]?.totalPrice || ""
   console.log(quantity)
-  res.status(200).json({message:"product added to cart",quantity:quantity,totalPrice:totalPrice});
+  res.status(200).json({message:"Cart updated successfully!",quantity:quantity,totalPrice:totalPrice});
 }catch (error){
 
   console.log(error)
@@ -80,11 +80,13 @@ const loadcartPage = async (req,res)=>{
     console.log("hi")
     const cart = await Cart.findOne({userId:userId}).populate("items.productId","productTitle productImage status isBlocked quantity category")
 
-    if(!cart){
+    if(!cart || cart.items.length ===0){
       return res.status(400).render("cart",{cart:[]})
     }
     
 
+
+    console.log(cart.items)
 
   for(let item of cart.items){
     const product = item.productId;

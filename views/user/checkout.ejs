@@ -661,11 +661,12 @@
                     couponError.innerHTML = ""
                     //'<p class="text-danger"><small>please enter a valid name</small></p>'
                     cartTotal.innerText = jsonResponse.cartTotal
-                    discountInOrder.innerText += jsonResponse.discountAmount
+                    discountInOrder.innerText = jsonResponse.discountAmount
                     discountInOrder.parentElement.hidden = false
                     couponApply.hidden = true
                     couponRemove.hidden = false
                     couponId.value = jsonResponse.coupon._id
+                    
                     
                 }else{
                     console.log("error")
@@ -680,6 +681,7 @@
             couponRemove.addEventListener("click",()=>{
                 couponCode.value = ""
                 cartTotal.innerText =  +cartTotal.innerText + (+discountInOrder.innerText * -1)
+                discountInOrder.innerText = ""
                 console.log(typeof +discountInOrder.innerText )
                 discountInOrder.parentElement.hidden = true
                 couponApply.hidden = false

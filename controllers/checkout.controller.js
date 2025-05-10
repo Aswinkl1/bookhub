@@ -14,7 +14,7 @@ const loadCheckout = async (req,res)=>{
     const address =await Address.find({userId})
     const cart = await Cart.findOne({userId}).populate('items.productId','productTitle productImage status isBlocked regularPrice quantity category')
     
-    if(!cart){
+    if(!cart || cart.items.length === 0){
       return res.redirect('/cart')
       }
       const listedCategories = await Category.find({ isListed: true }).select('_id');
