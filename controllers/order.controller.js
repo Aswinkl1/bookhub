@@ -96,6 +96,7 @@ const addOrder = async (req, res) => {
         if (!cart || cart.items.length === 0) {
             return res.status(400).json({ message: "Your cart is empty." });
         }
+        
         console.log(cart.items.length)
         // Calculate total price
         const orderItems = cart.items.map(item => {
@@ -109,10 +110,7 @@ const addOrder = async (req, res) => {
             };
         });
         console.log(orderItems)
-
         
-
-
         // Create new order
         const newOrder = new Order({
 
@@ -127,7 +125,6 @@ const addOrder = async (req, res) => {
         console.log(newOrder)
         await newOrder.save();
         if(couponId){
-
             const user = await User.findOne({_id:userId})
             user.usedCoupons.push(couponId)
             // user.save()

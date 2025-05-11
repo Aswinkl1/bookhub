@@ -75,6 +75,9 @@ const pageNotFound = async (req,res)=>{
 
 const loadSignUp = async (req,res)=>{
     try {
+        if(req.session.userId){
+            return res.redirect('/')
+        }
         req.session.userOtp = null
         res.render('signup')
     } catch (error) {
@@ -117,7 +120,9 @@ async function sendVerificationEmail(email,otp) {
 const postSignUp = async (req,res)=>{
    try {
     const {email,password,name} = req.body
-    
+    if(req.session.userId){
+            return res.redirect('/')
+        }
     const findUser = await User.findOne({email})
     if(findUser){
         return res.render('signup',{message:"User with this email already exists"})
@@ -209,6 +214,9 @@ const resendOtp = async (req,res)=>{
 
 const loadLoginPage = async (req,res)=>{
     try {
+        if(req.session.userId){
+            return res.redirect('/')
+        }
         res.render('login')
     } catch (error) {
         
@@ -244,9 +252,12 @@ const postLoginPage = async (req,res)=>{
 
 const getForgetPassword = async (req,res)=>{
     try {
+        if(req.session.userId){
+            return res.redirect('/')
+        }
         res.render('forget-password')
     } catch (error) {
-        
+        console.log(error)
     }
 }
 

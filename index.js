@@ -14,6 +14,7 @@ const User = require('./models/user.schema')
 const Cart = require("./models/cart.schema")
 const Wishlist = require("./models/wishlist.schema")
 const Coupon = require("./models/coupon.schema")
+const nocache = require("nocache")
 db()
 const cron = require('node-cron');
 
@@ -68,7 +69,7 @@ app.use(passport.session())
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(express.static(path.join(__dirname, 'public')));
-
+app.use(nocache())
 app.use( async function(req, res, next) {
     if (req.session && req.session.userId) {
         const userId = req.session.userId
