@@ -15,7 +15,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="shop-product-fillter">
+                        <div class="shop-product-fillter" style="justify-content: right;">
                             <div class="totall-product" style="visibility: hidden;">
                                 <p> We found <strong class="text-brand">688</strong> items for you!</p>
                             </div>
@@ -27,18 +27,43 @@
                                             <span><i class="fi-rs-apps-sort"></i>Sort by:</span>
                                         </div>
                                         <div class="sort-by-dropdown-wrap">
-                                            <span> Featured <i class="fi-rs-angle-small-down"></i></span>
+                                            <span> Featured <i class="fi-rs-angle-small-down" id=""></i></span>
                                         </div>
                                     </div>
                                     <div class="sort-by-dropdown " id="filter">
                                         <ul>
-                                            <li><a class="active" >Featured</a></li>
-                                            <li><a data-sort='{"salePrice":1}'>Price: Low to High</a></li>
-                                            <li><a data-sort='{"salePrice":-1}''>Price: High to Low</a></li>
-                                            <li><a data-sort='{"productTitle":1}''>name: aA to zZ</a></li>
-                                            <li><a data-sort='{"productTitle":-1}'>name: zZ to aA</a></li>
+                                            <li><a class="active" data-field="" data-order="">Show all</a></li>
+                                            <li><a data-field="salePrice" data-order="1">Price: Low to High</a></li>
+                                            <li><a data-field="salePrice" data-order="-1">Price: High to Low</a></li>
+                                            <li><a data-field="productTitle" data-order="1">name: aA to zZ</a></li>
+                                            <li><a data-field="productTitle" data-order="-1">name: zZ to aA</a></li>
+                                        </ul>
+
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                            <div class="sort-by-product-area">
+                                
+                                <div class="sort-by-cover">
+                                    <div class="sort-by-product-wrap">
+                                        <div class="sort-by">
+                                            <span><i class="fi-rs-apps-sort"></i>Sort by:</span>
+                                        </div>
+                                        <div class="sort-by-dropdown-wrap">
+                                            <span id="catagory-header"> category <i class="fi-rs-angle-small-down" ></i></span>
+                                        </div>
+                                    </div>
+                                    <div class="sort-by-dropdown " id="category">
+                                        <ul>
+                                            <li><a class="active" data-name="" data-order="">Show all</a></li>
+                                            <% category.forEach((cat)=> { %>
+                                                
+                                                <li><a data-name="<%=cat.name%>" data-order="1"><%=cat.name%></a></li>
+                                           <% }) %>
                                             
                                         </ul>
+
                                     </div>
                                     
                                 </div>
@@ -76,6 +101,11 @@
     <!--  -->
   </div>
     <script>
+
+        function changePage(page){
+            page = page
+            fetchProductDetails(search,sort,page)
+        }
         async function addToWishlist(productId) {
         console.log("evide unde")
         const response = await fetch('/api/wishlist',{
@@ -101,9 +131,11 @@
 
         const searchBar = document.querySelector('#search-bar')
         const filter = document.querySelector('#filter')
+        const categoryFilter = document.querySelector('#category')
         let sort = "{}"
         let search;
         let category;
+        let page;
 
         function showAlert(icon,title,text) {
         Swal.fire({
@@ -121,7 +153,7 @@
                 if(i== currentpage){
                     child.classList.add('active')
                 }
-                child.innerHTML = ` <a class="page-link" onclick="fetchProductDetails('','{}',${i})">${i}</a> `
+                child.innerHTML = ` <a class="page-link" onclick="changePage('${i}')">${i}</a> `
                 parent.appendChild(child)
             }
 
@@ -179,12 +211,13 @@
 
     }
 
-    async function fetchProductDetails(search="",sort='{}',page=1){
-
-        const response = await fetch(`/api/shop?search=${search}&sort=${sort}&page=${page}`,{
+    async function fetchProductDetails(search="",sort='{}',page=1,category=""){
+        console.log(sort)
+        const response = await fetch(`/api/shop?search=${search}&sort=${sort}&page=${page}&category=${category}`,{
             method:"GET",
             headers:{"Content-Type":"application/json"},
         })
+        
         const jsonResponse = await response.json()
         if(response.ok){
             console.log("yo")
@@ -225,8 +258,32 @@
                         e.preventDefault()
                         document.querySelectorAll('.sort-by-dropdown a').forEach(el => el.classList.remove('active'));
                         e.target.classList.add('active')
-                        sort = e.target.getAttribute('data-sort');
-                        debouncedFetch(search,sort)
+                        const field = e.target.getAttribute("data-field");
+                        const order = parseInt(e.target.getAttribute("data-order"));
+                        console.log(e.target)
+                        console.log(e.target.closest('a'))
+                        if(field == ""){
+                           sort = JSON.stringify({ })
+                        }else{
+                            sort = JSON.stringify({ [field]: order })
+                        }
+                        debouncedFetch(search,sort,1,category)
+
+                    }
+                })
+                categoryFilter.addEventListener('click',function(e) {
+                    console.log("lhk")
+                    if(e.target.tagName == "A"){
+                        e.preventDefault()
+                        document.querySelectorAll('.sort-by-dropdown a').forEach(el => el.classList.remove('active'));
+                        e.target.classList.add('active')
+                        
+                        console.log(e.target)
+                      
+                        
+                            category = e.target.getAttribute("data-name");
+                           
+                        debouncedFetch(search,sort,1,category)
 
                     }
                 })

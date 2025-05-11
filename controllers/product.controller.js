@@ -309,7 +309,8 @@ const getProductForUser = async (req,res)=>{
 
 const renderShopPage = async (req,res)=>{
     try {
-        res.render('shop')
+        const category = await Category.find({})
+        res.render('shop',{category})
     } catch (error) {
         console.log(error)
 
@@ -320,6 +321,8 @@ const renderShopPage = async (req,res)=>{
 const fetchAvailableProducts  = async (req,res)=>{
     try {
         const page = req.query.page || 1;
+        const categoryFilter = req.query.category
+        console.log()
         const limit = 8
         const search = req.query.search || ""
         const skip = (page - 1) * limit
@@ -329,16 +332,17 @@ const fetchAvailableProducts  = async (req,res)=>{
         // sort = JSON.parse(sort)
         console.log(sort)
 
-        const listedCategories = await Category.find({ isListed: true }).select('_id');
+        const listedCategories = await Category.find({ isListed: true,name: { $regex: categoryFilter, $options: 'i' }, }).select('_id');
         const listedCategoryIds = listedCategories.map(cat => cat._id);
-        console.log(listedCategoryIds)
+        // console.log(listedCategoryIds)
 
         // Step 2: Use those IDs in your product query
         const products = await Product.find({
         isBlocked: false,
         productTitle: { $regex: search, $options: 'i' },
         category: { $in: listedCategoryIds }
-        })        
+        })
+        .collation({ locale: 'en', strength: 2 })  // to make the sort case insensitive 
         .skip(skip)
         .sort(sort)
         .limit(limit)

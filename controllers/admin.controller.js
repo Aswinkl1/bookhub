@@ -10,6 +10,7 @@ const loadLogin = async (req,res)=>{
     res.render('admin-login',{invalid})
 }
 
+
 const postLogin = async (req,res)=>{
     try {
         const {email,password}= req.body
