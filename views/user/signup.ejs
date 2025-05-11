@@ -130,7 +130,7 @@
         console.log(errName)
         const passwordVal = password.value
         const cpasswordval = cpassword.value
-        const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+        const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d\W]{8,}$/
         if(passwordVal.trim() === ""){
             errPassword.innerHTML = '<p class="text-danger"><small>please enter a valid password</small></p>'
         }else if(!passwordPattern.test(passwordVal)){
