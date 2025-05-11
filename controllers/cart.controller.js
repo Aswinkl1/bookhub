@@ -47,7 +47,7 @@ const addTocart = async (req,res)=>{
       cart.items[existingProductIndex] = existingProduct
       
     }else{
-      return res.status(200).json({message:"product is already in the cart"});
+      return res.status(200).json({message:"product is already in the cart",alreadyIn:true});
     }
     
 
