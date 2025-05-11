@@ -3,10 +3,11 @@ const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 
 const loadLogin = async (req,res)=>{
-    if(req.session.adminId){
-        return res.redirect("/dashboard")
+    if(req.session.admin){
+        return res.redirect("/admin/dashboard")
     }
-    res.render('admin-login')
+    let invalid = req.query.invalid || false
+    res.render('admin-login',{invalid})
 }
 
 const postLogin = async (req,res)=>{
@@ -25,10 +26,10 @@ const postLogin = async (req,res)=>{
         }else{
             console.log("password miss");
             
-            res.redirect('login')
+            res.redirect('login?invalid=true')
         }
     }else{
-        res.redirect("login")
+        res.redirect("login?invalid=true")
     }
         
     } catch (error) {
