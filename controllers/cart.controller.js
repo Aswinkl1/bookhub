@@ -62,8 +62,8 @@ const addTocart = async (req,res)=>{
     {new:true}
   )
   const totalPrice = result.items[existingProductIndex]?.totalPrice || ""
-  console.log(quantity)
-  res.status(200).json({message:"Cart updated successfully!",quantity:quantity,totalPrice:totalPrice});
+  console.log(result.totalPrice)
+  res.status(200).json({message:"Cart updated successfully!",quantity:quantity,totalPrice:totalPrice,cartTotal:result.totalPrice});
 }catch (error){
 
   console.log(error)
@@ -130,10 +130,10 @@ const removeFromCart = async (req,res)=>{
    
    console.log(cart.items)
   //  cart.totalPrice -= removedItemPrice
-   await cart.save()
+  const result =  await cart.save()
   console.log(productId)
 
-  res.status(200).json({message:"Product Removed successfull"})
+  res.status(200).json({message:"Product Removed successfull",cartTotal:result.totalPrice})
 
 
 }
