@@ -15,16 +15,16 @@ async function compareOffers(product,categoryId){
     // console.log(category.name)
     if(!category.categoryOffer?.isActive){
        
-        return [product.salePrice,product.productOffer.discountPercentage]
+        return [product.salePrice,product.productOffer.discountPercentage || 0]
 
     }
     const offerPriceOfCategory = Math.round(product.regularPrice * (1- (category.categoryOffer.discountPercentage/100)))
     // console.log(offerPriceOfCategory)
     if(offerPriceOfCategory < product.salePrice){
         
-        return [offerPriceOfCategory,category.categoryOffer.discountPercentage]
+        return [offerPriceOfCategory,category.categoryOffer.discountPercentage || 0]
     }
-    return [product.salePrice,product.productOffer.discountPercentage]
+    return [product.salePrice,product.productOffer.discountPercentage || 0]
 }
 
 const HomePageLoad = async (req,res)=>{

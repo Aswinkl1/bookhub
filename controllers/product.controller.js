@@ -292,8 +292,12 @@ const getProductForUser = async (req,res)=>{
         const productId = req.params.id
         const product = await Product.findById(productId)
         const realtedProducts = await Product.find({category:product.category,isBlocked:false}).limit(4)
-        console.log(realtedProducts)
-        product.salePrice = (await compareOffers(product,product.category))[0]
+
+        for(let realtedProduct of realtedProducts){
+            [realtedProduct.salePrice,realtedProduct.productOffer.discountPercentage] = await compareOffers(realtedProduct,realtedProduct.category)
+            console.log(await compareOffers(realtedProduct,realtedProduct.category))
+        }
+
         // console.log(product.salePrice)
         // console.log(await compareOffers(product,product.category))
         if(!product){

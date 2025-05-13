@@ -474,7 +474,7 @@
                             </div>
                             <div class="summary-row" hidden>
                                 <span>coupon Discount</span>
-                                <span class="text-discount" id="coupon-on-calculation">-</span>
+                                <span class="text-discount" id="coupon-on-calculation"></span>
                             </div>
                             <div class="summary-row summary-total">
                                 <span>Total</span>
@@ -625,7 +625,7 @@
                     if(+totalPrice >= 1000){
                         Swal.fire({
                         title: "error",
-                        text: "amount above 5000 cannot be done using COD",
+                        text: "amount above 1000 cannot be done using COD",
                         icon: "error"
                         });
                         return
@@ -661,7 +661,7 @@
                     couponError.innerHTML = ""
                     //'<p class="text-danger"><small>please enter a valid name</small></p>'
                     cartTotal.innerText = jsonResponse.cartTotal
-                    discountInOrder.innerText = jsonResponse.discountAmount
+                    discountInOrder.innerText = +jsonResponse.discountAmount * -1
                     discountInOrder.parentElement.hidden = false
                     couponApply.hidden = true
                     couponRemove.hidden = false

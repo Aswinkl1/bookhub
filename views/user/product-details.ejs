@@ -26,8 +26,8 @@ figure img {
     <div class="page-header breadcrumb-wrap">
         <div class="container">
             <div class="breadcrumb">
-                <a href="index.html" rel="nofollow">Home</a>
-                <span></span> shop
+                <a href="/" rel="nofollow">Home</a>
+                <span></span> <a href="/shop" rel="nofollow">Shop</a>
                 <span></span> <%=product.productTitle%>
             </div>
         </div>
@@ -195,21 +195,21 @@ figure img {
                                                         <!-- <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a> -->
                                                     </div>
                                                     <div class="product-badges product-badges-position product-badges-mrg">
-                                                        <% if(locals.product[i]?.quantity ==0) { %>
+                                                        <% if(locals.realtedProducts[i]?.quantity ==0) { %>
                                                             <span class="hot">Out Of Stock</span>
                                                         <% } else  {%>
-                                                            <span class="hot"><%=locals.product[i]?.productOffer?.discountPercentage || 0%> %</span>
+                                                            <span class="hot"><%=locals.realtedProducts[i]?.productOffer?.discountPercentage || 0%> %</span>
                                                         <%  }   %>
                                                     </div>
                                                 </div>
                                                 <div class="product-content-wrap">
                                                     <div class="product-category">
-                                                        <a href="/product/<%= locals.realtedProducts[i]._id %>"><%=locals.realtedProducts[i].category.name%></a>
+                                                        <a href="/product/<%= locals.realtedProducts[i]._id %>"><%=locals.realtedProducts[i].category?.name%></a>
                                                     </div>
                                                     <h2><a href="/product/<%= locals.realtedProducts[i]._id %>"><%=locals.realtedProducts[i].productTitle%></a></h2>
                                                     <div class="rating-result" title="90%">
                                                         <span>
-                                                            <span><%=locals.realtedProducts[i].productOffer.discountPercentage || 0 %> %</span>
+                                                            <span><%=locals.realtedProducts[i].productOffer?.discountPercentage || 0 %> %</span>
                                                         </span>
                                                     </div>
                                                     <div class="product-price">

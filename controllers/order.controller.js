@@ -127,7 +127,7 @@ const addOrder = async (req, res) => {
         if(couponId){
             const user = await User.findOne({_id:userId})
             user.usedCoupons.push(couponId)
-            // user.save()
+            user.save()
         }
 
         // Reduce quantity for each product
