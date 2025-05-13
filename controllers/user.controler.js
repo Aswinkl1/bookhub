@@ -39,7 +39,7 @@ const HomePageLoad = async (req,res)=>{
         const products = await Product.find({
         isBlocked: false,
         category: { $in: listedCategoryIds }
-        })        
+        }) 
         .limit(8)
         .populate("category")
         for(let product of products){

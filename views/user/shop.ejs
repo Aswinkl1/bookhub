@@ -164,6 +164,14 @@
         const parent = document.getElementById("row-div")
         parent.innerHTML = ""
             products.forEach(product =>{
+
+
+                let status ;
+                if(product.quantity <=0){
+                    status = `<span class="hot">Out Of Stock</span>`
+                }else{
+                    status = `<span class="hot">${product.productOffer.discountPercentage || 0} %</span>`
+                }
                 const element = document.createElement("div")
                 element.classList.add('col-lg-3')
                 element.classList.add('col-md-4')
@@ -181,7 +189,7 @@
                                                 <a aria-label="Add To Wishlist" class="action-btn hover-up" onclick="addToWishlist('${product._id}')"><i class="fi-rs-heart"></i></a>
                                         </div>
                                         <div class="product-badges product-badges-position product-badges-mrg">
-                                           <!-- <span class="hot">Hot</span> -->
+                                           ${status}
                                         </div>
                                     </div>
                                     <div class="product-content-wrap">
@@ -191,7 +199,7 @@
                                         <h2><a href="/product/${product._id}">${product.productTitle}</a></h2>
                                         <div class="rating-result" title="90%">
                                             <span>
-                                               
+                                               <span class="hot">${product.productOffer?.discountPercentage || 0} %</span>
                                             </span>
                                         </div>
                                         <div class="product-price">

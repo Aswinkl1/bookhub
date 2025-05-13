@@ -353,8 +353,10 @@ const fetchAvailableProducts  = async (req,res)=>{
         const totalPages = Math.ceil(totalNumberOfProduct/limit)
         
         for(let product of products){
-            product.salePrice = await compareOffers(product,product.category)
+            [product.salePrice,product.productOffer.discountPercentage] = await compareOffers(product,product.category)
+            console.log(await compareOffers(product,product.category))
         }
+
         if(!products){
             return res.status(400).json({message:"products not found"})
         }
