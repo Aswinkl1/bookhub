@@ -52,8 +52,9 @@ const CategoryInfo = async (req,res)=>{
 
 const addCategory = async (req,res)=>{
     
-    const {name,description,status,discountPercentage} = req.body
-   
+    let {name,description,status,discountPercentage =0} = req.body
+    discountPercentage = discountPercentage || 0
+   console.log(discountPercentage)
     try {
         const existingCategory = await Category.findOne({name:name}) .collation({ locale: 'en', strength: 2 });
 
