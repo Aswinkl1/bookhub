@@ -55,7 +55,8 @@ const addCategory = async (req,res)=>{
     const {name,description,status,discountPercentage} = req.body
    
     try {
-        const existingCategory = await Category.findOne({name:name})
+        const existingCategory = await Category.findOne({name:name}) .collation({ locale: 'en', strength: 2 });
+
         if(existingCategory) {
             return res.status(400).json({error:"Category already exists"})
         }

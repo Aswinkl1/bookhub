@@ -407,7 +407,7 @@
                                     </div>
                                     <div class="col-md-2 col-6 text-end">
                                         <div class="mb-1 text-muted small">Status</div>
-                                        <div class="fw-semibold"><%= item.status%></div>
+                                        <div class="fw-semibold" id="status<%= item.productId._id %>"><%= item.status%></div>
                                          
                                     </div>
                                     <div class="col-md-2 col-6 text-md-center">
@@ -715,6 +715,7 @@
     <script>
 
         let productId ;
+        let status ;
         const orderId = document.getElementById("orderId").innerText
         let button
         document.addEventListener('DOMContentLoaded',()=>{
@@ -725,13 +726,16 @@
                  button = e.relatedTarget
                 console.log(button)
                  productId = button.getAttribute("data-productid")
+                status = document.getElementById("status"+productId)
                  
             })
 
             cancelProductModal.addEventListener("show.bs.modal",(e)=>{
                  button = e.relatedTarget
-                console.log(button)
+                    console.log(button)
                  productId = button.getAttribute("data-productid")
+                status = document.getElementById("status"+productId)
+
                  
             })
 
@@ -751,6 +755,8 @@
                     showAlert("success",jsonResponse.message)
                     button.disabled = true
                     button.innerHTML = "Return Pending"
+                    status.innerHTML = "Return Pending"
+                    
                     
                 }else{
                     showAlert("error",jsonResponse.error)
@@ -834,6 +840,7 @@
                     
                     button.disabled = true; // Disable the button
                     button.innerHTML = "Cancelled";
+                    status.innerHTML = "Cancelled"
                 }else{
                     showAlert("error","error",jsonResponse.message)
                     
