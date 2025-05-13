@@ -287,12 +287,12 @@
                         
                         <div class="col-md-3 custom-date-inputs">
                             <label class="form-label">Start Date</label>
-                            <input type="date" class="form-control" id="startDate">
+                            <input type="date" class="form-control" id="startDate" >
                         </div>
                         
                         <div class="col-md-3 custom-date-inputs">
                             <label class="form-label">End Date</label>
-                            <input type="date" class="form-control" id="endDate">
+                            <input type="date" class="form-control" id="endDate" >
                         </div>
                         
                         <div class="col-md-3">
@@ -455,6 +455,65 @@
     const start = document.getElementById("startDate")
     const end = document.getElementById("endDate")
     const SelectedValue = document.getElementById("dateRangeType")
+    const Toast = Swal.mixin({
+  toast: true,
+  position: "top-end",
+  showConfirmButton: false,
+  timer: 3000,
+  timerProgressBar: true,
+  didOpen: (toast) => {
+    toast.onmouseenter = Swal.stopTimer;
+    toast.onmouseleave = Swal.resumeTimer;
+  }
+});
+
+
+
+
+    function validateDateRange() {
+        const start = document.getElementById("startDate").value;
+        const end = document.getElementById("endDate").value;
+        const today = new Date().toISOString().split("T")[0]; // current date in yyyy-mm-dd
+
+        if (!start || !end) {
+            Toast.fire({
+                icon: "error",
+                title: "Please select both Start Date and End Date."
+            });
+            return false;
+        }
+
+        if (start > today) {
+
+            Toast.fire({
+                icon: "error",
+                title: "Start Date cannot be in the future."
+            });
+            return false;
+        }
+
+        if (end > today) {
+
+            Toast.fire({
+                icon: "error",
+                title: "End Date cannot be in the future."
+            });
+            return false;
+        }
+
+        if (start > end) {
+
+            Toast.fire({
+                icon: "error",
+                title: "Start Date cannot be after End Date."
+            });
+            return false;
+        }
+
+        return true; // valid
+    }
+
+
     function pagination(totalPages,currentPage){
 
         const parent = document.getElementById("pagination")
@@ -471,10 +530,10 @@
 
     }
 
-function changePage(Page){
-page = Page
-fetchdata(SelectedValue.value,start.value,end.value,page)
-}
+        function changePage(Page){
+        page = Page
+        fetchdata(SelectedValue.value,start.value,end.value,page)
+        }
 
 
    function renderDataIntoTable(orders){
@@ -570,12 +629,18 @@ fetchdata(SelectedValue.value,start.value,end.value,page)
     }
     // Simulate report generation
     document.getElementById('generateReport').addEventListener('click', function() {
+
         // Show loading state
         this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Generating...';
         this.disabled = true;
         
             // Simulate API call delay
             if (SelectedValue.value === "custom") {
+                if(!validateDateRange()){
+                    this.innerHTML = '<i class="fas fa-sync-alt me-2"></i>Generate Report';
+            this.disabled = false;
+                    return
+                }
                 if (!start || !end) {
                     alert("Please select both start and end dates.");
                     return;
