@@ -174,6 +174,7 @@
                             <i class="fas fa-edit me-1"></i> Edit
                         </button>
                         
+                        
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item">
                                 <div class="info-icon bg-primary">
@@ -221,6 +222,19 @@
                                 <strong>Email:</strong> <span id="user-email"><%=profile.email%></span>
                             </li>
                         </ul>
+                    </div>
+                </div>
+                <!-- Third Group: Contact Information -->
+                <div class="card profile-section">
+                    <div class="card-header bg-success text-white">
+                        <i class="fas fa-envelope me-2"></i> Password
+                    </div>
+                    <div class="card-body p-0">
+                        <button class="btn btn-sm btn-outline-success edit-btn" data-bs-toggle="modal" data-bs-target="#passwordChangeModalLabel">
+                            <i class="fas fa-edit me-1"></i> Change Password
+                        </button>
+                        
+                        
                     </div>
                 </div>
             </div>
@@ -367,9 +381,54 @@
         </div>
     </div>
     
+
+    <!-- password change modal  -->
+    <div class="modal fade" id="passwordChangeModalLabel" tabindex="-1" aria-labelledby="passwordChangeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="passwordChangeModalLabel">Edit Contact Information</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" id="changePasswordClose" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="passwordChangeForm">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Current Passowrd</label>
+                            <input type="email" class="form-control" name="currentPassword" id="oldPassword" value="" onblur="passwordValidationCheck(event)">
+                            <label for="email" class="form-label">New Password</label>
+                            <input type="email" class="form-control" name="newPassword" id="NewPassword" value="" onblur="passwordValidationCheck(event)">
+                            <div id="errorForPasswords"></div>
+                            <label for="email" class="form-label">Confirm password</label>
+                            <input type="email" class="form-control" name="confirmPassword" id="rePassword" value="" onblur="passwordValidationCheck(event)">
+                            <div id="errorForConformPassword"></div>
+                            <input type="text" name="id" value="<%=profile._id%>" hidden>
+                        </div>
+                     
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="email-cancel-btn">Cancel</button>
+                    <button type="button" class="btn btn-success" id="changePassword">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script>
+        
+        const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+            }
+        });
 
         function validateName(name) {
             const errName = document.getElementById("errorForName")
@@ -573,6 +632,85 @@
 
         }
         });
+    
+    
+    function passwordValidationCheck(e) {
+
+
+        const passwordVal = document.getElementById("NewPassword").value
+        console.log(passwordVal)
+        const cpasswordval = document.getElementById("rePassword").value
+        const errPassword = document.getElementById("errorForPasswords")
+       
+        const errCPassword = document.getElementById("errorForConformPassword")
+        const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d\W]{8,}$/
+        if(passwordVal.trim() === ""){
+            errPassword.innerHTML = '<p class="text-danger"><small>please enter a valid password</small></p>'
+            return false
+        }else if(!passwordPattern.test(passwordVal)){
+            errPassword.innerHTML = '<p class="text-danger"><small>Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&).</small></p>'
+            return false
+        }else{
+            errPassword.innerHTML = ""
+            
+        }
+
+        if(passwordVal != cpasswordval){
+            errCPassword.innerHTML =  '<p class="text-danger"><small>Paasword do not match</small></p>'
+            return false
+        }else{
+            errCPassword.innerHTML = ""
+            return true
+        }
+    }
+    
+    
+    
+    document.getElementById("changePassword").addEventListener("click", async (e)=>{
+        if(!passwordValidationCheck(e)){
+            return
+        }
+        console.log(passwordValidationCheck(e))
+        // Get form values
+            const data = new FormData(document.getElementById("passwordChangeForm"))
+            let jsonData = {};
+            data.forEach((value,key)=>{
+                jsonData[key] = value
+            });
+
+            // send data to server using fetch
+           const response = await fetch("api/password",{
+                method:"PATCH",
+                headers:{'content-Type':"application/json"},
+                body:JSON.stringify(jsonData)
+            }) 
+
+
+            if(response.ok){
+                const jsonResonse = await response.json()
+                Toast.fire({
+                    icon: "success",
+                    title:jsonResonse.message
+                });
+            document.getElementById("passwordChangeForm").reset()
+
+            }else{
+                const jsonResonse = await response.json()
+                Toast.fire({
+                    icon: "error",
+                    title:jsonResonse.message
+                });
+
+            }
+
+            document.getElementById("changePasswordClose").click()
+
+    })
+    
+    
+    
+    
+    
     </script>
     </body>
 

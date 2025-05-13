@@ -52,6 +52,7 @@ router.get('/account',userAuth,controller.getAccount)
 router.put("/api/editprofile",userAuth,controller.editProfile);
 router.put("/api/editEmail",userAuth,controller.editEmail);
 router.patch("/api/verifyOtpForEmail",userAuth,controller.verifyOtpForEditEmail)
+router.patch("/api/password",userAuth,controller.changePassword)
 
 // address
 router.get("/account/addresses",userAuth,address.getShowAddresses); // just rendering the address page
