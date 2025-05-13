@@ -10,6 +10,7 @@ const categoryPageRender =  async (req,res)=>{
         console.log(error)
     }
 }
+
 const CategoryInfo = async (req,res)=>{
     try {
         let page = parseInt(req.query.page) || 1;

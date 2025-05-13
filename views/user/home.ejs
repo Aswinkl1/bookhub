@@ -84,7 +84,11 @@
                                                 <!-- <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a> -->
                                             </div>
                                             <div class="product-badges product-badges-position product-badges-mrg">
+                                                <% if(locals.product[i]?.quantity ==0) { %>
+                                                <span class="hot">Out Of Stock</span>
+                                             <%   }else{%>
                                                 <span class="hot"><%=locals.product[i]?.productOffer?.discountPercentage || 0%> %</span>
+                                                <%}%>
                                             </div>
                                         </div>
                                         <div class="product-content-wrap">
@@ -94,7 +98,7 @@
                                             <h2><a href="/product/<%= locals.product[i]._id %>"><%=locals.product[i].productTitle%></a></h2>
                                             <div class="rating-result" title="90%">
                                                 <span>
-                                                    <span><%=locals.product[i].productOffer.discountPercentage%> %</span>
+                                                    <span><%=locals.product[i].productOffer.discountPercentage || 0%> %</span>
                                                 </span>
                                             </div>
                                             <div class="product-price">
