@@ -31,6 +31,7 @@ async (accessToken,refreshToken,profile,done)=>{
                 name:profile.displayName,
                 email:profile.emails[0].value,
                 googleId:profile.id
+                
             });
           user =  await user.save();
             return done(null,user)
