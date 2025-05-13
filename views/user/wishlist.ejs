@@ -65,11 +65,21 @@
             return
         }
         emptyCart.setAttribute("hidden","");
-
+        console.log(wishlist)
         wishlist.forEach(data => {
             const element = document.createElement('tr')
-            // element.id =  
+            let status;
+            // element.id =                                      
+                const isOutOfStock = data.quantity <=0 ||  data.isBlocked || data.status != "Available" 
+        
 
+
+            if(isOutOfStock){
+                status = `<span class="color3 font-weight-bold">UnAvailable</span>`
+            }else{
+                status = `<span class="color3 font-weight-bold">Available</span>`
+
+            }
             element.innerHTML = `
                     <td class="image product-thumbnail"><img src="/uploads/products-images/${data.productImage[0]}" alt="#"></td>
                     <td class="product-des product-name">
@@ -78,7 +88,7 @@
                     </td>
                     <td class="price" data-title="Price"><span>${data.salePrice}</span></td>
                     <td class="text-center" data-title="Stock">
-                        <span class="color3 font-weight-bold">${data.status}</span>
+                        ${status}
                     </td>
                     <td class="text-right" data-title="Cart">
                         <button class="btn btn-sm" onClick="addToCart('${data._id}',this)"><i class="fi-rs-shopping-bag mr-5"></i>Add to cart</button>

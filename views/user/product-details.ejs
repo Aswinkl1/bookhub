@@ -109,7 +109,13 @@ figure img {
                                         <ul>
                                             <!-- <li class="mb-10"><i class="fi-rs-crown mr-5"></i> 1 Year AL Jazeera Brand Warranty</li> -->
                                             <li class="mb-10"><i class="fi-rs-refresh mr-5"></i> 30 Day Return Policy</li>
-                                            <li><i class="fi-rs-credit-card mr-5"></i> Cash on Delivery available</li>
+                                            <li class="mb-10"><i class="fi-rs-credit-card mr-5"></i> Cash on Delivery available</li>
+                                            <% if(locals.product?.quantity ==0) { %>
+                                                <span class="hot">Out Of Stock</span>
+                                             <%   }else{%>
+                                                <li class=""><i class="fi-rs-credit-card mr-5"></i>only <%=locals.product?.quantity %> units left </li>
+                                                
+                                                <%}%>
                                         </ul>
                                     </div>
                                     
@@ -189,7 +195,11 @@ figure img {
                                                         <!-- <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a> -->
                                                     </div>
                                                     <div class="product-badges product-badges-position product-badges-mrg">
-                                                        <span class="hot"><%=locals.realtedProducts[i]?.productOffer?.discountPercentage || 0%> %</span>
+                                                        <% if(locals.product[i]?.quantity ==0) { %>
+                                                            <span class="hot">Out Of Stock</span>
+                                                        <% } else  {%>
+                                                            <span class="hot"><%=locals.product[i]?.productOffer?.discountPercentage || 0%> %</span>
+                                                        <%  }   %>
                                                     </div>
                                                 </div>
                                                 <div class="product-content-wrap">
@@ -199,7 +209,7 @@ figure img {
                                                     <h2><a href="/product/<%= locals.realtedProducts[i]._id %>"><%=locals.realtedProducts[i].productTitle%></a></h2>
                                                     <div class="rating-result" title="90%">
                                                         <span>
-                                                            <span><%=locals.realtedProducts[i].productOffer.discountPercentage%> %</span>
+                                                            <span><%=locals.realtedProducts[i].productOffer.discountPercentage || 0 %> %</span>
                                                         </span>
                                                     </div>
                                                     <div class="product-price">
