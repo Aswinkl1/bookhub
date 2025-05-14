@@ -270,10 +270,10 @@ const verifyEmailForForgetPassword = async(req,res)=>{
         }
         
         const otp = generateOtp()
-        // const emailSend = sendVerificationEmail(email,otp);
-        // if(!emailSend){
-        //     return res.status(400).json("email-error")
-        // }
+        const emailSend = sendVerificationEmail(email,otp);
+        if(!emailSend){
+            return res.status(400).json("email-error")
+        }
         
         console.log("Otp send",otp);
         req.session.userOtp = otp;
