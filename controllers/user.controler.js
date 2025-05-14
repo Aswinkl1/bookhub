@@ -458,7 +458,7 @@ const changePassword = async (req,res)=>{
     }
 
     const user = await User.findById(userId);
-    if (!user || !(user?.password)) return res.status(404).json({ message: 'User not found' });
+    if (!user || !(user?.password)) return res.status(404).json({ message: 'User not found or its a google login' });
 
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
